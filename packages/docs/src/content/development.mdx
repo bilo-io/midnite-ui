@@ -1,0 +1,65 @@
+---
+title: Contributing
+section: Development
+order: 0
+---
+
+# Contributing
+
+The [midnite-ui repo](https://github.com/bilo-io/midnite-ui) is a
+[moon](https://moonrepo.dev) + [proto](https://moonrepo.dev/proto) + pnpm
+monorepo with three packages:
+
+| Package | What it is |
+| --- | --- |
+| `packages/ui` | `@bilo-io/ui` — the leaf design system (depends on nothing in-repo) |
+| `packages/shell` | `@bilo-io/shell` — the app shell (depends only on `@bilo-io/ui`) |
+| `packages/docs` | this site — a Vite + MDX SPA consuming both libraries |
+
+## Setup
+
+```bash
+git clone https://github.com/bilo-io/midnite-ui.git
+cd midnite-ui
+proto install   # installs the pinned node / pnpm / moon versions
+pnpm install
+```
+
+## Everyday commands
+
+```bash
+moon run :build          # build everything (ui → shell → docs)
+moon run :test           # all test suites (unit + jsdom + Storybook browser tests)
+moon run :typecheck      # tsc --noEmit across the graph
+moon run :lint           # eslint across the graph
+
+moon run docs:dev        # this site, on :5173
+moon run ui:storybook    # component workbench, on :6007
+```
+
+Always go through `moon run` — its dependency graph builds the libraries before
+anything that consumes their `dist/`, and its cache keeps repeat runs fast.
+
+## Package boundaries
+
+The dependency graph is strict and one-way — `ui ← shell ← docs` — and each
+package carries a `boundary.test.ts` that greps its own source and **fails CI**
+if a forbidden workspace import appears. If two packages need to agree on a
+shape, it lives in the lower one.
+
+Other invariants to know:
+
+- `resolveLocale` and the appearance appliers are embedded into pre-paint init
+  scripts via `.toString()` — they must stay self-contained (no module-level
+  references).
+- Shell components hold **no copy**: user-visible strings arrive via labels
+  props (enforced by an ESLint i18n gate on `packages/shell/src/**/*.tsx`).
+- The docs Tailwind config scans both libraries' source for class names; if you
+  add a class in a library, no docs change is needed — but never remove those
+  content globs.
+
+## Releasing
+
+CI (`moon ci`) runs on every PR; pushes to `main` run the full suite and deploy
+this site + Storybook to GitHub Pages. Publishing `@bilo-io/ui` + `@bilo-io/shell`
+to GitHub Packages happens from a GitHub Release (or a manual workflow dispatch).

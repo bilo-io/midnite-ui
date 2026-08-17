@@ -1,0 +1,67 @@
+---
+title: AppFrame
+section: Shell
+order: 0
+---
+
+# AppFrame
+
+`AppFrame` is the wired app chrome: a fixed, route-aware desktop nav rail, a
+phone-width bottom-tab bar, and the padded content region. **This documentation
+site is mounted inside it** — the rail on your left is the live component.
+
+It is deliberately **router-agnostic**: the active route arrives as the
+`activePath` string prop, and links render through an injected `linkComponent`
+(defaults to a plain `<a>`). A Next.js host passes `next/link`; this site passes
+react-router's `Link`.
+
+## Minimal wiring
+
+```tsx
+import { AppFrame, type NavConfig } from '@bilo-io/shell';
+import '@bilo-io/shell/appearance.css';
+
+const nav: NavConfig = {
+  pinned: [{ href: '/', label: 'Dashboard', icon: <Home /> }],
+  sections: [
+    {
+      key: 'app',
+      title: 'App',
+      items: [
+        { href: '/tasks', label: 'Tasks', icon: <ListTodo /> },
+        { href: '/projects', label: 'Projects', icon: <Folder /> },
+      ],
+    },
+  ],
+  brand: ({ expanded }) => (expanded ? <Wordmark /> : <Glyph />),
+  footer: ({ expanded }) => <FooterCluster expanded={expanded} />,
+};
+
+<AppFrame nav={nav} activePath={pathname} linkComponent={Link} navMode="auto">
+  {children}
+</AppFrame>;
+```
+
+## Behaviour
+
+- **`navMode`** — `auto` (default) renders an icon rail that expands on
+  hover/keyboard focus as an overlay; `expanded` / `collapsed` lock the state.
+  Only the locked-open state shifts page content (via the `--nav-offset`
+  custom property the frame publishes). This site locks it `expanded`.
+- **Sections collapse** — a titled section renders a toggle; pass
+  `collapsedSections` + `onToggleSection` to persist the state wherever you like.
+- **Mobile** — below `md` the rail hides and a bottom-tab bar takes over: the
+  first `mobileMaxTabs` (default 4) flattened items become tabs, the rest spill
+  into a `More` sheet. `settings`, `onLock`, `mobileSheet`, and
+  `mobileSettingsAction` extend the sheet.
+- **Slots** — `banner` (full-width strip above content), `headerActions`
+  (right-aligned header cluster), and `titleBar` (see [TitleBar](/shell/title-bar))
+  are all host-mounted; the frame is only the rail + tabs + padded main.
+- **Copy injection** — every visible string (`navLabel`, `sectionToggleLabel`,
+  `mobileLabels`) is a prop with an English default, so a translated host passes
+  its own catalog — the shell owns no copy.
+
+## Active-state matching
+
+`isActivePath(activePath, href)` is exported: `href` matches itself or any
+descendant route (`/x` is active on `/x/y`), with `/` matching only exactly.

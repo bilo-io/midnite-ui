@@ -1,0 +1,46 @@
+---
+title: Locale & i18n
+section: Shell
+order: 4
+---
+
+# Locale & i18n
+
+The shell ships a small locale runtime for hosts using
+[next-intl](https://next-intl.dev) message catalogs. The shell itself carries
+**no copy** — every visible string in its components is an injected-labels prop —
+but it standardises how the active locale is resolved and switched.
+
+## Locale resolution
+
+```ts
+import { resolveLocale, LOCALE_CHANGE_EVENT, localeInitScript } from '@bilo-io/shell';
+
+// stored pref → nearest browser locale → default
+const locale = resolveLocale(stored, navigator.language, codes, 'en-GB');
+```
+
+`resolveLocale` matches a tag exactly (`de-DE`) or by language prefix (`de-AT` →
+`de-DE`). Supported codes: `en-GB` (canonical), `de-DE`, `fr-FR`, `es-ES`.
+
+## Pre-paint init
+
+`localeInitScript` returns an inline `<head>` script that resolves the locale
+before first paint and stamps it on `<html lang>` — it embeds `resolveLocale`'s
+source via `.toString()`, so the init script and the runtime share one
+implementation and can never drift.
+
+## LocaleProvider
+
+```tsx
+import { LocaleProvider } from '@bilo-io/shell';
+
+<LocaleProvider messages={catalogs}>{children}</LocaleProvider>;
+```
+
+Wraps `NextIntlClientProvider`, keeps the active locale in sync with the
+persisted preference, and dispatches the `midnite:locale-change` DOM event
+(`LOCALE_CHANGE_EVENT`) when it changes so out-of-tree listeners can react.
+
+`next-intl` is a **peer dependency** — only hosts that mount `LocaleProvider`
+need it installed with catalogs; everything else in the shell works without it.

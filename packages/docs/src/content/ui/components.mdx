@@ -1,0 +1,56 @@
+---
+title: Components
+section: UI
+order: 0
+---
+
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@bilo-io/ui';
+
+# Components
+
+`@bilo-io/ui` ships generic, framework-agnostic primitives. Everything below is
+rendered live by the installed library — this page imports from `@bilo-io/ui`
+exactly the way your app would.
+
+## Live examples
+
+<Card>
+  <CardHeader>
+    <CardTitle>Buttons</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <Button>Default</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+    </div>
+  </CardContent>
+</Card>
+
+<Card>
+  <CardHeader>
+    <CardTitle>Input</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Input placeholder="Type something…" aria-label="Example input" />
+  </CardContent>
+</Card>
+
+## The catalog
+
+| Group | Components |
+| --- | --- |
+| Actions & forms | `Button`, `Input`, `Textarea`, `Select`, `StyledSelect`, `Switch`, `Tabs`, `Accordion`, `Collapse` |
+| Surfaces | `Card`, `GradientGlow`, `ContextRing` |
+| Data display | `AreaChart`, `RadialGauge`, `MetricDial` |
+| Reading | `ReadingLayout`, `Prose`, `proseComponents`, `TableOfContents` |
+| Backdrops | `NeuroCloudBackground` (the starfield behind this page), `DynamicBackground` |
+| Security | `PasscodePad`, `PasscodeSetupDialog`, `PasscodeUnlockDialog` |
+| Icons | `GithubIcon`, `DiscordIcon`, `GoogleIcon`, `LinearIcon`, `SlackIcon` |
+| Utilities | `cn` (class merge), typed design tokens, `ThemeToggle` |
+
+## Storybook
+
+The full interactive reference — every component, every variant, with a11y checks —
+lives in <a href="./storybook/" target="_blank" rel="noreferrer noopener">Storybook</a>
+(deployed alongside this site; run `moon run ui:storybook` locally).

@@ -1,0 +1,18 @@
+/* The design tokens (HSL custom properties + the .dark block) are the library's,
+ * imported once here; the .dark class is toggled on <html> by @bilo-io/ui/theme. */
+@import '@bilo-io/ui/styles';
+/* Shared highlight.js token palette for fenced code blocks. */
+@import '@bilo-io/ui/code-highlight.css';
+/* The shell's appearance layer (accent/density/motion data-attribute rules) —
+ * imported alongside the tokens exactly as a real host app would. */
+@import '@bilo-io/shell/appearance.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

@@ -1,0 +1,76 @@
+---
+title: Theming & tokens
+section: UI
+order: 1
+---
+
+# Theming & tokens
+
+The design system is token-first: every color is an HSL custom property defined
+in `@bilo-io/ui/styles` (a `:root` block plus a `.dark` override block), and the
+primitives reference them through Tailwind utilities like `bg-background` and
+`text-muted-foreground`.
+
+## The theme runtime
+
+`@bilo-io/ui/theme` exports a small runtime shared by every consumer:
+
+```tsx
+import {
+  ThemeProvider, // wraps the app; toggles .dark on <html>
+  useTheme,      // { preference, resolved, setPreference }
+  themeInitScript, // inline <head> script — applies the stored theme pre-paint
+  THEME_STORAGE_KEY, // 'midnite.theme'
+} from '@bilo-io/ui/theme';
+```
+
+Four preferences are supported: `light`, `dark`, `system` (follows the OS), and
+`time` (light by day, dark by night). The toggle in this site's rail footer is
+built on `useTheme` — try it.
+
+### No-flash first paint
+
+Inject `themeInitScript` (or an inline copy of it) in your document `<head>` so
+the stored preference applies before React hydrates. This site does exactly that
+in its `index.html`.
+
+## Consuming the tokens in Tailwind
+
+The library ships **no compiled utility CSS** — your app's Tailwind build
+generates the classes. Map the tokens in your `tailwind.config`:
+
+```ts
+theme: {
+  extend: {
+    colors: {
+      border: 'hsl(var(--border))',
+      background: 'hsl(var(--background))',
+      foreground: 'hsl(var(--foreground))',
+      primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
+      muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
+      accent: { DEFAULT: 'hsl(var(--accent))', foreground: 'hsl(var(--accent-foreground))' },
+      card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
+      // …plus secondary, destructive, success, popover, input, ring
+    },
+    borderRadius: {
+      lg: 'var(--radius)',
+      md: 'calc(var(--radius) - 2px)',
+      sm: 'calc(var(--radius) - 4px)',
+    },
+  },
+},
+```
+
+And make sure Tailwind **scans the libraries' shipped code** so their class names
+are emitted (see [Getting started](/getting-started)) — missing that glob is the
+classic silent-layout-collapse bug.
+
+## Typed tokens
+
+The same palette is exported as typed constants from `@bilo-io/ui` for use in
+canvas drawing, charts, or anywhere CSS variables can't reach.
+
+## Code highlighting
+
+`@bilo-io/ui/code-highlight.css` provides a highlight.js token palette matched to
+the design tokens — the fenced code blocks on this page use it.

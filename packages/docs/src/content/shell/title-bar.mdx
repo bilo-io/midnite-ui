@@ -1,0 +1,44 @@
+---
+title: TitleBar
+section: Shell
+order: 3
+---
+
+# TitleBar
+
+Desktop window chrome for a **frameless Electron window**: the renderer-drawn
+title bar with a drag strip, traffic-light clearance on macOS, focus dimming,
+and fullscreen collapse.
+
+```tsx
+import { TitleBar, TITLE_BAR_HEIGHT, type WindowChromeBridge } from '@bilo-io/shell';
+
+// Your Electron preload exposes this shape (e.g. at window.myApp.windowChrome):
+declare const bridge: WindowChromeBridge;
+
+<AppFrame titleBar={<TitleBar windowChrome={bridge} />} /* … */ />;
+```
+
+## The bridge contract
+
+`WindowChromeBridge` is a **pure type** — shell performs no IPC. The host's
+preload implements it:
+
+```ts
+type WindowChromeBridge = {
+  platform: 'darwin' | 'win32' | 'linux';
+  frameless: boolean; // false → TitleBar renders nothing (native frame)
+  onFullscreenChange: (handler: (fullscreen: boolean) => void) => () => void;
+  onFocusChange: (handler: (focused: boolean) => void) => () => void;
+  setBackgroundColor: (color: string) => void; // '#rrggbb', match your theme
+};
+```
+
+The bar renders nothing when `windowChrome` is absent or the window is framed,
+and takes `left` / `center` / `right` slots for host controls (all `no-drag`).
+It publishes its height as the `--titlebar-h` custom property, which
+`AppFrame`'s fixed rail uses to offset itself below the bar. `TitleBarDragStrip`
+is exported separately for hosts that need only the draggable region.
+
+In a plain web app, simply don't render a `TitleBar` — nothing else in the shell
+depends on it.

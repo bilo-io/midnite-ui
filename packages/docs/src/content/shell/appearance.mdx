@@ -1,0 +1,57 @@
+---
+title: Appearance runtime
+section: Shell
+order: 1
+---
+
+# Appearance runtime
+
+The appearance runtime is how a host app applies user look-and-feel preferences —
+accent color/gradient, background pattern, density, motion, UI font, visual
+effects, shimmer direction — as `data-*` attributes and CSS custom properties on
+`<html>`, styled by `@bilo-io/shell/appearance.css`.
+
+## The appliers
+
+```ts
+import {
+  applyAccent,          // solid swatch or gradient → --accent custom props
+  applyAccentSecondary, // independent secondary accent channel
+  applyBackground,      // data-bg="starfield" | "grid" | "aurora" | …
+  applyDensity,         // data-density="comfortable" | "compact"
+  applyMotion,          // data-motion="system" | "reduced" | "full"
+  applyUiFont,          // data-font="system" | "grotesk" | "humanist" | "serif" | "mono"
+  applyEffects,         // page reveal / typewriter / frosted glass toggles
+  applyShimmerDirection,
+} from '@bilo-io/shell';
+```
+
+Each applier is a pure DOM write — call them on mount and whenever the user
+changes a preference. Values are plain string unions (no runtime validation);
+the host owns persistence and parsing.
+
+## Accents
+
+An accent is either a **solid** palette swatch or a **gradient** of 1–3 swatches:
+
+```ts
+import { BRAND_ACCENT, coerceAccentValue, accentGradientCss } from '@bilo-io/shell';
+
+// The signature brand gradient (blue → violet → rose, animated):
+applyAccent(BRAND_ACCENT);
+
+// Coerce a legacy persisted value (a bare string like "violet") safely:
+applyAccent(coerceAccentValue(stored, BRAND_ACCENT));
+```
+
+`ACCENT_OPTIONS` and `ACCENT_SWATCH_HS` export the palette (hue + saturation
+only — lightness comes from the active light/dark theme, so contrast holds in
+both).
+
+## Pre-paint init
+
+`appearanceInitScript` returns an inline script for your document `<head>` that
+reads the persisted settings blob (`SETTINGS_STORAGE_KEY` = `midnite.settings`
+in localStorage) and applies everything **before first paint** — no flash of
+default appearance. It embeds the same applier implementations via
+`.toString()`, so the init path and the runtime path can never drift.

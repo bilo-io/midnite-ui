@@ -1,0 +1,42 @@
+---
+title: Overview
+section: Introduction
+order: 0
+---
+
+# midnite ui
+
+**midnite ui** is the design system extracted from [midnite](https://github.com/bilo-io/midnite-app) —
+two React libraries you can install and build an app on:
+
+- **`@bilo-io/ui`** — the leaf design system: ~25 generic primitives (buttons, cards,
+  inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield backdrop)
+  plus HSL design tokens and a light/dark/system/time theme runtime. It depends on
+  nothing but React.
+- **`@bilo-io/shell`** — the wired app shell: `AppFrame` (a route-aware nav rail +
+  mobile bottom tabs + content region with an injected nav config), `LockScreen`
+  (idle timer + passcode unlock), `TitleBar` (frameless desktop window chrome),
+  an appearance runtime (accent gradients, density, motion, background patterns),
+  and a locale provider. It depends only on `@bilo-io/ui`.
+
+## This site is the demo
+
+The page you are reading is rendered inside `@bilo-io/shell`'s `AppFrame` — the rail
+on the left, the mobile tab bar, and the content region you're looking at are the
+shipped components, wired the same way any host app wires them. The typography,
+theme toggle, tokens, and starfield backdrop all come from `@bilo-io/ui`.
+
+## Where to go next
+
+- [Getting started](/getting-started) — install the packages and render your first frame.
+- [Components](/ui/components) — the `@bilo-io/ui` catalog, with the full interactive
+  reference in Storybook.
+- [AppFrame](/shell/app-frame) — wire the shell into your own app.
+- [Contributing](/development) — run this monorepo locally.
+
+## Design principles
+
+Both libraries are **router-agnostic and data-free**: the shell never imports a
+router or fetches anything — the active path, link component, nav config, and all
+visible copy arrive as props. That's the seam that lets the same shell serve a
+Next.js app, a Vite SPA (like this site), or an Electron renderer.

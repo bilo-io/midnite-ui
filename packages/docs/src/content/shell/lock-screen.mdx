@@ -1,0 +1,47 @@
+---
+title: LockScreen
+section: Shell
+order: 2
+---
+
+# LockScreen
+
+A full-viewport lock/screensaver surface on the starfield backdrop, with an
+optional passcode gate — the screensaver from the midnite desktop app, exposed
+as a component.
+
+```tsx
+import { LockScreen, useIdleTimer } from '@bilo-io/shell';
+
+function App() {
+  const [locked, setLocked] = useState(false);
+
+  // Fire after N ms without pointer/key/scroll activity.
+  useIdleTimer(5 * 60_000, () => setLocked(true));
+
+  return (
+    <>
+      {children}
+      {locked ? (
+        <LockScreen
+          requireCode={Boolean(storedPasscode)} // false → any gesture dismisses
+          passcode={storedPasscode}
+          onUnlock={() => setLocked(false)}
+          onDismiss={() => setLocked(false)}
+          labels={lockScreenLabels}             // host-translated copy
+        />
+      ) : null}
+    </>
+  );
+}
+```
+
+- **Everything is injected**: the passcode, the unlock/dismiss handlers, all
+  visible copy (`LockScreenLabels`), the `children` (centre content — a clock,
+  cycling words, status pills) and `corners` (absolutely-positioned widgets)
+  slots, and `animateBackground` (gate it on the visitor's motion preference).
+  The component holds no session or telemetry knowledge.
+- The passcode pad itself (`PasscodePad`, `PasscodeUnlockDialog`,
+  `PasscodeSetupDialog`) lives in `@bilo-io/ui` and can be used standalone.
+- `useIdleTimer(ms, onIdle)` is exported separately — use it for any
+  inactivity-driven behaviour, not just locking.

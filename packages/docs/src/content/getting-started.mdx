@@ -1,0 +1,98 @@
+---
+title: Getting started
+section: Introduction
+order: 1
+---
+
+# Getting started
+
+## Install
+
+The packages are published to **GitHub Packages** under the `@bilo-io` scope.
+GitHub's npm registry requires authentication even for public packages, so you
+need a personal access token with the `read:packages` scope once per machine.
+
+Add the scope registry to your project's `.npmrc`:
+
+```ini
+@bilo-io:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+Then install:
+
+```bash
+pnpm add @bilo-io/ui @bilo-io/shell
+# or: npm install / yarn add
+```
+
+`react` and `react-dom` (v19) are peer dependencies. `@bilo-io/shell` additionally
+peers on `@tanstack/react-query` (for `ShellProviders`) and `next-intl` (for
+`LocaleProvider`) — install them if you use those pieces.
+
+## Wire the theme + tokens
+
+Import the token stylesheet once, wrap your app in the theme provider, and let
+Tailwind generate the utility classes the primitives use:
+
+```tsx
+// main.tsx
+import { ThemeProvider } from '@bilo-io/ui/theme';
+import '@bilo-io/ui/styles'; // the HSL token custom properties + .dark block
+
+createRoot(container).render(
+  <ThemeProvider>
+    <App />
+  </ThemeProvider>,
+);
+```
+
+```ts
+// tailwind.config.ts — scan BOTH your source and the libraries' source so every
+// utility class a primitive references is generated in your build.
+content: [
+  './src/**/*.{ts,tsx}',
+  './node_modules/@bilo-io/ui/dist/**/*.js',
+  './node_modules/@bilo-io/shell/dist/**/*.js',
+],
+```
+
+Map the tokens to Tailwind colors (`background`, `foreground`, `primary`, `muted`,
+`accent`, `card`, …) — see [Theming & tokens](/ui/theming) for the full mapping.
+
+## First components
+
+```tsx
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@bilo-io/ui';
+
+export function Hello() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Hello midnite</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button>Get started</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+## Add the app shell
+
+```tsx
+import { AppFrame } from '@bilo-io/shell';
+import '@bilo-io/shell/appearance.css';
+
+<AppFrame
+  nav={{ sections: [{ title: 'App', items: [{ href: '/', label: 'Home' }] }] }}
+  activePath={pathname}
+  linkComponent={Link} // next/link, react-router Link, or omit for plain <a>
+>
+  {children}
+</AppFrame>;
+```
+
+See [AppFrame](/shell/app-frame) for the full wiring — including the nav config,
+brand/footer slots, and mobile behaviour.
