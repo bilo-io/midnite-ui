@@ -1,0 +1,61 @@
+# GitHub Pages — the docs site (built inside the shell's AppFrame) at the site
+# root, plus ui's Storybook under /storybook/. Deployed with the workflow-based
+# Pages flow (actions/deploy-pages) — no gh-pages branch.
+#
+# One-time repo setup: Settings → Pages → Source: "GitHub Actions" (or
+# `gh api -X POST repos/<owner>/<repo>/pages -f build_type=workflow`).
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One Pages deploy at a time; let a queued newer push supersede a waiting one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build docs + Storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Build the docs site and Storybook
+        run: moon run docs:build ui:build-storybook
+
+      - name: Assemble the Pages tree
+        run: |
+          mkdir -p _site
+          cp -R packages/docs/dist/. _site/
+          mkdir -p _site/storybook
+          cp -R packages/ui/storybook-static/. _site/storybook/
+          # Pages runs Jekyll by default, which drops _-prefixed asset dirs.
+          touch _site/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

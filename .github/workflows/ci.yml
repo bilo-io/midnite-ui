@@ -1,0 +1,41 @@
+# CI — `moon ci` across the graph.
+#
+# PRs run `moon ci --include-relations` so a change in a library also runs its
+# consumers' tasks (without the flag moon picks tasks purely by each task's own
+# input globs). Pushes to main run `moon ci --force`: the full suite, no
+# affected filtering, no cache reuse — a green badge on main means the whole
+# graph passed.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    name: moon ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      # ui's Storybook stories run as Vitest browser tests on chromium.
+      - name: Install Playwright chromium
+        run: pnpm --filter @bilo-io/ui exec playwright install chromium --with-deps
+
+      - name: Run moon ci
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            moon ci --include-relations
+          else
+            moon ci --force
+          fi

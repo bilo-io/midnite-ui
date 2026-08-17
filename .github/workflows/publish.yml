@@ -1,0 +1,51 @@
+# Publish @bilo-io/ui + @bilo-io/shell to GitHub Packages.
+#
+# Runs when a GitHub Release is published (or manually via workflow_dispatch).
+# Auth is the workflow's own GITHUB_TOKEN — no PAT needed to publish; consumers
+# need a read:packages token to install (GitHub Packages requires auth even for
+# public packages).
+name: Publish packages
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup
+
+      - name: Build the libraries
+        run: moon run ui:build shell:build
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > "$HOME/.npmrc" <<EOF
+          @bilo-io:registry=https://npm.pkg.github.com
+          //npm.pkg.github.com/:_authToken=\${NODE_AUTH_TOKEN}
+          EOF
+          # Publish leaf-first; skip a version that is already published so the
+          # workflow is safely re-runnable.
+          for pkg in ui shell; do
+            name=$(node -p "require('./packages/$pkg/package.json').name")
+            version=$(node -p "require('./packages/$pkg/package.json').version")
+            if npm view "$name@$version" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+              echo "$name@$version already published — skipping"
+            else
+              (cd "packages/$pkg" && pnpm publish --no-git-checks)
+            fi
+          done
