@@ -1,0 +1,43 @@
+$schema: 'https://moonrepo.dev/schemas/tasks.json'
+
+fileGroups:
+  sources:
+    - 'src/**/*'
+  configs:
+    - 'tsconfig.json'
+    - 'package.json'
+
+tasks:
+  build:
+    command: 'tsc -b'
+    deps:
+      - 'root:install'
+    inputs:
+      - '@group(sources)'
+      - '@group(configs)'
+    outputs:
+      - 'dist'
+
+  typecheck:
+    command: 'tsc --noEmit'
+    inputs:
+      - '@group(sources)'
+      - '@group(configs)'
+
+  test:
+    command: 'vitest run'
+    inputs:
+      - '@group(sources)'
+      - '@group(configs)'
+
+  lint:
+    command: 'pnpm exec eslint .'
+    inputs:
+      - 'src/**/*'
+      - 'app/**/*'
+      - 'components/**/*'
+      - 'hooks/**/*'
+      - 'lib/**/*'
+      - 'scripts/**/*'
+      - '*.{ts,tsx,cjs,mjs}'
+      - '/eslint.config.mjs'

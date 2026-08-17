@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "composite": false,
+    // Declarations come from vite-plugin-dts (the build), not this tsc (which is
+    // `--noEmit` typecheck only). Turning declaration emit off avoids TS2742 on
+    // portably-unnameable dep realpaths under pnpm — same fix web/ui use.
+    "declaration": false,
+    "declarationMap": false,
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

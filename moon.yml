@@ -1,0 +1,25 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+# The workspace-root project. It exists only to host repo-wide tasks; it has no
+# TypeScript sources of its own, so don't inherit the global build/test/typecheck/
+# lint tasks (those are per-package, defined in .moon/tasks.yml).
+id: 'root'
+language: 'bash'
+layer: 'tool'
+
+workspace:
+  inheritedTasks:
+    exclude:
+      - 'build'
+      - 'test'
+      - 'typecheck'
+      - 'lint'
+
+tasks:
+  # install: ensure workspace deps are up to date before build/dev. Runs once at
+  # the workspace root (a pnpm workspace install covers all packages). Skipped in
+  # CI where the workflow already runs `pnpm install --frozen-lockfile` explicitly.
+  install:
+    command: 'pnpm install'
+    options:
+      cache: false

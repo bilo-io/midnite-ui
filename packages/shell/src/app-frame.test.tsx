@@ -1,0 +1,301 @@
+import { type ReactElement } from 'react';
+import { fireEvent, render as rtlRender, screen, within } from '@testing-library/react';
+import { ThemeProvider } from '@bilo-io/ui/theme';
+import { describe, expect, it, vi } from 'vitest';
+
+import { AppFrame, isActivePath, type NavConfig, type NavLinkComponent } from './app-frame';
+import { MOBILE_MENU_EVENT, type MobileMenuEventDetail } from './nav/mobile-nav';
+
+/** The mobile nav mounts `<ThemeToggle>`, which needs a `ThemeProvider` in scope. */
+const render = (ui: ReactElement) => rtlRender(<ThemeProvider>{ui}</ThemeProvider>);
+
+const NAV: NavConfig = {
+  brand: <span>midnite</span>,
+  sections: [
+    { title: 'Main', items: [{ href: '/', label: 'Board' }, { href: '/sessions', label: 'Sessions' }] },
+    { items: [{ href: '/settings', label: 'Settings', badge: <span>3</span> }] },
+  ],
+  footer: <button type="button">Account</button>,
+};
+
+/** The desktop rail's inner nav landmark — links appear here AND in the mobile nav. */
+const rail = () => within(screen.getByRole('navigation', { name: 'Primary' }));
+const mobile = () => within(screen.getByRole('navigation', { name: 'Mobile navigation' }));
+
+describe('isActivePath', () => {
+  it('matches the exact path and descendants (but not the root for everything)', () => {
+    expect(isActivePath('/sessions', '/sessions')).toBe(true);
+    expect(isActivePath('/sessions/abc', '/sessions')).toBe(true);
+    expect(isActivePath('/sessionsx', '/sessions')).toBe(false);
+    expect(isActivePath('/', '/')).toBe(true);
+    expect(isActivePath('/sessions', '/')).toBe(false);
+  });
+});
+
+describe('AppFrame', () => {
+  it('renders every injected nav item as a rail link, plus brand/footer/section titles', () => {
+    render(
+      <AppFrame nav={NAV} activePath="/sessions">
+        <p>content</p>
+      </AppFrame>,
+    );
+    expect(rail().getByRole('link', { name: 'Board' })).toHaveAttribute('href', '/');
+    expect(rail().getByRole('link', { name: /Sessions/ })).toHaveAttribute('href', '/sessions');
+    expect(rail().getByRole('link', { name: /Settings/ })).toHaveAttribute('href', '/settings');
+    // Brand + footer + the collapsible section header live only in the rail.
+    // At rest (auto mode) the rail is collapsed, so the section title surfaces
+    // as the header button's accessible name (its tooltip only mounts on hover).
+    expect(screen.getByRole('button', { name: 'Main section' })).toBeInTheDocument();
+    expect(screen.getByText('midnite')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByText('content')).toBeInTheDocument();
+  });
+
+  it('marks only the active route with aria-current=page', () => {
+    render(
+      <AppFrame nav={NAV} activePath="/sessions">
+        <p>content</p>
+      </AppFrame>,
+    );
+    expect(rail().getByRole('link', { name: /Sessions/ })).toHaveAttribute('aria-current', 'page');
+    expect(rail().getByRole('link', { name: 'Board' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('renders header actions and a banner in their slots', () => {
+    render(
+      <AppFrame
+        nav={NAV}
+        activePath="/"
+        headerActions={<button type="button">Notify</button>}
+        banner={<div>Update available</div>}
+      >
+        <p>content</p>
+      </AppFrame>,
+    );
+    expect(screen.getByRole('button', { name: 'Notify' })).toBeInTheDocument();
+    expect(screen.getByText('Update available')).toBeInTheDocument();
+  });
+
+  it('routes links through an injected link component', () => {
+    const Link: NavLinkComponent = ({ href, children, ...rest }) => (
+      <a data-custom href={href} {...rest}>
+        {children}
+      </a>
+    );
+    render(
+      <AppFrame nav={NAV} activePath="/" linkComponent={Link}>
+        <p>content</p>
+      </AppFrame>,
+    );
+    expect(rail().getByRole('link', { name: 'Board' })).toHaveAttribute('data-custom');
+  });
+
+  it('accepts render-prop brand/footer slots and hands them { expanded }', () => {
+    render(
+      <AppFrame
+        nav={{
+          sections: [],
+          brand: ({ expanded }) => <span>brand:{expanded ? 'open' : 'rail'}</span>,
+          footer: ({ expanded }) => <span>footer:{expanded ? 'open' : 'rail'}</span>,
+        }}
+        activePath="/"
+        navMode="expanded"
+      >
+        <p>content</p>
+      </AppFrame>,
+    );
+    expect(screen.getByText('brand:open')).toBeInTheDocument();
+    expect(screen.getByText('footer:open')).toBeInTheDocument();
+  });
+
+  describe('collapsible sections', () => {
+    const KEYED: NavConfig = {
+      sections: [
+        { key: 'app', title: 'App', items: [{ href: '/board', label: 'Board' }] },
+        { key: 'agents', title: 'Agents', items: [{ href: '/agents', label: 'Agents' }] },
+      ],
+    };
+
+    it('toggles a section via onToggleSection with its key (expanded view)', () => {
+      const onToggleSection = vi.fn();
+      render(
+        <AppFrame nav={KEYED} activePath="/" navMode="expanded" onToggleSection={onToggleSection}>
+          <p>content</p>
+        </AppFrame>,
+      );
+      fireEvent.click(screen.getByRole('button', { name: /App/ }));
+      expect(onToggleSection).toHaveBeenCalledWith('app');
+    });
+
+    it('falls back to the section index when a section has no key', () => {
+      const onToggleSection = vi.fn();
+      render(
+        <AppFrame nav={NAV} activePath="/" navMode="expanded" onToggleSection={onToggleSection}>
+          <p>content</p>
+        </AppFrame>,
+      );
+      fireEvent.click(screen.getByRole('button', { name: /Main/ }));
+      expect(onToggleSection).toHaveBeenCalledWith('0');
+    });
+
+    it('renders section headers as icon buttons with tooltips when collapsed (navMode)', () => {
+      render(
+        <AppFrame nav={KEYED} activePath="/" navMode="collapsed">
+          <p>content</p>
+        </AppFrame>,
+      );
+      // Collapsed rail: the header is an icon button with an aria-label, and every
+      // rail control carries a hover tooltip instead of an inline label. Tooltips
+      // portal to <body> (the nav list is a scroll container that would clip
+      // them) and only mount while their control is hovered/focused.
+      expect(rail().getByRole('button', { name: 'App section' })).toBeInTheDocument();
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      const link = rail().getByRole('link', { name: 'Board' });
+      fireEvent.mouseEnter(link);
+      expect(screen.getByRole('tooltip')).toHaveTextContent('Board');
+      fireEvent.mouseLeave(link);
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    });
+
+    it('renders section headers as text with the title when expanded (navMode)', () => {
+      render(
+        <AppFrame nav={KEYED} activePath="/" navMode="expanded">
+          <p>content</p>
+        </AppFrame>,
+      );
+      const header = screen.getByRole('button', { name: /App/ });
+      expect(within(header).getByText('App')).toBeInTheDocument();
+      expect(screen.queryAllByRole('tooltip')).toHaveLength(0);
+    });
+  });
+
+  describe('mobile nav', () => {
+    const SIX: NavConfig = {
+      pinned: [{ href: '/', label: 'Home' }],
+      sections: [
+        { title: 'A', items: [{ href: '/a', label: 'Alpha' }, { href: '/b', label: 'Bravo' }] },
+        { title: 'B', items: [{ href: '/c', label: 'Charlie' }, { href: '/d', label: 'Delta' }, { href: '/e', label: 'Echo' }] },
+      ],
+    };
+
+    it('renders the first N flattened items as tabs and spills the rest into the More sheet', () => {
+      render(
+        <AppFrame nav={SIX} activePath="/" mobileMaxTabs={4}>
+          <p>content</p>
+        </AppFrame>,
+      );
+      // Flatten order = pinned + section items → [Home, Alpha, Bravo, Charlie, Delta, Echo].
+      // First 4 are tabs; the More button + the last 2 spill into the sheet.
+      expect(mobile().getByRole('link', { name: 'Home' })).toBeInTheDocument();
+      expect(mobile().getByRole('link', { name: 'Charlie' })).toBeInTheDocument();
+      expect(mobile().getByRole('button', { name: 'Menu' })).toBeInTheDocument();
+      // Overflow items are not tabs; they live in the dialog sheet.
+      expect(mobile().queryByRole('link', { name: 'Delta' })).not.toBeInTheDocument();
+      // Open the sheet so its contents enter the accessibility tree (closed = aria-hidden).
+      fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+      const sheet = within(screen.getByRole('dialog', { name: 'Menu' }));
+      expect(sheet.getByRole('link', { name: 'Delta' })).toBeInTheDocument();
+      expect(sheet.getByRole('link', { name: 'Echo' })).toBeInTheDocument();
+    });
+
+    it('renders Settings directly above the Lock button in the More sheet', () => {
+      const onLock = vi.fn();
+      render(
+        <AppFrame
+          nav={SIX}
+          activePath="/"
+          settings={{ href: '/settings', label: 'Settings' }}
+          onLock={onLock}
+        >
+          <p>content</p>
+        </AppFrame>,
+      );
+      fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+      const sheet = within(screen.getByRole('dialog', { name: 'Menu' }));
+      const settings = sheet.getByRole('link', { name: 'Settings' });
+      const lock = sheet.getByRole('button', { name: /Lock/ });
+      expect(settings).toBeInTheDocument();
+      expect(lock).toBeInTheDocument();
+
+      // Settings sits below the destination grid and above the theme/lock row —
+      // it used to be a tile *in* the grid. DOCUMENT_POSITION_FOLLOWING means
+      // `lock` comes after `settings` in document order.
+      expect(settings.compareDocumentPosition(lock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      const grid = screen.getByRole('dialog', { name: 'Menu' }).querySelector('.grid');
+      expect(grid?.contains(settings)).toBe(false);
+    });
+
+    it('puts the host settings action beside Settings, directly above the Lock button', () => {
+      render(
+        <AppFrame
+          nav={SIX}
+          activePath="/"
+          settings={{ href: '/settings', label: 'Settings' }}
+          onLock={vi.fn()}
+          mobileSettingsAction={<button type="button">Language</button>}
+        >
+          <p>content</p>
+        </AppFrame>,
+      );
+      fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+      const dialog = screen.getByRole('dialog', { name: 'Menu' });
+      const action = within(dialog).getByRole('button', { name: 'Language' });
+      const settings = within(dialog).getByRole('link', { name: 'Settings' });
+      const lock = within(dialog).getByRole('button', { name: /Lock/ });
+
+      // Same row as Settings (it used to be a tile in the grid above), and above
+      // the lock — so the sheet's right-hand column reads language → lock.
+      expect(dialog.querySelector('.grid')?.contains(action)).toBe(false);
+      expect(action.parentElement).toBe(settings.parentElement);
+      expect(action.compareDocumentPosition(lock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('broadcasts the More sheet state so host floating affordances can step aside', () => {
+      const seen: boolean[] = [];
+      const onMenu = (e: Event) => seen.push((e as CustomEvent<MobileMenuEventDetail>).detail.open);
+      window.addEventListener(MOBILE_MENU_EVENT, onMenu);
+      try {
+        const { unmount } = render(
+          <AppFrame nav={SIX} activePath="/">
+            <p>content</p>
+          </AppFrame>,
+        );
+        // Mount announces the closed sheet, so a late listener still knows.
+        expect(seen).toEqual([false]);
+
+        fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+        expect(seen.at(-1)).toBe(true);
+
+        fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+        expect(seen.at(-1)).toBe(false);
+
+        // Reopen, then drop the frame: the retraction on unmount is what stops an
+        // open sheet from leaving the FAB hidden for good.
+        fireEvent.click(mobile().getByRole('button', { name: 'Menu' }));
+        expect(seen.at(-1)).toBe(true);
+        unmount();
+        expect(seen.at(-1)).toBe(false);
+      } finally {
+        window.removeEventListener(MOBILE_MENU_EVENT, onMenu);
+      }
+    });
+
+    it('shows an unread dot on the More button when mobileUnread > 0', () => {
+      const { rerender } = render(
+        <AppFrame nav={SIX} activePath="/" mobileUnread={0}>
+          <p>content</p>
+        </AppFrame>,
+      );
+      const dotSelector = 'button[aria-label="Menu"] span.bg-destructive';
+      expect(document.querySelector(dotSelector)).toBeNull();
+      rerender(
+        <ThemeProvider>
+          <AppFrame nav={SIX} activePath="/" mobileUnread={3}>
+            <p>content</p>
+          </AppFrame>
+        </ThemeProvider>,
+      );
+      expect(document.querySelector(dotSelector)).not.toBeNull();
+    });
+  });
+});

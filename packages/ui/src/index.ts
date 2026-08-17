@@ -1,0 +1,70 @@
+// @bilo-io/ui — the reusable component library + design system.
+//
+// Phase 25 Theme A stood up the package + Vite build; Theme B moves in the design
+// tokens (here) + the theme runtime (`@bilo-io/ui/theme`) + the token CSS
+// (`@bilo-io/ui/styles`). The generic primitives (button, card, input, …) migrate
+// from packages/web/components/ui in Theme C.
+
+export { cn } from './lib/cn';
+
+// Typed design tokens (the TS mirror of `@bilo-io/ui/styles`).
+export * from './tokens';
+
+// Generic UI primitives (Phase 25 Theme C).
+export { Accordion } from './components/accordion';
+export { Button, buttonVariants, type ButtonProps } from './components/button';
+export { Card, CardHeader, CardTitle, CardContent } from './components/card';
+export { Collapse } from './components/collapse';
+export { ContextRing, type ContextRingLabels } from './components/context-ring';
+export { DynamicBackground, type BackgroundPattern } from './components/dynamic-background';
+export { DiscordIcon, GoogleIcon, LinearIcon, SlackIcon } from './components/brand-icons';
+export { GithubIcon } from './components/github-icon';
+export {
+  GradientGlow,
+  type GradientGlowProps,
+  type GradientGlowTrigger,
+} from './components/gradient-glow';
+export { Input, type InputProps } from './components/input';
+export { NeuroCloudBackground } from './components/neuro-cloud-background';
+export {
+  PasscodePad,
+  PasscodeSetupDialog,
+  PasscodeUnlockDialog,
+  PASSCODE_LENGTH,
+  type PasscodePadLabels,
+} from './components/passcode-pad';
+export { RadialGauge, type RadialGaugeLabels } from './components/radial-gauge';
+export { MetricDial } from './components/metric-dial';
+// The shared reading face (Phase 80 A) — consumed by `docs` and the site's legal pages.
+export {
+  ReadingLayout,
+  ReadingLayoutProvider,
+  useReadingLink,
+  Prose,
+  proseComponents,
+  TableOfContents,
+  collectHeadings,
+  READING_ARTICLE_ATTR,
+  extractText,
+  slugify,
+  claimSlug,
+  type ReadingLayoutProps,
+  type ReadingLinkComponent,
+  type ReadingLinkProps,
+  type TableOfContentsProps,
+  type TocEntry,
+  type SlugRegistry,
+} from './components/reading';
+export { AreaChart, LegendDot, CHART_W, CHART_H, type ChartSeries } from './components/system-chart';
+export {
+  RailShell,
+  RailFloatingToggle,
+  RailHeaderToggle,
+  type RailConfig,
+} from './components/rail-shell';
+export { Select, type SelectOption } from './components/select';
+export { StyledSelect, ModelComboSelect } from './components/styled-select';
+export { Switch } from './components/switch';
+export { Tabs, type TabOption } from './components/tabs';
+export { ThemeToggle, type ThemeToggleLabels } from './components/theme-toggle';
+export { Textarea, type TextareaProps } from './components/textarea';

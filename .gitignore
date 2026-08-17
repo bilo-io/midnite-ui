@@ -1,0 +1,33 @@
+node_modules/
+dist/
+build/
+out/
+.moon/cache/
+.moon/docker/
+*.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Storybook
+storybook-static/
+*storybook.log
+
+# Git worktrees: parallel-agent checkouts live in the repo-root .worktrees/ dir (never committed)
+.worktrees/
+
+# Claude Code: machine-local settings (never committed)
+.claude/settings.local.json

@@ -1,0 +1,84 @@
+// @bilo-io/shell — the wired app shell host apps mount.
+//
+// A mid-tier package: it may depend on `@bilo-io/ui` only (react/react-dom/
+// react-query are peers). The leaf-visual primitives live in `@bilo-io/ui`; the
+// wired frame lives here. Consumers also import the appearance CSS layer via the
+// `@bilo-io/shell/appearance.css` subpath.
+
+// App frame — the injected-nav shell chrome (fixed rail + mobile nav + padded main).
+export {
+  AppFrame,
+  isActivePath,
+  type AppFrameProps,
+  type NavConfig,
+  type NavItem,
+  type NavSection,
+  type NavLinkComponent,
+  type RailSlot,
+  type RailSlotContext,
+} from './app-frame';
+
+// Mobile bottom-tab nav — rendered internally by `AppFrame`, exported for typing.
+// `MOBILE_MENU_EVENT` lets the host's floating affordances step aside while the
+// `More` sheet is open (see the FAB in `web`).
+export {
+  AppMobileNav,
+  MOBILE_MENU_EVENT,
+  type AppMobileNavProps,
+  type AppMobileNavLabels,
+  type MobileMenuEventDetail,
+} from './nav/mobile-nav';
+
+// Desktop title bar (Phase 81) — app-drawn chrome for the frameless Electron
+// window; slots are the host's, behaviours (drag/clearance/dim) live here.
+export { TitleBar, TitleBarDragStrip, TITLE_BAR_HEIGHT, type TitleBarProps } from './title-bar';
+
+// Lock screen — the reusable idle/login lock on the neuro-cloud starfield.
+export { LockScreen, type LockScreenProps, type LockScreenLabels } from './lock/lock-screen';
+export { useIdleTimer } from './lock/use-idle-timer';
+
+// Provider composition — the app-agnostic frame-level provider stack.
+export { ShellProviders, type ShellProvidersProps } from './providers/shell-providers';
+
+// i18n runtime (Phase 79 Theme B) — the locale provider + pre-paint init script
+// both `web` and `admin` mount. Catalogs are supplied by the host (they live in
+// the app, not shell); this owns locale resolution + reactivity.
+export {
+  LocaleProvider,
+  LOCALE_CHANGE_EVENT,
+  type LocaleProviderProps,
+  type LocaleMessages,
+} from './i18n/locale-provider';
+export { localeInitScript } from './i18n/locale-init-script';
+
+// Appearance runtime — the Phase 39/68 appliers + init script (drives the CSS in
+// `@bilo-io/shell/appearance.css`).
+export {
+  coerceAccentValue,
+  buildAccentCssParts,
+  applyAccent,
+  applyAccentSecondary,
+  accentGradientCss,
+  applyMotion,
+  applyDensity,
+  applyBackground,
+  applyUiFont,
+  applyEffects,
+  applyShimmerDirection,
+  appearanceInitScript,
+  type AccentCssParts,
+} from './appearance/apply-appearance';
+
+// Appearance constants (owned here; `web/lib/app-settings` re-exports them).
+export {
+  SETTINGS_STORAGE_KEY,
+  ACCENT_OPTIONS,
+  ACCENT_SWATCH_HS,
+  MONO_HUE_SHIFT,
+  BACKGROUND_PATTERN_OPTIONS,
+  DEFAULT_EFFECTS,
+  UI_FONT_STACK,
+  BG_INTENSITY_DEFAULT,
+  BACKGROUND_PATTERN_DEFAULT,
+  BRAND_ACCENT,
+} from './appearance/constants';
