@@ -12,6 +12,12 @@ const config: StorybookConfig = {
   framework: { name: '@storybook/react-vite', options: {} },
   stories: ['../src/**/*.stories.tsx', '../src/**/*.mdx'],
   addons: ['@storybook/addon-a11y', '@storybook/addon-vitest', '@storybook/addon-docs'],
+  // The agent marks as linkable files (/storybook/agents/claude.svg), and the
+  // brand font for the manager's wordmark (manager-head.html).
+  staticDirs: [
+    { from: '../assets/agents', to: '/agents' },
+    { from: '../src/styles/brand', to: '/brand' },
+  ],
 };
 
 export default config;

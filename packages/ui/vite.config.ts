@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
+import { copyFileSync, cpSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
@@ -31,6 +31,12 @@ function copyStylesheets() {
       mkdirSync(r('dist'), { recursive: true });
       copyFileSync(r('src/styles/tokens.css'), r('dist/tokens.css'));
       copyFileSync(r('src/styles/code-highlight.css'), r('dist/code-highlight.css'));
+      // The brand kit: the stylesheet plus the font + crescent it references by
+      // relative url, so a consumer's bundler resolves them from dist/brand/.
+      copyFileSync(r('src/styles/brand.css'), r('dist/brand.css'));
+      cpSync(r('src/styles/brand'), r('dist/brand'), { recursive: true });
+      // The agent marks as files, for consumers that link rather than import.
+      cpSync(r('assets/agents'), r('dist/agents'), { recursive: true });
     },
   };
 }

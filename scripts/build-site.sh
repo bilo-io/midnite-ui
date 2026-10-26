@@ -20,3 +20,6 @@ mkdir -p _site/showcase _site/storybook
 cp -R packages/docs/dist/. _site/
 cp -R packages/showcase/dist/. _site/showcase/
 cp -R packages/ui/storybook-static/. _site/storybook/
+# The agent marks, linkable from anywhere at /agents/<name>.svg.
+mkdir -p _site/agents
+cp -R packages/ui/assets/agents/. _site/agents/

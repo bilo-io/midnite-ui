@@ -46,6 +46,8 @@ jobs:
           cp -R packages/showcase/dist/. _site/showcase/
           mkdir -p _site/storybook
           cp -R packages/ui/storybook-static/. _site/storybook/
+          mkdir -p _site/agents
+          cp -R packages/ui/assets/agents/. _site/agents/
           # Pages runs Jekyll by default, which drops _-prefixed asset dirs.
           touch _site/.nojekyll
 

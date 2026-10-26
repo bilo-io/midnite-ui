@@ -3,6 +3,8 @@
 @import '@bilo-io/ui/styles';
 /* Shared highlight.js token palette for fenced code blocks. */
 @import '@bilo-io/ui/code-highlight.css';
+/* The wordmark's face, rainbow ramp and crescent. */
+@import '@bilo-io/ui/brand.css';
 /* The shell's appearance layer (accent/density/motion data-attribute rules) —
  * imported alongside the tokens exactly as a real host app would. */
 @import '@bilo-io/shell/appearance.css';

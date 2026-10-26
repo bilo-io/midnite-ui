@@ -25,10 +25,17 @@
       "default": "./dist/theme.js"
     },
     "./styles": "./dist/tokens.css",
-    "./code-highlight.css": "./dist/code-highlight.css"
+    "./code-highlight.css": "./dist/code-highlight.css",
+    "./brand.css": "./dist/brand.css",
+    "./brand/*": "./dist/brand/*",
+    "./agents/*": "./dist/agents/*"
   },
-  "sideEffects": ["**/*.css"],
-  "files": ["dist"],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit",

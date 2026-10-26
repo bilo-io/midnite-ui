@@ -12,11 +12,28 @@ export * from './tokens';
 
 // Generic UI primitives (Phase 25 Theme C).
 export { Accordion } from './components/accordion';
+export {
+  AgentIcon,
+  AGENT_IDS,
+  agentColor,
+  agentFiles,
+  agentName,
+  type AgentIconProps,
+  type AgentIconVariant,
+  type AgentId,
+} from './components/agent-icon';
 export { Button, buttonVariants, type ButtonProps } from './components/button';
 export { Card, CardHeader, CardTitle, CardContent } from './components/card';
 export { Collapse } from './components/collapse';
 export { ContextRing, type ContextRingLabels } from './components/context-ring';
 export { DynamicBackground, type BackgroundPattern } from './components/dynamic-background';
+export {
+  MidniteLogo,
+  Wordmark,
+  type MidniteLogoProps,
+  type WordmarkProps,
+  type WordmarkTone,
+} from './components/brand';
 export { DiscordIcon, GoogleIcon, LinearIcon, SlackIcon } from './components/brand-icons';
 export { GithubIcon } from './components/github-icon';
 export {
@@ -55,7 +72,13 @@ export {
   type TocEntry,
   type SlugRegistry,
 } from './components/reading';
-export { AreaChart, LegendDot, CHART_W, CHART_H, type ChartSeries } from './components/system-chart';
+export {
+  AreaChart,
+  LegendDot,
+  CHART_W,
+  CHART_H,
+  type ChartSeries,
+} from './components/system-chart';
 export {
   RailShell,
   RailFloatingToggle,

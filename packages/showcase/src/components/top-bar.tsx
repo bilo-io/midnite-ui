@@ -1,6 +1,6 @@
-import { BookOpen, Menu, Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 
-import { GithubIcon, ThemeToggle } from '@bilo-io/ui';
+import { GithubIcon, MidniteLogo, ThemeToggle } from '@bilo-io/ui';
 
 import { hrefFor } from '../router';
 
@@ -12,8 +12,8 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
 
 export function TopBar({ onSearch, onMenu }: { onSearch: () => void; onMenu: () => void }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-3 px-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-[1400px] items-center gap-4 px-4 sm:px-6">
         <button
           type="button"
           aria-label="Open navigation"
@@ -24,12 +24,10 @@ export function TopBar({ onSearch, onMenu }: { onSearch: () => void; onMenu: () 
         </button>
         <a
           href={hrefFor({ page: 'home' })}
-          className="flex shrink-0 items-center gap-2 whitespace-nowrap font-semibold tracking-tight"
+          aria-label="Midnite UI showcase"
+          className="flex shrink-0 items-center gap-3 rounded-md transition hover:opacity-80"
         >
-          <span aria-hidden className="text-lg">
-            🌒
-          </span>
-          <span>midnite ui</span>
+          <MidniteLogo product="UI" className="text-[0.95rem] tracking-tight" />
           <span className="hidden rounded-full border border-border/60 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground min-[420px]:inline">
             showcase
           </span>
@@ -38,7 +36,7 @@ export function TopBar({ onSearch, onMenu }: { onSearch: () => void; onMenu: () 
         <button
           type="button"
           onClick={onSearch}
-          className="mx-auto hidden h-9 w-full max-w-sm items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:flex"
+          className="mx-auto hidden h-9 w-full max-w-sm items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-4 text-sm text-muted-foreground transition-colors hover:border-border hover:text-foreground sm:flex"
         >
           <Search className="h-4 w-4" />
           <span>Search components…</span>
@@ -47,7 +45,7 @@ export function TopBar({ onSearch, onMenu }: { onSearch: () => void; onMenu: () 
           </kbd>
         </button>
 
-        <nav className="ml-auto flex items-center gap-1 sm:ml-0">
+        <nav className="ml-auto flex items-center gap-2 sm:ml-0">
           <button
             type="button"
             aria-label="Search components"
@@ -56,18 +54,20 @@ export function TopBar({ onSearch, onMenu }: { onSearch: () => void; onMenu: () 
           >
             <Search className="h-4 w-4" />
           </button>
-          <a
-            href={DOCS_URL}
-            className="hidden h-9 items-center gap-1.5 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:inline-flex"
-          >
-            <BookOpen className="h-4 w-4" /> Docs
-          </a>
-          <a
-            href={STORYBOOK_URL}
-            className="hidden h-9 items-center rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:inline-flex"
-          >
-            Storybook
-          </a>
+          <div className="hidden items-center gap-6 px-2 md:flex">
+            <a
+              href={DOCS_URL}
+              className="showcase-nav-tab text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Docs
+            </a>
+            <a
+              href={STORYBOOK_URL}
+              className="showcase-nav-tab text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Storybook
+            </a>
+          </div>
           <a
             href={REPO_URL}
             aria-label="GitHub repository"

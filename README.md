@@ -5,6 +5,8 @@ React primitives + design tokens, and a wired app shell — as installable packa
 
 **Docs:** https://bilo-io.github.io/midnite-ui/ · **Showcase:** https://bilo-io.github.io/midnite-ui/showcase/ · **Storybook:** https://bilo-io.github.io/midnite-ui/storybook/
 
+**Agent logos:** every coding-agent mark as a linkable SVG at `https://bilo-io.github.io/midnite-ui/agents/<name>.svg` (e.g. [`claude-color.svg`](https://bilo-io.github.io/midnite-ui/agents/claude-color.svg)); the files live in [`packages/ui/assets/agents/`](packages/ui/assets/agents/) and render as `<AgentIcon agent="claude" />`.
+
 | Package | What it is |
 | --- | --- |
 | [`@bilo-io/ui`](packages/ui) | Leaf design system: ~25 generic React primitives (buttons, cards, inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield) + HSL design tokens + a light/dark/system/time theme runtime. Depends on nothing but React. |

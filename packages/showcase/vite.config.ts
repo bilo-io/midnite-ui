@@ -9,5 +9,8 @@ export default defineConfig({
   // Deterministic ports, one past docs' so both can run at once.
   server: { port: 5174, strictPort: true },
   preview: { port: 4174, strictPort: true },
+  // The library's agent marks, served at ./agents/ so the published-files example
+  // renders in dev as on the deployed site.
+  publicDir: '../ui/assets',
   plugins: [react()],
 });
