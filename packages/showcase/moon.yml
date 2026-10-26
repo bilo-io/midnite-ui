@@ -1,0 +1,73 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+language: 'typescript'
+
+# The showcase is a pure consumer of @bilo-io/ui: a searchable gallery of every
+# component, each with live examples whose shown source is the file that renders
+# them. It depends on nothing else — enforced by src/boundary.test.ts. Built with Vite (an SPA), so build/dev/
+# preview override the repo's default `tsc -b` build.
+dependsOn:
+  - 'ui'
+
+tasks:
+  dev:
+    command: 'pnpm exec vite'
+    preset: 'server'
+    # Vite resolves @bilo-io/ui to its built dist/, so build first.
+    deps:
+      - 'root:install'
+      - '^:build'
+
+  build:
+    command: 'pnpm exec vite build'
+    # The bundle imports the built lib (dist/ + token CSS), so build it first.
+    deps:
+      - 'root:install'
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'index.html'
+      - 'vite.config.ts'
+      - 'tailwind.config.ts'
+      - 'postcss.config.mjs'
+      - 'tsconfig.json'
+    outputs:
+      - 'dist'
+
+  preview:
+    command: 'pnpm exec vite preview'
+    preset: 'server'
+    deps:
+      - '^:build'
+
+  typecheck:
+    command: 'pnpm exec tsc --noEmit'
+    # tsc resolves the lib via its dist .d.ts, so build it first.
+    deps:
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'tailwind.config.ts'
+      - 'tsconfig.json'
+
+  test:
+    command: 'pnpm exec vitest run'
+    # RTL tests import the built lib (dist), so build upstream deps first.
+    deps:
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'vitest.setup.ts'
+
+  lint:
+    command: 'pnpm exec eslint .'
+    inputs:
+      - 'src/**/*'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'tailwind.config.ts'
+      - 'postcss.config.mjs'
+      - '/eslint.config.mjs'

@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // A bundled Vite app, not a `tsc -b` library: no declaration/composite emit,
+    // and `tsc` runs only as `--noEmit` typecheck (the `typecheck` task).
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  // Same split as docs: vite/vitest configs are left to vite at runtime, because
+  // vitest/config's bundled vite (v7) types clash with the app's vite (v6).
+  "include": ["src/**/*", "vitest.setup.ts"],
+  "exclude": ["dist", "node_modules"]
+}
