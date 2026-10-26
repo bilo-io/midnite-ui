@@ -3,13 +3,14 @@
 The design system extracted from [midnite](https://github.com/bilo-io/midnite-app):
 React primitives + design tokens, and a wired app shell — as installable packages.
 
-**Docs:** https://bilo-io.github.io/midnite-ui/ · **Storybook:** https://bilo-io.github.io/midnite-ui/storybook/
+**Docs:** https://bilo-io.github.io/midnite-ui/ · **Showcase:** https://bilo-io.github.io/midnite-ui/showcase/ · **Storybook:** https://bilo-io.github.io/midnite-ui/storybook/
 
 | Package | What it is |
 | --- | --- |
 | [`@bilo-io/ui`](packages/ui) | Leaf design system: ~25 generic React primitives (buttons, cards, inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield) + HSL design tokens + a light/dark/system/time theme runtime. Depends on nothing but React. |
 | [`@bilo-io/shell`](packages/shell) | The wired app shell: `AppFrame` (route-aware nav rail + mobile tabs + content region), `LockScreen`, `TitleBar` (frameless desktop chrome), an appearance runtime (accent gradients, density, motion, backgrounds), and a locale provider. Depends only on `@bilo-io/ui`. |
 | [`packages/docs`](packages/docs) | The documentation site — a Vite + MDX SPA **mounted inside the shell's `AppFrame`**, deployed to GitHub Pages. |
+| [`packages/showcase`](packages/showcase) | The component showcase — a searchable Vite SPA with a live example, its source and a props table for every `@bilo-io/ui` component, deployed under `/showcase/`. |
 
 ## Install
 
@@ -107,7 +108,7 @@ by a `boundary.test.ts` in each package.
 ## Releasing
 
 - **CI** (`.github/workflows/ci.yml`) runs `moon ci` on every PR and push to main.
-- **Pages** (`pages.yml`) deploys the docs site + Storybook on every push to main.
+- **Pages** (`pages.yml`) deploys the docs site, the showcase and Storybook on every push to main.
 - **Publish** (`publish.yml`) publishes both libraries to GitHub Packages when a
   GitHub Release is published (or via manual dispatch).
 

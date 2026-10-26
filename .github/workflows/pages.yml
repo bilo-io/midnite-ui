@@ -1,5 +1,6 @@
 # GitHub Pages — the docs site (built inside the shell's AppFrame) at the site
-# root, plus ui's Storybook under /storybook/. Deployed with the workflow-based
+# root, the component showcase under /showcase/, plus ui's Storybook under
+# /storybook/. Deployed with the workflow-based
 # Pages flow (actions/deploy-pages) — no gh-pages branch.
 #
 # One-time repo setup: Settings → Pages → Source: "GitHub Actions" (or
@@ -23,7 +24,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build docs + Storybook
+    name: Build docs + showcase + Storybook
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -33,13 +34,16 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Build the docs site and Storybook
-        run: moon run docs:build ui:build-storybook
+      - name: Build the docs site, the showcase and Storybook
+        run: moon run docs:build showcase:build ui:build-storybook
 
+      # Same layout as scripts/build-site.sh, the Vercel build; keep the two in step.
       - name: Assemble the Pages tree
         run: |
           mkdir -p _site
           cp -R packages/docs/dist/. _site/
+          mkdir -p _site/showcase
+          cp -R packages/showcase/dist/. _site/showcase/
           mkdir -p _site/storybook
           cp -R packages/ui/storybook-static/. _site/storybook/
           # Pages runs Jekyll by default, which drops _-prefixed asset dirs.

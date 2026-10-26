@@ -31,3 +31,7 @@ storybook-static/
 
 # Claude Code: machine-local settings (never committed)
 .claude/settings.local.json
+
+# The assembled public site (scripts/build-site.sh) and the Vercel CLI link
+_site/
+.vercel/

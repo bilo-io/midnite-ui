@@ -1,0 +1,37 @@
+/* The design tokens (HSL custom properties + the .dark block) are the library's,
+ * imported once here; the .dark class is toggled on <html> by @bilo-io/ui/theme. */
+@import '@bilo-io/ui/styles';
+/* Shared highlight.js token palette for the code panels. */
+@import '@bilo-io/ui/code-highlight.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family:
+      'Inter',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  code,
+  kbd,
+  pre {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+}
+
+@layer components {
+  /* The stage every live preview sits on: a faint dot grid on the page tone. */
+  .showcase-canvas {
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+}
