@@ -1,7 +1,7 @@
 import { useId, type SVGProps } from 'react';
 
 import { cn } from '../lib/cn';
-import { AGENT_ICON_DATA } from './agent-icons.generated';
+import { AGENT_ICON_DATA, type AgentIconData } from './agent-icons.generated';
 
 export type AgentId = keyof typeof AGENT_ICON_DATA;
 
@@ -13,7 +13,7 @@ export const agentName = (id: AgentId): string => AGENT_ICON_DATA[id].name;
 
 /** The brand colour of an agent, or `undefined` when it has no single one (monochrome brands, antigravity's multicolour art). */
 export const agentColor = (id: AgentId): string | undefined =>
-  'color' in AGENT_ICON_DATA[id] ? (AGENT_ICON_DATA[id] as { color: string }).color : undefined;
+  (AGENT_ICON_DATA[id] as AgentIconData).color;
 
 /**
  * Every file name (without `.svg`) published for an agent under `/agents/` —
@@ -49,12 +49,7 @@ export function AgentIcon({
   className,
   ...props
 }: AgentIconProps) {
-  const data = AGENT_ICON_DATA[agent] as {
-    name: string;
-    color?: string;
-    mono: string;
-    art?: string;
-  };
+  const data: AgentIconData = AGENT_ICON_DATA[agent];
   // Ids inside an inline svg are document-global; scope the artwork's mask and
   // filter ids so two copies on one page do not resolve against each other.
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');

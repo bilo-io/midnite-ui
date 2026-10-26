@@ -66,11 +66,22 @@
   letter-spacing: 0.025em;
 }
 
-/* The qualifier ("UI", "Studio") stays in the UI face, one muted step back. */
+/* The qualifier ("UI", "Studio") stays in the UI face; beside the rainbow it
+   sits one muted step back, under `tone="inherit"` it takes the parent paint. */
 .mui-wordmark-product {
   margin-left: 0.08em;
   font-weight: 500;
+}
+
+.mui-wordmark-muted {
   color: hsl(var(--muted-foreground));
+}
+
+/* <MidniteLogo>: the crescent beside the wordmark. */
+.mui-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
 }
 
 /* The ramp clipped to the glyphs, drifting slowly. `drop-shadow`, not

@@ -34,7 +34,9 @@ export function Wordmark({ product, tone = 'rainbow', className }: WordmarkProps
       {product ? (
         <>
           {' '}
-          <span className="mui-wordmark-product">{product}</span>
+          <span className={cn('mui-wordmark-product', tone === 'rainbow' && 'mui-wordmark-muted')}>
+            {product}
+          </span>
         </>
       ) : null}
     </span>
@@ -57,7 +59,7 @@ export type MidniteLogoProps = {
  */
 export function MidniteLogo({ size = 28, markOnly = false, product, className }: MidniteLogoProps) {
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
+    <span className={cn('mui-logo', className)}>
       <span aria-hidden className="mui-logo-mark" style={{ width: size, height: size }} />
       {markOnly ? null : <Wordmark product={product} />}
     </span>
