@@ -37,6 +37,7 @@ jobs:
       - name: Build the docs site, the showcase and Storybook
         run: moon run docs:build showcase:build ui:build-storybook
 
+      # Same layout as scripts/build-site.sh, the Vercel build; keep the two in step.
       - name: Assemble the Pages tree
         run: |
           mkdir -p _site
