@@ -11,7 +11,7 @@ export const AGENT_IDS = Object.keys(AGENT_ICON_DATA) as AgentId[];
 /** The display name of an agent ("GitHub Copilot" for `copilot`). */
 export const agentName = (id: AgentId): string => AGENT_ICON_DATA[id].name;
 
-/** The brand colour of an agent, or `undefined` for a monochrome brand. */
+/** The brand colour of an agent, or `undefined` when it has no single one (monochrome brands, antigravity's multicolour art). */
 export const agentColor = (id: AgentId): string | undefined =>
   'color' in AGENT_ICON_DATA[id] ? (AGENT_ICON_DATA[id] as { color: string }).color : undefined;
 
