@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import {
   GithubIcon,
+  MidniteLogo,
   NeuroCloudBackground,
   ReadingLayout,
   ReadingLayoutProvider,
@@ -92,15 +93,8 @@ const NAV_CONFIG: NavConfig = {
       })),
     })),
   brand: ({ expanded }) => (
-    <Link to="/" className="flex items-center gap-2 px-1 font-semibold tracking-tight">
-      <span aria-hidden className="text-lg leading-none">
-        🌒
-      </span>
-      {expanded ? (
-        <span className="text-sm">
-          midnite <span className="font-normal text-muted-foreground">ui</span>
-        </span>
-      ) : null}
+    <Link to="/" aria-label="Midnite UI docs" className="flex items-center px-1">
+      <MidniteLogo product="UI" size={22} markOnly={!expanded} className="text-sm" />
     </Link>
   ),
   footer: ({ expanded }) => (

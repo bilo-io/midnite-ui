@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 
-import { Button, DynamicBackground, cn } from '@bilo-io/ui';
+import { Button, DynamicBackground, Wordmark, cn } from '@bilo-io/ui';
 
 import { CATEGORIES, COMPONENTS, type Category } from '../catalog';
 import { examplesFor } from '../examples';
@@ -35,11 +35,7 @@ export function HomePage() {
             {COMPONENTS.length} components · React 19 · Tailwind tokens
           </p>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-            The building blocks of every{' '}
-            <span className="bg-gradient-to-r from-[hsl(var(--status-todo))] via-[hsl(var(--kind-feature))] to-[hsl(var(--status-wip))] bg-clip-text text-transparent">
-              midnite
-            </span>{' '}
-            app.
+            The building blocks of every <Wordmark className="leading-tight" /> app.
           </h1>
           <p className="text-base text-muted-foreground sm:text-lg">
             Accessible primitives, data displays and animated backdrops on one set of HSL design

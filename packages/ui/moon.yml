@@ -19,6 +19,7 @@ tasks:
       - 'root:install'
     inputs:
       - 'src/**/*'
+      - 'assets/**/*'
       - 'vite.config.ts'
       - 'tsconfig.json'
       - 'package.json'
@@ -35,6 +36,8 @@ tasks:
     command: 'pnpm exec vitest run'
     inputs:
       - 'src/**/*'
+      - 'assets/**/*'
+      - 'scripts/agent-icons.mjs'
       - 'vite.config.ts'
       - 'vitest.config.ts'
       # Stories run as browser tests, so Storybook config (preview decorators,
@@ -51,6 +54,7 @@ tasks:
     command: 'pnpm exec storybook build'
     inputs:
       - 'src/**/*'
+      - 'assets/**/*'
       - '.storybook/**/*'
       - 'tailwind.config.ts'
       - 'postcss.config.mjs'

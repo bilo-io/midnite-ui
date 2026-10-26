@@ -10,6 +10,7 @@ export type Category =
   | 'Backdrops'
   | 'Security'
   | 'Theming'
+  | 'Brand'
   | 'Icons'
   | 'Reading';
 
@@ -20,6 +21,7 @@ export const CATEGORIES: readonly Category[] = [
   'Backdrops',
   'Security',
   'Theming',
+  'Brand',
   'Icons',
   'Reading',
 ];
@@ -435,6 +437,75 @@ export const COMPONENTS: readonly ComponentDoc[] = [
         description: 'A labelled trigger instead of the icon-only one.',
       },
       { name: 'labels', type: 'ThemeToggleLabels', description: 'Overrides for every string.' },
+    ],
+  },
+  {
+    id: 'wordmark',
+    name: 'Wordmark',
+    category: 'Brand',
+    description:
+      'The midnite wordmark and crescent, as the website wears them: "Midnite" in the Damion brand face with the rainbow ramp, the product name in the UI face. Import `@bilo-io/ui/brand.css` once.',
+    exports: ['Wordmark', 'MidniteLogo'],
+    keywords: ['brand', 'logo', 'crescent', 'damion', 'rainbow', 'gradient', 'title', 'midnite'],
+    props: [
+      {
+        name: 'product',
+        type: 'string',
+        description: 'The second half: "UI", "Studio". Omit for "Midnite" alone.',
+      },
+      {
+        name: 'tone',
+        type: "'rainbow' | 'inherit'",
+        default: "'rainbow'",
+        description: 'Rainbow ramp and glow, or inherit the parent paint.',
+      },
+      {
+        name: 'size',
+        type: 'number',
+        default: '28',
+        description: 'MidniteLogo only: the crescent in px.',
+      },
+      {
+        name: 'markOnly',
+        type: 'boolean',
+        default: 'false',
+        description: 'MidniteLogo only: the crescent without the wordmark.',
+      },
+    ],
+  },
+  {
+    id: 'agent-icon',
+    wide: true,
+    name: 'Agent icon',
+    category: 'Icons',
+    description:
+      'The marks of every coding agent (Claude, Codex, Copilot, Cursor, Gemini and ten more), generated from the SVG files published at `/agents/`. Brand colour or `currentColor`.',
+    exports: ['AgentIcon', 'AGENT_IDS', 'agentName', 'agentColor', 'agentFiles'],
+    keywords: [
+      'agent',
+      'ai',
+      'logo',
+      'claude',
+      'codex',
+      'copilot',
+      'cursor',
+      'gemini',
+      'grok',
+      'svg',
+    ],
+    props: [
+      { name: 'agent', type: 'AgentId', description: 'One of `AGENT_IDS`.' },
+      {
+        name: 'variant',
+        type: "'color' | 'mono'",
+        default: "'color'",
+        description: 'Brand colour, or `currentColor`.',
+      },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'Accessible name; omitted, the icon is decorative.',
+      },
     ],
   },
   {

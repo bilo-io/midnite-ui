@@ -3,6 +3,8 @@
 @import '@bilo-io/ui/styles';
 /* Shared highlight.js token palette for the code panels. */
 @import '@bilo-io/ui/code-highlight.css';
+/* The wordmark's face, rainbow ramp and crescent. */
+@import '@bilo-io/ui/brand.css';
 
 @tailwind base;
 @tailwind components;
@@ -29,6 +31,28 @@
 
 @layer components {
   /* The stage every live preview sits on: a faint dot grid on the page tone. */
+  /* Nav links as the website draws them: a 2px rainbow underline that scales in
+     from the left on hover, without moving the text. */
+  .showcase-nav-tab {
+    position: relative;
+    padding: 0.25rem 0;
+  }
+  .showcase-nav-tab::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -2px 0;
+    height: 2px;
+    border-radius: 9999px;
+    background-image: linear-gradient(90deg, var(--brand-rainbow-ramp));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms ease;
+  }
+  .showcase-nav-tab:hover::after,
+  .showcase-nav-tab:focus-visible::after {
+    transform: scaleX(1);
+  }
+
   .showcase-canvas {
     background-color: hsl(var(--background));
     background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);

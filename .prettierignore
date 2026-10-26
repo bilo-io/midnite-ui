@@ -6,3 +6,4 @@
 **/build-staging
 packages/gateway/drizzle/meta
 pnpm-lock.yaml
+packages/ui/src/components/agent-icons.generated.ts

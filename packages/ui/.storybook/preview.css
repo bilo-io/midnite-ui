@@ -9,6 +9,7 @@
  * primitives exactly as a real consumer would see them.
  */
 @import '../src/styles/tokens.css';
+@import '../src/styles/brand.css';
 
 @tailwind base;
 @tailwind components;
