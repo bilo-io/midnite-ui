@@ -166,7 +166,7 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     category: 'Actions & forms',
     description:
       'A range slider over a native `<input type="range">`, so arrows, Home/End and Page keys work natively. An optional gradient paints the filled track and the knob; the rest of the track stays neutral.',
-    exports: ['Slider', 'sliderPaint'],
+    exports: ['Slider', 'sliderPaint', 'sliderValue'],
     keywords: ['range', 'gradient', 'spectrum', 'volume', 'percent', 'knob'],
     props: [
       {
@@ -200,7 +200,7 @@ export const COMPONENTS: readonly ComponentDoc[] = [
         name: '...props',
         type: 'InputHTMLAttributes',
         description:
-          'Any other native input attribute (`aria-valuetext`, `name`, …); `className` goes on the wrapper.',
+          'Any other native input attribute (`aria-valuetext`, `name`, …). `className` and `style` go on the wrapper.',
       },
     ],
   },

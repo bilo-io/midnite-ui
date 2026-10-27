@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Slider, sliderPaint } from './slider';
@@ -35,21 +34,28 @@ describe('Slider', () => {
     expect(root(input).style.getPropertyValue('--slider-frac')).toBe('0.25');
   });
 
-  it('steps by its step increment', () => {
-    function Harness() {
-      const [v, setV] = useState(50);
-      return <Slider aria-label="Step" step={5} value={v} onValueChange={setV} />;
-    }
-    render(<Harness />);
-    const input = screen.getByRole('slider', { name: 'Step' }) as HTMLInputElement;
-    // jsdom has no native range keyboard handling; the browser story covers the
-    // real key path. Here: a keyboard-driven change lands through onValueChange.
-    input.focus();
-    fireEvent.change(input, {
-      target: { value: String(Number(input.value) + Number(input.step)) },
-    });
-    expect(input.value).toBe('55');
-    expect(document.activeElement).toBe(input);
+  it('paints the knob where the browser snaps and clamps the value', () => {
+    const { rerender } = render(<Slider aria-label="Snap" step={5} value={7} />);
+    const input = screen.getByRole('slider', { name: 'Snap' }) as HTMLInputElement;
+    expect(input.value).toBe('5');
+    expect(root(input).style.getPropertyValue('--slider-frac')).toBe('0.05');
+    rerender(<Slider aria-label="Snap" step={5} value={Number.NaN} />);
+    expect(root(input).style.getPropertyValue('--slider-frac')).toBe('0');
+    rerender(<Slider aria-label="Snap" step={5} value={250} />);
+    expect(root(input).style.getPropertyValue('--slider-frac')).toBe('1');
+  });
+
+  it('keeps its place when it goes from controlled to uncontrolled', () => {
+    const { rerender } = render(<Slider aria-label="Mode" defaultValue={10} value={60} />);
+    rerender(<Slider aria-label="Mode" defaultValue={10} />);
+    expect((screen.getByRole('slider', { name: 'Mode' }) as HTMLInputElement).value).toBe('60');
+  });
+
+  it('puts style on the wrapper beside its own variables', () => {
+    render(<Slider aria-label="Styled" style={{ maxWidth: 200 }} defaultValue={50} />);
+    const el = root(screen.getByRole('slider', { name: 'Styled' }));
+    expect(el.style.maxWidth).toBe('200px');
+    expect(el.style.getPropertyValue('--slider-frac')).toBe('0.5');
   });
 
   it('paints the ramp from colour stops, focus ring in the middle stop', () => {
@@ -86,6 +92,11 @@ describe('sliderPaint', () => {
   it('uses a single stop as a solid colour and its own focus ring', () => {
     expect(sliderPaint(['teal'])).toEqual({ ramp: 'teal', focus: 'teal' });
     expect(sliderPaint('teal')).toEqual({ ramp: 'teal', focus: 'teal' });
+  });
+
+  it('drops a stop position from the focus colour and a lone stop', () => {
+    expect(sliderPaint(['red 0%', 'lime 50%', 'blue 100%']).focus).toBe('lime');
+    expect(sliderPaint(['rgb(1 2 3) 10% 30%']).ramp).toBe('rgb(1 2 3)');
   });
 
   it('keeps the ring token for an image gradient', () => {

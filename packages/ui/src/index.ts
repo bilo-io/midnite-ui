@@ -90,6 +90,7 @@ export { StyledSelect, ModelComboSelect } from './components/styled-select';
 export {
   Slider,
   sliderPaint,
+  sliderValue,
   type SliderProps,
   type SliderGradient,
 } from './components/slider';

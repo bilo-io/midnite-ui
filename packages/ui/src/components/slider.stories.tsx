@@ -24,7 +24,7 @@ export const Interactive: Story = {
     return (
       <div className="w-72">
         <Slider
-          label={`Auto-rotate at ${v}%`}
+          label="Auto-rotate subagents"
           min={10}
           max={100}
           step={5}

@@ -8,7 +8,7 @@ export type SliderGradient = string | readonly string[];
 
 export type SliderProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'value' | 'defaultValue' | 'onChange' | 'min' | 'max' | 'step' | 'children'
+  'type' | 'value' | 'defaultValue' | 'onChange' | 'min' | 'max' | 'step' | 'children' | 'style'
 > & {
   /** Controlled value. Leave undefined (and pass `defaultValue`) for uncontrolled. */
   value?: number;
@@ -29,6 +29,8 @@ export type SliderProps = Omit<
   label?: React.ReactNode;
   /** Classes for the outer wrapper (the input itself takes none). */
   className?: string;
+  /** Inline style for the outer wrapper, like `className`. */
+  style?: React.CSSProperties;
 };
 
 const KNOB = 14; // px — keep in step with the size-3.5 knob and the native thumb.
@@ -46,8 +48,23 @@ export function sliderPaint(gradient: SliderGradient | undefined): {
     return { ramp: gradient, focus: isImage ? 'hsl(var(--ring))' : gradient };
   }
   const stops = gradient as readonly string[];
-  const ramp = stops.length === 1 ? stops[0]! : `linear-gradient(90deg, ${stops.join(', ')})`;
-  return { ramp, focus: stops[Math.floor((stops.length - 1) / 2)]! };
+  const ramp =
+    stops.length === 1 ? bareColor(stops[0]!) : `linear-gradient(90deg, ${stops.join(', ')})`;
+  return { ramp, focus: bareColor(stops[Math.floor((stops.length - 1) / 2)]!) };
+}
+
+/** `'red 40%'` / `'rgb(1 2 3) 10% 30%'` → the colour alone (a stop's position is not a colour). */
+function bareColor(stop: string): string {
+  return stop.trim().replace(/(\s+-?[\d.]+(%|px|em|rem)?)+$/, '');
+}
+
+/** The value the browser will actually show: clamped to [min, max] and snapped to `step`. */
+export function sliderValue(value: number, min: number, max: number, step: number): number {
+  if (!Number.isFinite(value)) return min;
+  const clamped = Math.min(max, Math.max(min, value));
+  if (!(step > 0)) return clamped;
+  const snapped = min + Math.round((clamped - min) / step) * step;
+  return Math.min(max, Number(snapped.toFixed(10)));
 }
 
 /**
@@ -57,6 +74,11 @@ export function sliderPaint(gradient: SliderGradient | undefined): {
  * the track stays `--muted`. The knob carries a popover-coloured ring so it
  * reads on light and dark, and a focus-visible ring in the gradient's middle
  * stop. Controlled (`value`) or uncontrolled (`defaultValue`).
+ *
+ * The ramp is sized to the filled part, so the whole spectrum always shows
+ * between the start and the knob (the knob wears all of it too). The 24px row
+ * is the hit target; the painted track stays 6px. In forced-colors mode the
+ * painting steps aside and the native range shows.
  */
 export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   (
@@ -80,12 +102,16 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
     const autoId = React.useId();
     const inputId = id ?? autoId;
     const [inner, setInner] = React.useState(defaultValue ?? min);
+    // Track a controlled value so a later switch to uncontrolled keeps its place.
+    if (value !== undefined && !Object.is(value, inner)) setInner(value);
     const current = value ?? inner;
     const span = max - min;
-    const frac = span > 0 ? Math.min(1, Math.max(0, (current - min) / span)) : 0;
+    const shown = sliderValue(current, min, max, step);
+    const frac = span > 0 ? (shown - min) / span : 0;
     const { ramp, focus } = sliderPaint(gradient);
 
     const vars = {
+      ...style,
       '--slider-ramp': ramp,
       '--slider-focus': focus,
       '--slider-frac': String(frac),
@@ -103,7 +129,7 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             {label}
           </label>
         )}
-        <div className="relative flex h-4 w-full items-center">
+        <div className="relative flex h-6 w-full items-center">
           <input
             ref={ref}
             id={inputId}
@@ -111,20 +137,19 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             min={min}
             max={max}
             step={step}
-            value={current}
+            value={shown}
             disabled={disabled}
             onChange={(event) => {
               const next = Number(event.target.value);
               if (value === undefined) setInner(next);
               onValueChange?.(next);
             }}
-            className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer appearance-none bg-transparent opacity-0 disabled:cursor-not-allowed [&::-moz-range-thumb]:size-3.5 [&::-moz-range-thumb]:border-0 [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none"
-            style={style}
+            className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer appearance-none bg-transparent opacity-0 disabled:cursor-not-allowed forced-colors:appearance-auto forced-colors:opacity-100 [&::-moz-range-thumb]:size-3.5 [&::-moz-range-thumb]:border-0 [&::-webkit-slider-thumb]:size-3.5 [&::-webkit-slider-thumb]:appearance-none"
             {...props}
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 h-1.5 overflow-hidden rounded-full bg-muted"
+            className="pointer-events-none absolute inset-x-0 h-1.5 overflow-hidden rounded-full bg-muted forced-colors:hidden"
           >
             <div
               data-slider-fill=""
@@ -138,9 +163,9 @@ export const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
           <div
             aria-hidden
             data-slider-knob=""
-            className="pointer-events-none absolute z-20 size-3.5 rounded-full border-2 border-popover shadow-[0_0_0_1px_hsl(var(--border))] transition-shadow peer-focus-visible:shadow-[0_0_0_2px_var(--slider-focus)]"
+            className="pointer-events-none absolute z-20 size-3.5 rounded-full forced-colors:hidden border-2 border-popover shadow-[0_0_0_1px_hsl(var(--border))] transition-shadow peer-focus-visible:shadow-[0_0_0_2px_var(--slider-focus)]"
             style={{
-              left: `calc((100% - ${KNOB}px) * var(--slider-frac))`,
+              insetInlineStart: `calc((100% - ${KNOB}px) * var(--slider-frac))`,
               background: 'var(--slider-ramp)',
             }}
           />
