@@ -1,6 +1,6 @@
 {
   "name": "@bilo-io/shell",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "midnite design system — the wired app shell (AppFrame, LockScreen, TitleBar, appearance runtime)",
   "license": "MIT",
   "repository": {
