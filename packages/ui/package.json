@@ -1,6 +1,6 @@
 {
   "name": "@bilo-io/ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "midnite design system — reusable React primitives + HSL design tokens",
   "license": "MIT",
   "repository": {

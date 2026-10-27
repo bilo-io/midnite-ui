@@ -1,6 +1,6 @@
 {
   "name": "midnite-ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "midnite design system — @bilo-io/ui primitives + tokens and the @bilo-io/shell app frame",
   "packageManager": "pnpm@9.15.0",
