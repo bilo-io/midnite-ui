@@ -161,6 +161,50 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     ],
   },
   {
+    id: 'slider',
+    name: 'Slider',
+    category: 'Actions & forms',
+    description:
+      'A range slider over a native `<input type="range">`, so arrows, Home/End and Page keys work natively. An optional gradient paints the filled track and the knob; the rest of the track stays neutral.',
+    exports: ['Slider', 'sliderPaint', 'sliderValue'],
+    keywords: ['range', 'gradient', 'spectrum', 'volume', 'percent', 'knob'],
+    props: [
+      {
+        name: 'value',
+        type: 'number',
+        description: 'Controlled value. Omit it (and pass `defaultValue`) for uncontrolled.',
+      },
+      { name: 'defaultValue', type: 'number', default: 'min', description: 'Uncontrolled start.' },
+      { name: 'min', type: 'number', default: '0', description: 'Lowest value.' },
+      { name: 'max', type: 'number', default: '100', description: 'Highest value.' },
+      { name: 'step', type: 'number', default: '1', description: 'Keyboard and drag increment.' },
+      {
+        name: 'onValueChange',
+        type: '(value: number) => void',
+        description: 'Called with the next value as a number.',
+      },
+      {
+        name: 'gradient',
+        type: 'string | string[]',
+        default: 'primary token',
+        description:
+          'A CSS background (`linear-gradient(…)` or a colour), or colour stops joined left to right. Paints the fill and the knob; the focus ring takes the middle stop.',
+      },
+      {
+        name: 'label',
+        type: 'ReactNode',
+        description: 'Visible label wired to the input. Otherwise pass `aria-label`.',
+      },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Locks and dims it.' },
+      {
+        name: '...props',
+        type: 'InputHTMLAttributes',
+        description:
+          'Any other native input attribute (`aria-valuetext`, `name`, …). `className` and `style` go on the wrapper.',
+      },
+    ],
+  },
+  {
     id: 'switch',
     name: 'Switch',
     category: 'Actions & forms',
