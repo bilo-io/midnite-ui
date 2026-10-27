@@ -87,6 +87,12 @@ export {
 } from './components/rail-shell';
 export { Select, type SelectOption } from './components/select';
 export { StyledSelect, ModelComboSelect } from './components/styled-select';
+export {
+  Slider,
+  sliderPaint,
+  type SliderProps,
+  type SliderGradient,
+} from './components/slider';
 export { Switch } from './components/switch';
 export { Tabs, type TabOption } from './components/tabs';
 export { ThemeToggle, type ThemeToggleLabels } from './components/theme-toggle';
