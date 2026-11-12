@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "jsx": "react-jsx",
+    // DOM is here for the tests only (they render through react-native-web in
+    // jsdom); the components themselves touch nothing but `react-native`.
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // As in @bilo-io/ui: `tsc` only typechecks (`--noEmit`); the `.d.ts` files
+    // come from vite-plugin-dts in the build.
+    "declaration": false,
+    "declarationMap": false
+  },
+  "include": ["src/**/*", "vitest.setup.ts"],
+  "exclude": ["dist", "node_modules"]
+}

@@ -1,0 +1,57 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+language: 'typescript'
+
+# @bilo-io/ui-native is the React Native companion to @bilo-io/ui: the same
+# primitives drawn with View/Text/Pressable/TextInput and plain StyleSheet, on
+# the SAME token values. It may import `@bilo-io/ui/tokens` and nothing else
+# from the workspace (no components, no CSS, no react-dom) — enforced by
+# src/boundary.test.ts.
+#
+# Built with Vite library mode like ui (vite-plugin-dts for the types); tests
+# run in jsdom with `react-native` aliased to react-native-web.
+dependsOn:
+  - 'ui'
+
+tasks:
+  build:
+    command: 'pnpm exec vite build'
+    deps:
+      - 'root:install'
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'package.json'
+    outputs:
+      - 'dist'
+
+  typecheck:
+    command: 'pnpm exec tsc --noEmit'
+    # tsc resolves @bilo-io/ui/tokens via its dist .d.ts, so build it first.
+    deps:
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'vitest.setup.ts'
+      - 'tsconfig.json'
+
+  test:
+    command: 'pnpm exec vitest run'
+    # The tokens come from the built @bilo-io/ui (dist), so build it first.
+    deps:
+      - '^:build'
+    inputs:
+      - 'src/**/*'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - 'vitest.setup.ts'
+
+  lint:
+    command: 'pnpm exec eslint .'
+    inputs:
+      - 'src/**/*'
+      - 'scripts/**/*'
+      - 'vite.config.ts'
+      - 'vitest.config.ts'
+      - '/eslint.config.mjs'
