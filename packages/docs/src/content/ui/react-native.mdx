@@ -1,0 +1,51 @@
+---
+title: React Native
+section: UI
+order: 2
+---
+
+# React Native
+
+`@bilo-io/ui` is a DOM library: its primitives render HTML elements and are
+styled by your Tailwind build, so they do not run in React Native.
+`@bilo-io/ui-native` is the companion package for iOS and Android. It draws the
+same primitives with `View`, `Text`, `Pressable` and `TextInput`, styled with
+plain `StyleSheet` from the **same token values**: it reads them from
+`@bilo-io/ui/tokens` at runtime, so the two libraries never drift apart.
+
+```bash
+pnpm add @bilo-io/ui-native
+```
+
+```tsx
+import { Button, Switch, ThemeProvider, useTheme } from '@bilo-io/ui-native';
+
+export default function Settings() {
+  const [sync, setSync] = useState(false);
+  return (
+    <ThemeProvider>
+      <Switch checked={sync} onCheckedChange={setSync} accessibilityLabel="Background sync" />
+      <Button variant="outline" onPress={save}>
+        Save
+      </Button>
+    </ThemeProvider>
+  );
+}
+```
+
+It peers on `react` 19 and `react-native` 0.79 or later and needs no native
+modules, so it runs in Expo Go. `ThemeProvider` follows the device's light/dark
+setting unless you pin `scheme`; `useTheme()` returns the resolved `colors`,
+`alpha()`, `radius` and brand ramp.
+
+## Components
+
+Button, Input, Textarea, Switch, Tabs, Slider, Card, Accordion, the Wordmark and
+MidniteLogo, and the ThemeProvider. Every one has live examples in phone frames in
+the [showcase's Mobile mode](https://midnite-design.vercel.app/showcase/#/mobile).
+
+Canvas backdrops, SVG charts and gauges, portal-based selects, the reading
+typography and the desktop rail stay web-only: each needs a native module or
+has a platform equivalent. The
+[package README](https://github.com/bilo-io/midnite-ui/tree/main/packages/ui-native#what-stays-web-only-and-why)
+lists them with the reason for each.

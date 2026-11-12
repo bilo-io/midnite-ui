@@ -10,6 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 pnpm --filter @bilo-io/ui build
+pnpm --filter @bilo-io/ui-native build
 pnpm --filter @bilo-io/shell build
 pnpm --filter @bilo-io/docs build
 pnpm --filter @bilo-io/showcase build

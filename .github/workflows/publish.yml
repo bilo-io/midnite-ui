@@ -1,4 +1,4 @@
-# Publish @bilo-io/ui + @bilo-io/shell to GitHub Packages.
+# Publish @bilo-io/ui, @bilo-io/ui-native + @bilo-io/shell to GitHub Packages.
 #
 # Runs when a GitHub Release is published (or manually via workflow_dispatch).
 # Auth is the workflow's own GITHUB_TOKEN — no PAT needed to publish; consumers
@@ -28,7 +28,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Build the libraries
-        run: moon run ui:build shell:build
+        run: moon run ui:build ui-native:build shell:build
 
       - name: Publish
         env:
@@ -40,7 +40,7 @@ jobs:
           EOF
           # Publish leaf-first; skip a version that is already published so the
           # workflow is safely re-runnable.
-          for pkg in ui shell; do
+          for pkg in ui ui-native shell; do
             name=$(node -p "require('./packages/$pkg/package.json').name")
             version=$(node -p "require('./packages/$pkg/package.json').version")
             if npm view "$name@$version" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
