@@ -20,13 +20,13 @@ import {
   ReadingLayout,
   ReadingLayoutProvider,
   TableOfContents,
+  ThemeToggle,
   type ReadingLinkProps,
 } from '@bilo-io/ui';
 import { AppFrame, type NavConfig, type NavLinkComponent } from '@bilo-io/shell';
 
 import { DocPage } from './components/doc-page';
 import { mdxComponents } from './components/mdx-components';
-import { ThemeToggle } from './components/theme-toggle';
 import { nav, routes } from './content/registry';
 
 // This site IS the shell demo: the layout is @bilo-io/shell's <AppFrame>, wired
@@ -117,7 +117,7 @@ const NAV_CONFIG: NavConfig = {
         <GithubIcon className="h-4 w-4 shrink-0" />
         {expanded ? <span>GitHub</span> : null}
       </a>
-      <ThemeToggle />
+      <ThemeToggle expanded={expanded} />
     </>
   ),
 };

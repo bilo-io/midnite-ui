@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Check, Clock, Laptop, Moon, Sun } from 'lucide-react';
+import { Check, Clock, Laptop, Moon, Sun, type LucideIcon } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { Button } from './button';
 import { useTheme, type ThemePreference } from '../theme/theme-context';
@@ -12,23 +12,28 @@ import { useTheme, type ThemePreference } from '../theme/theme-context';
  * consumers pass translated values (Phase 82 Theme E).
  */
 export type ThemeToggleLabels = {
-  /** Accessible name of the trigger (default 'Toggle theme'). */
+  /** Accessible name of the collapsed icon button (default 'Toggle theme'). */
   toggle?: string;
-  /** Visible trigger text (expanded) / tooltip (collapsed) — default 'Theme'. */
+  /**
+   * Tooltip (collapsed) / accessible prefix (expanded) — default 'Theme'. The
+   * expanded trigger is named "Theme: Dark"; it also names the menu.
+   */
   theme?: string;
-  /** Menu option labels. */
+  /** Menu option labels; the expanded trigger shows the selected one. */
   light?: string;
   dark?: string;
   system?: string;
   time?: string;
 };
 
-const ICONS: { value: ThemePreference; Icon: typeof Sun }[] = [
-  { value: 'light', Icon: Sun },
-  { value: 'dark', Icon: Moon },
-  { value: 'system', Icon: Laptop },
-  { value: 'time', Icon: Clock },
-];
+const ORDER: readonly ThemePreference[] = ['light', 'dark', 'system', 'time'];
+
+const ICONS: Record<ThemePreference, LucideIcon> = {
+  light: Sun,
+  dark: Moon,
+  system: Laptop,
+  time: Clock,
+};
 
 const DEFAULT_OPTION_LABELS: Record<ThemePreference, string> = {
   light: 'Light',
@@ -46,14 +51,20 @@ export function ThemeToggle({
 }) {
   const toggleLabel = labels?.toggle ?? 'Toggle theme';
   const themeLabel = labels?.theme ?? 'Theme';
-  const options = ICONS.map(({ value, Icon }) => ({
+  const option = (value: ThemePreference) => ({
     value,
-    Icon,
+    Icon: ICONS[value],
     label: labels?.[value] ?? DEFAULT_OPTION_LABELS[value],
-  }));
+  });
+  const options = ORDER.map(option);
   const { preference, resolved, setPreference } = useTheme();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // The two triggers anchor the menu differently; don't carry it across a switch.
+  useEffect(() => {
+    setOpen(false);
+  }, [expanded]);
 
   useEffect(() => {
     if (!open) return;
@@ -72,20 +83,26 @@ export function ThemeToggle({
   }, [open]);
 
   const TriggerIcon = resolved === 'dark' ? Moon : Sun;
+  // The expanded trigger reads like every other sidenav row: the saved
+  // preference's icon and label ("System" with the laptop), not a generic
+  // "Theme". The collapsed trigger shows the resolved light/dark glyph instead.
+  const selected = option(preference);
 
   return (
     <div ref={rootRef} className="group relative">
       {expanded ? (
         <button
           type="button"
-          aria-label={toggleLabel}
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
         >
-          <TriggerIcon className="h-4 w-4 shrink-0" />
-          <span className="truncate text-sm">{themeLabel}</span>
+          <selected.Icon className="h-4 w-4 shrink-0" />
+          <span className="truncate text-sm">
+            <span className="sr-only">{themeLabel}: </span>
+            {selected.label}
+          </span>
         </button>
       ) : (
         <Button
@@ -111,11 +128,14 @@ export function ThemeToggle({
       {open ? (
         <div
           role="menu"
+          aria-label={themeLabel}
           className={cn(
             'absolute z-50 rounded-md border bg-card text-card-foreground p-1 shadow-md',
             // Expanded: the dropup spans the sidenav's full width; collapsed: a
             // fixed-width flyout to the right of the icon rail.
-            expanded ? 'bottom-full left-0 mb-1 w-full' : 'bottom-0 left-full ml-2 min-w-[10rem]',
+            expanded
+              ? 'bottom-full left-0 mb-1 w-full min-w-[10rem]'
+              : 'bottom-0 left-full ml-2 min-w-[10rem]',
           )}
         >
           {options.map(({ value, label, Icon }) => {
