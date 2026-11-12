@@ -2,7 +2,8 @@
 //
 // The same primitives drawn with View/Text/Pressable/TextInput and plain
 // StyleSheet, on the same token values: every colour and radius is read from
-// `@bilo-io/ui/tokens` at runtime, never copied. Web-only pieces of @bilo-io/ui
+// `@bilo-io/ui/tokens`, never copied, and the build inlines them into dist (no
+// runtime dependency on @bilo-io/ui). Web-only pieces of @bilo-io/ui
 // (canvas backdrops, portals, SVG charts, the reading typography) have no
 // counterpart here; see the README for the list and why.
 

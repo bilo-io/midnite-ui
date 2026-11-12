@@ -8,18 +8,19 @@ import { defineConfig } from 'vite';
 const here = fileURLToPath(new URL('.', import.meta.url));
 const r = (p: string) => resolve(here, p);
 
-// Same library build as @bilo-io/ui: every dependency and peer (with its
-// subpaths, e.g. `@bilo-io/ui/tokens`, `react/jsx-runtime`) stays external, so
-// the bundle is this package's code alone and Metro (or Vite, through
-// react-native-web) resolves `react-native` in the consuming app.
+// The peers (with their subpaths, e.g. `react/jsx-runtime`) stay external, so
+// Metro (or Vite, through react-native-web) resolves `react` and `react-native`
+// in the consuming app. `@bilo-io/ui` is a devDependency and is NOT external:
+// the token values are read from `@bilo-io/ui/tokens` at build time and inlined
+// into dist, so the published package has no runtime dependency on the web
+// library (and the 0.2.0 `@bilo-io/ui` on the registry, which predates
+// `./tokens`, never has to resolve).
 const pkg = JSON.parse(readFileSync(r('package.json'), 'utf8')) as {
-  dependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
 };
-const external = [
-  ...Object.keys(pkg.peerDependencies ?? {}),
-  ...Object.keys(pkg.dependencies ?? {}),
-].map((name) => new RegExp(`^${name}(?:/.*)?$`));
+const external = Object.keys(pkg.peerDependencies ?? {}).map(
+  (name) => new RegExp(`^${name}(?:/.*)?$`),
+);
 
 export default defineConfig({
   plugins: [
@@ -27,6 +28,10 @@ export default defineConfig({
     dts({
       include: ['src'],
       exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+      // One dist/index.d.ts, with the token types it names (`Hsl`, `ColorScale`)
+      // copied in from @bilo-io/ui, so the types need no @bilo-io/ui either.
+      rollupTypes: true,
+      bundledPackages: ['@bilo-io/ui'],
     }),
   ],
   build: {

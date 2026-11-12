@@ -58,6 +58,21 @@ export function valueAt(x: number, width: number, min: number, max: number, step
 type KeyEvent = { key: string; preventDefault: () => void };
 
 /**
+ * Layout dp per pointer pixel on the web. A CSS transform on an ancestor (the
+ * showcase's scaled phone frame, a zoomed embed) shrinks what the pointer
+ * reports (`locationX`, `dx`) but not `onLayout`'s width, which
+ * react-native-web reads from `offsetWidth`. The track's drawn width, from
+ * `getBoundingClientRect`, gives the ratio between the two. 1 when either is
+ * unknown.
+ */
+export function layoutPerPixel(target: unknown, layoutWidth: number): number {
+  const drawn = (target as Drawn | null)?.getBoundingClientRect?.().width ?? 0;
+  return drawn > 0 && layoutWidth > 0 ? layoutWidth / drawn : 1;
+}
+
+type Drawn = { getBoundingClientRect?: () => { width: number } };
+
+/**
  * A range slider in pure React Native: a PanResponder over a painted track, no
  * native module. Drag or tap the track; screen readers get the adjustable role
  * with increment/decrement actions; on the web (react-native-web) it takes
@@ -95,7 +110,8 @@ export function Slider({
   // The responder is created once; it reads the latest render through this ref.
   const latest = useRef({ commit, width, disabled, min, max, step, onSlidingComplete });
   latest.current = { commit, width, disabled, min, max, step, onSlidingComplete };
-  const drag = useRef({ startX: 0, last: current });
+  // `scale` turns pointer distances into layout dp for this gesture (1 on native).
+  const drag = useRef({ startX: 0, scale: 1, last: current });
 
   const responder = useRef(
     PanResponder.create({
@@ -105,14 +121,18 @@ export function Slider({
       onPanResponderTerminationRequest: () => false,
       onPanResponderGrant: (e: GestureResponderEvent) => {
         const { commit, width, min, max, step } = latest.current;
-        drag.current.startX = e.nativeEvent.locationX;
+        drag.current.scale = Platform.OS === 'web' ? layoutPerPixel(e.currentTarget, width) : 1;
+        drag.current.startX = e.nativeEvent.locationX * drag.current.scale;
         drag.current.last = commit(valueAt(drag.current.startX, width, min, max, step));
       },
       onPanResponderMove: (_e, g) => {
         const { commit, width, min, max, step } = latest.current;
-        drag.current.last = commit(valueAt(drag.current.startX + g.dx, width, min, max, step));
+        const x = drag.current.startX + g.dx * drag.current.scale;
+        drag.current.last = commit(valueAt(x, width, min, max, step));
       },
       onPanResponderRelease: () => latest.current.onSlidingComplete?.(drag.current.last),
+      // Taken away anyway (the OS, a modal): the drag still ends.
+      onPanResponderTerminate: () => latest.current.onSlidingComplete?.(drag.current.last),
     }),
   ).current;
 
@@ -205,7 +225,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   label: { fontSize: 14, lineHeight: 20, fontWeight: '500' },
   value: { fontSize: 12, fontVariant: ['tabular-nums'] },
-  row: { height: ROW, justifyContent: 'center', userSelect: 'none' },
+  row: { height: ROW, justifyContent: 'center' },
   track: {
     position: 'absolute',
     top: (ROW - TRACK) / 2,

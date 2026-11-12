@@ -10,8 +10,9 @@ order: 2
 styled by your Tailwind build, so they do not run in React Native.
 `@bilo-io/ui-native` is the companion package for iOS and Android. It draws the
 same primitives with `View`, `Text`, `Pressable` and `TextInput`, styled with
-plain `StyleSheet` from the **same token values**: it reads them from
-`@bilo-io/ui/tokens` at runtime, so the two libraries never drift apart.
+plain `StyleSheet` from the **same token values**: its build reads them from
+`@bilo-io/ui/tokens` and inlines them, so the two libraries never drift apart and
+`@bilo-io/ui` is not a runtime dependency.
 
 ```bash
 pnpm add @bilo-io/ui-native
@@ -34,9 +35,12 @@ export default function Settings() {
 ```
 
 It peers on `react` 19 and `react-native` 0.79 or later and needs no native
-modules, so it runs in Expo Go. `ThemeProvider` follows the device's light/dark
-setting unless you pin `scheme`; `useTheme()` returns the resolved `colors`,
-`alpha()`, `radius` and brand ramp.
+modules, so it runs in Expo Go. It ships ES modules only: under Jest
+(`jest-expo`), add `@bilo-io` to `transformIgnorePatterns`, as the
+[package README](https://github.com/bilo-io/midnite-ui/tree/main/packages/ui-native#esm-only)
+shows. `ThemeProvider` follows the device's light/dark setting unless you pin
+`scheme`; `useTheme()` returns the resolved `colors`, `alpha()`, `radius` and
+brand ramp.
 
 ## Components
 

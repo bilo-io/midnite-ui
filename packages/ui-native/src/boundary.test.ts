@@ -6,8 +6,10 @@ import { describe, expect, it } from 'vitest';
 
 // @bilo-io/ui-native shares @bilo-io/ui's token VALUES and nothing else. A React
 // Native app cannot load react-dom, lucide-react (DOM SVG), the web components
-// or their CSS, so the only workspace import allowed is the DOM-free
-// `@bilo-io/ui/tokens` entry. This guard greps the shipped source for the rest.
+// or their CSS, so the shipped source may import only what is listed here:
+// relative modules (its own files and the `?inline` crescent PNGs), React,
+// React Native, and the DOM-free `@bilo-io/ui/tokens` entry, which the build
+// inlines into dist.
 
 const srcDir = fileURLToPath(new URL('./', import.meta.url));
 
@@ -20,14 +22,9 @@ function specifiers(source: string): string[] {
   return found;
 }
 
-const FORBIDDEN = [
-  /^react-dom(?:\/|$)/,
-  /^lucide-react(?:\/|$)/,
-  /^react-native-web(?:\/|$)/,
-  /\.css$/,
-  // Any workspace package except the tokens entry of @bilo-io/ui.
-  /^@(?:bilo-io|midnite)\/(?!ui\/tokens$)/,
-];
+const ALLOWED = /^(\.|react$|react\/jsx-runtime$|react-native$|@bilo-io\/ui\/tokens$)/;
+
+const outsideAllowlist = (specs: string[]) => specs.filter((spec) => !ALLOWED.test(spec));
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -42,11 +39,11 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe('@bilo-io/ui-native package boundary', () => {
-  it('imports only react, react-native and @bilo-io/ui/tokens', () => {
+  it('imports only relative modules, react, react/jsx-runtime, react-native and @bilo-io/ui/tokens', () => {
     const offenders = sourceFiles(srcDir).flatMap((file) =>
-      specifiers(readFileSync(file, 'utf8'))
-        .filter((spec) => FORBIDDEN.some((rule) => rule.test(spec)))
-        .map((spec) => `${file.slice(srcDir.length)}: ${spec}`),
+      outsideAllowlist(specifiers(readFileSync(file, 'utf8'))).map(
+        (spec) => `${file.slice(srcDir.length)}: ${spec}`,
+      ),
     );
     expect(offenders).toEqual([]);
   });
@@ -61,11 +58,22 @@ describe('@bilo-io/ui-native package boundary', () => {
     expect(literals).toEqual([]);
   });
 
-  it('catches a forbidden import (the guard itself works)', () => {
-    const sample = "import { Button } from '@bilo-io/ui';\nimport '@bilo-io/ui/styles';";
-    expect(specifiers(sample).filter((s) => FORBIDDEN.some((r) => r.test(s)))).toEqual([
+  it('rejects anything off the allowlist (the guard itself works)', () => {
+    const sample = [
+      "import { Button } from '@bilo-io/ui';",
+      "import '@bilo-io/ui/styles';",
+      "import { createPortal } from 'react-dom';",
+      "import { View } from 'react-native-web';",
+      "import { Svg } from 'react-native-svg';",
+      "import { useTheme } from './theme/theme-provider';",
+      "import { color } from '@bilo-io/ui/tokens';",
+    ].join('\n');
+    expect(outsideAllowlist(specifiers(sample))).toEqual([
       '@bilo-io/ui',
       '@bilo-io/ui/styles',
+      'react-dom',
+      'react-native-web',
+      'react-native-svg',
     ]);
   });
 });

@@ -19,7 +19,8 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "sideEffects": false,
   "files": [
@@ -27,17 +28,15 @@
   ],
   "scripts": {
     "build": "vite build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run"
   },
   "peerDependencies": {
     "react": "^19.0.0",
     "react-native": ">=0.79.0"
   },
-  "dependencies": {
-    "@bilo-io/ui": "workspace:*"
-  },
   "devDependencies": {
+    "@bilo-io/ui": "workspace:*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^22.10.2",

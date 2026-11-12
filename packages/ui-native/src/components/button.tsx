@@ -23,7 +23,7 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   size?: ButtonSize;
   /** A string is set in the label style; anything else (an icon, a row) renders as given. */
   children?: ReactNode;
-  /** Swaps in a spinner, blocks presses and reports busy. */
+  /** Covers the content with a spinner (the button keeps its width), blocks presses and reports busy. */
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -115,22 +115,30 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
         style,
       ]}
     >
-      {loading ? <ActivityIndicator size="small" color={paint.foreground} /> : null}
-      {label ? (
-        <Text
-          numberOfLines={1}
-          style={[
-            styles.label,
-            size === 'sm' && styles.labelSm,
-            { color: paint.foreground },
-            textStyle,
-          ]}
-        >
-          {children}
-        </Text>
-      ) : (
-        children
-      )}
+      {/* Still laid out (and still the accessible name) while loading, only
+          invisible, so the button keeps its width under the spinner. */}
+      <View style={[styles.content, loading && styles.hidden]}>
+        {label ? (
+          <Text
+            numberOfLines={1}
+            style={[
+              styles.label,
+              size === 'sm' && styles.labelSm,
+              { color: paint.foreground },
+              textStyle,
+            ]}
+          >
+            {children}
+          </Text>
+        ) : (
+          children
+        )}
+      </View>
+      {loading ? (
+        <View pointerEvents="none" style={styles.spinner}>
+          <ActivityIndicator size="small" color={paint.foreground} />
+        </View>
+      ) : null}
     </Pressable>
   );
 });
@@ -141,6 +149,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+  },
+  content: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  hidden: { opacity: 0 },
+  spinner: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   inactive: { opacity: 0.5 },
   label: { fontSize: 14, lineHeight: 20, fontWeight: '500' },

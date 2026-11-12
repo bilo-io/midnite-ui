@@ -75,10 +75,12 @@ import { Button, ThemeProvider } from '@bilo-io/ui-native';
 </ThemeProvider>;
 ```
 
-Peers on `react` 19 and `react-native` 0.79+. The components read the same
-token values as the web library from `@bilo-io/ui/tokens`; canvas, SVG and
-portal-based pieces stay web-only. See [`packages/ui-native`](packages/ui-native)
-for the component list and what is not ported.
+Peers on `react` 19 and `react-native` 0.79+, and no other dependencies. The
+components use the same token values as the web library: the build reads them
+from `@bilo-io/ui/tokens` and inlines them, so `@bilo-io/ui` is not installed
+with it. Canvas, SVG and portal-based pieces stay web-only. See
+[`packages/ui-native`](packages/ui-native) for the component list and what is
+not ported.
 
 ### App shell (`@bilo-io/shell`)
 
@@ -120,8 +122,8 @@ moon run docs:dev        # docs site on :5173
 moon run ui:storybook    # component workbench on :6007
 ```
 
-The dependency graph is strict and one-way — `ui ← shell ← docs`, and `ui ← ui-native` (tokens only) — enforced in CI
-by a `boundary.test.ts` in each package.
+The dependency graph is strict and one-way — `ui ← shell ← docs`, and `ui ← ui-native` (tokens only, inlined at
+build time) — enforced in CI by a `boundary.test.ts` in each package.
 
 **Social card:** the Open Graph image is [`scripts/og/og.html`](scripts/og/og.html), rendered to
 `packages/docs/public/og.jpg` by `node scripts/og/render.mjs` (run

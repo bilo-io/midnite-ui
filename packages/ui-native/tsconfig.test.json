@@ -1,0 +1,10 @@
+{
+  // The tests and the test setup: the same settings plus the DOM lib, since
+  // they render through react-native-web in jsdom.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src/**/*", "vitest.setup.ts", "vite.config.ts", "vitest.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

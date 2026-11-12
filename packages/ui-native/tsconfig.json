@@ -3,14 +3,15 @@
   "compilerOptions": {
     "composite": false,
     "jsx": "react-jsx",
-    // DOM is here for the tests only (they render through react-native-web in
-    // jsdom); the components themselves touch nothing but `react-native`.
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // No DOM: the shipped components run on React Native, where `window`,
+    // `document` and the DOM event types do not exist. The tests (which render
+    // through react-native-web in jsdom) get DOM from tsconfig.test.json.
+    "lib": ["ES2022"],
     // As in @bilo-io/ui: `tsc` only typechecks (`--noEmit`); the `.d.ts` files
     // come from vite-plugin-dts in the build.
     "declaration": false,
     "declarationMap": false
   },
-  "include": ["src/**/*", "vitest.setup.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

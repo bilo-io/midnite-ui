@@ -70,7 +70,15 @@ export const Field = forwardRef<TextInput, FieldProps & { multiline?: boolean }>
   if (!label) return input;
   return (
     <View style={styles.labelled}>
-      <Text style={[styles.label, { color: theme.colors.foreground }]}>{label}</Text>
+      {/* The input already carries the label as its accessible name; hidden here
+          so VoiceOver/TalkBack do not read it twice. */}
+      <Text
+        importantForAccessibility="no"
+        accessibilityElementsHidden
+        style={[styles.label, { color: theme.colors.foreground }]}
+      >
+        {label}
+      </Text>
       {input}
     </View>
   );

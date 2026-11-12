@@ -3,8 +3,9 @@
 The React Native companion to [`@bilo-io/ui`](../ui): the midnite primitives
 drawn with `View`, `Text`, `Pressable` and `TextInput` and styled with plain
 `StyleSheet`, on the **same token values** as the web library. Colours, radii
-and the brand ramp are read from `@bilo-io/ui/tokens` at runtime, never copied,
-so a token change reaches iOS, Android and the web together.
+and the brand ramp come from `@bilo-io/ui/tokens`, never copied by hand: the
+build reads them from there and inlines them into `dist`, so a token change
+reaches iOS, Android and the web with the next release of both packages.
 
 No native modules, no Tailwind, no NativeWind: it runs in Expo Go, a bare React
 Native app, and on the web through react-native-web (which is how the
@@ -17,10 +18,29 @@ renders it).
 pnpm add @bilo-io/ui-native
 ```
 
-Peers: `react` 19 and `react-native` 0.79 or later. `@bilo-io/ui` comes along as
-a dependency for its tokens only; nothing that touches the DOM is imported.
-Like `@bilo-io/ui`, it is published to GitHub Packages (see the
+Peers: `react` 19 and `react-native` 0.79 or later. There are no other
+dependencies: the published `dist` imports only `react`, `react/jsx-runtime`
+and `react-native`, and its types name nothing else either. `@bilo-io/ui` is
+not installed with it; its token values are already inside the bundle. Like
+`@bilo-io/ui`, it is published to GitHub Packages (see the
 [root README](../../README.md#install) for the `.npmrc`).
+
+### ESM only
+
+The package ships ES modules alone (`"type": "module"`). Metro and Vite take
+that as is. Jest does not transform `node_modules` by default, so with
+`jest-expo` (or the `react-native` preset) add the scope to the packages it
+does transform:
+
+```js
+// jest.config.js
+module.exports = {
+  preset: 'jest-expo',
+  transformIgnorePatterns: [
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|@bilo-io)/)',
+  ],
+};
+```
 
 ## Usage
 
@@ -87,15 +107,29 @@ const [loaded] = useFonts({ Damion: require('./assets/Damion-Regular.ttf') });
 
 | Component                                        | Notes                                                                                                                                                                      |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`                                         | `variant`: default, secondary, outline, ghost, destructive. `size`: default, sm, lg, icon. `loading` shows a spinner and reports busy.                                     |
+| `Button`                                         | `variant`: default, secondary, outline, ghost, destructive. `size`: default, sm, lg, icon. `loading` covers the label with a spinner (the width holds) and reports busy.   |
 | `Input`, `Textarea`                              | Labelled `TextInput`s with the web focus ring and disabled state.                                                                                                          |
 | `Switch`                                         | Controlled; the switch role and an animated thumb drawn like the web Switch, not the platform control.                                                                     |
 | `Tabs`                                           | A segmented control (tablist/tab roles); `stretch` fills the row.                                                                                                          |
 | `Slider`                                         | A `PanResponder` over a painted track. Adjustable role with increment/decrement actions; arrow, Page and Home/End keys on the web. `snapValue` and `valueAt` are exported. |
 | `Card`, `CardHeader`, `CardTitle`, `CardContent` | The web Card's surface, border and spacing.                                                                                                                                |
-| `Accordion`                                      | One collapsible section (stack several), with a count badge, icon and trailing action; `LayoutAnimation` on toggle; `card` or `bare`.                                      |
+| `Accordion`                                      | One collapsible section (stack several), with a count badge, icon and trailing action; `LayoutAnimation` on toggle (see below); `card` or `bare`.                          |
 | `Wordmark`, `MidniteLogo`                        | The brand mark: per-letter colours along the brand ramp with the glow.                                                                                                     |
 | `ThemeProvider`, `useTheme`, `createTheme`       | The palette, `alpha()`, radii and brand ramp for a scheme.                                                                                                                 |
+
+### Accordion animation on Android
+
+The open/close animation is `LayoutAnimation`. On the New Architecture (the
+default since React Native 0.76) it works everywhere. On Android with the legacy
+architecture it is a no-op until the app opts in, once, at startup:
+
+```ts
+import { Platform, UIManager } from 'react-native';
+
+if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental?.(true);
+```
+
+Without it the section still opens and closes, just without the animation.
 
 ## What stays web-only, and why
 
@@ -125,5 +159,8 @@ moon run ui-native:lint
 
 Tests run the components through react-native-web, so they check the roles,
 states and token colours a screen reader and a browser see. `src/boundary.test.ts`
-keeps the shipped source native-safe: no DOM, CSS, `react-dom` or
-`react-native-web` imports, and no hard-coded HSL triplets.
+keeps the shipped source native-safe with an allowlist: relative modules,
+`react`, `react/jsx-runtime`, `react-native` and `@bilo-io/ui/tokens`, nothing
+else, and no hard-coded HSL triplets. The components typecheck without the DOM
+lib (`tsconfig.json`); the tests, which render in jsdom, get it from
+`tsconfig.test.json`.
