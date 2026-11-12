@@ -1,20 +1,18 @@
 <!doctype html>
 <!--
   The site's Open Graph card, 1200×630. scripts/og/render.mjs screenshots this
-  page to packages/docs/public/og.png; edit here, then re-render.
+  page to packages/docs/public/og.jpg; edit here, then re-render. The wordmark,
+  ramp, glow and face come from brand.css under its dark theme.
 -->
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=block"
     />
+    <link rel="stylesheet" href="../../packages/ui/src/styles/brand.css" />
     <style>
-      @font-face {
-        font-family: 'Damion';
-        src: url('../../packages/ui/src/styles/brand/Damion-latin.woff2') format('woff2');
-      }
       html,
       body {
         margin: 0;
@@ -33,7 +31,11 @@
           radial-gradient(ellipse 55% 60% at 12% 95%, hsl(217 85% 35% / 0.35), transparent 70%),
           radial-gradient(ellipse 40% 45% at 95% 100%, hsl(308 70% 35% / 0.25), transparent 70%),
           linear-gradient(180deg, #07070f 0%, #05050a 100%);
-        font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        font-family:
+          'Inter',
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
       }
       svg.sky {
         position: absolute;
@@ -53,46 +55,39 @@
         align-items: center;
         gap: 36px;
       }
-      /* The crescent: black on a white disc, inverted as the dark theme wears it. */
-      .mark {
+      /* The crescent, inverted as the dark theme wears it, with the brand glow. */
+      .dark .mark {
         width: 132px;
         height: 132px;
-        background: url('../../packages/ui/src/styles/brand/midnite-logo.png') center / contain
-          no-repeat;
-        filter: invert(1) drop-shadow(0 0 28px hsl(258 82% 62% / 0.45));
+        filter: invert(1)
+          drop-shadow(0 0 28px color-mix(in srgb, var(--brand-glow) 45%, transparent));
       }
+      /* brand.css sizes "Midnite" at 1.35em of this and spaces "UI" by 0.08em. */
       .wordmark {
         display: flex;
         align-items: baseline;
-        white-space: nowrap;
-        line-height: 1;
+        font-size: 112px;
       }
+      /* The full six-stop ramp, static: the drift's 200% tile would show only half of it. */
       .brand {
-        display: inline-block;
-        padding-right: 0.15em;
-        font-family: 'Damion', cursive;
-        font-size: 168px;
-        letter-spacing: 0.025em;
         background-image: linear-gradient(
           100deg,
-          hsl(217 95% 58%),
-          hsl(235 88% 68%),
-          hsl(258 90% 66%),
-          hsl(271 91% 65%),
-          hsl(285 80% 60%),
-          hsl(308 78% 58%)
+          var(--brand-rainbow-0),
+          var(--brand-rainbow-1),
+          var(--brand-rainbow-2),
+          var(--brand-rainbow-3),
+          var(--brand-rainbow-4),
+          var(--brand-rainbow-5)
         );
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        filter: drop-shadow(0 0 3px hsl(258 82% 62% / 0.55))
-          drop-shadow(0 0 24px hsl(258 82% 62% / 0.4));
+        filter: drop-shadow(0 0 3px color-mix(in srgb, var(--brand-glow) 55%, transparent))
+          drop-shadow(0 0 24px color-mix(in srgb, var(--brand-glow) 40%, transparent));
       }
+      /* The dark theme's --muted-foreground. */
       .product {
-        margin-left: 0.15em;
-        font-size: 112px;
-        font-weight: 500;
-        color: hsl(240 5% 72%);
+        color: hsl(240 5% 64.9%);
       }
       .tagline {
         font-size: 30px;
@@ -107,23 +102,41 @@
       <svg class="sky" width="1200" height="630" viewBox="0 0 1200 630" aria-hidden="true">
         <defs>
           <linearGradient id="orbit" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stop-color="hsl(217 95% 58%)" stop-opacity="0" />
-            <stop offset="0.5" stop-color="hsl(258 90% 66%)" stop-opacity="0.55" />
-            <stop offset="1" stop-color="hsl(308 78% 58%)" stop-opacity="0" />
+            <stop offset="0" style="stop-color: var(--brand-rainbow-0)" stop-opacity="0" />
+            <stop offset="0.5" style="stop-color: var(--brand-rainbow-2)" stop-opacity="0.55" />
+            <stop offset="1" style="stop-color: var(--brand-rainbow-5)" stop-opacity="0" />
           </linearGradient>
         </defs>
         <!-- Two faint orbits sweeping behind the mark. -->
-        <ellipse cx="600" cy="330" rx="560" ry="150" fill="none" stroke="url(#orbit)"
-          stroke-width="1.5" transform="rotate(-9 600 330)" />
-        <ellipse cx="600" cy="330" rx="470" ry="205" fill="none" stroke="url(#orbit)"
-          stroke-width="1" opacity="0.6" transform="rotate(7 600 330)" />
+        <ellipse
+          cx="600"
+          cy="330"
+          rx="560"
+          ry="150"
+          fill="none"
+          stroke="url(#orbit)"
+          stroke-width="1.5"
+          transform="rotate(-9 600 330)"
+        />
+        <ellipse
+          cx="600"
+          cy="330"
+          rx="470"
+          ry="205"
+          fill="none"
+          stroke="url(#orbit)"
+          stroke-width="1"
+          opacity="0.6"
+          transform="rotate(7 600 330)"
+        />
         <g id="stars"></g>
       </svg>
       <div class="content">
         <div class="logo">
-          <div class="mark"></div>
-          <div class="wordmark">
-            <span class="brand">Midnite</span><span class="product">UI</span>
+          <div class="mark mui-logo-mark"></div>
+          <div class="wordmark mui-wordmark">
+            <span class="brand mui-wordmark-brand">Midnite</span
+            ><span class="product mui-wordmark-product">UI</span>
           </div>
         </div>
         <div class="tagline">A React design system — primitives, tokens and an app shell</div>
@@ -132,7 +145,7 @@
     <script>
       // A seeded starfield, so every render draws the same sky.
       let seed = 20261112;
-      const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+      const rand = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32;
       const g = document.getElementById('stars');
       const ns = 'http://www.w3.org/2000/svg';
       for (let i = 0; i < 260; i++) {
