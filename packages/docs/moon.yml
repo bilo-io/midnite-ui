@@ -28,6 +28,7 @@ tasks:
     inputs:
       - 'src/**/*'
       - 'index.html'
+      - 'public/**/*'
       - 'vite.config.ts'
       - 'tailwind.config.ts'
       - 'postcss.config.mjs'
