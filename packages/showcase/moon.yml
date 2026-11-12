@@ -1,12 +1,15 @@
 $schema: 'https://moonrepo.dev/schemas/project.json'
 language: 'typescript'
 
-# The showcase is a pure consumer of @bilo-io/ui: a searchable gallery of every
-# component, each with live examples whose shown source is the file that renders
-# them. It depends on nothing else — enforced by src/boundary.test.ts. Built with Vite (an SPA), so build/dev/
-# preview override the repo's default `tsc -b` build.
+# The showcase is a pure consumer of @bilo-io/ui and @bilo-io/ui-native: a
+# searchable gallery of every component, each with live examples whose shown
+# source is the file that renders them. Its Mobile mode renders the React Native
+# components through react-native-web. It depends on nothing else — enforced by
+# src/boundary.test.ts. Built with Vite (an SPA), so build/dev/preview override
+# the repo's default `tsc -b` build.
 dependsOn:
   - 'ui'
+  - 'ui-native'
 
 tasks:
   dev:
@@ -27,6 +30,7 @@ tasks:
       - 'src/**/*'
       - 'index.html'
       - 'vite.config.ts'
+      - 'react-native-web.config.ts'
       - 'tailwind.config.ts'
       - 'postcss.config.mjs'
       - 'tsconfig.json'
@@ -61,6 +65,7 @@ tasks:
       - 'vite.config.ts'
       - 'vitest.config.ts'
       - 'vitest.setup.ts'
+      - 'react-native-web.config.ts'
 
   lint:
     command: 'pnpm exec eslint .'
@@ -68,6 +73,7 @@ tasks:
       - 'src/**/*'
       - 'vite.config.ts'
       - 'vitest.config.ts'
+      - 'react-native-web.config.ts'
       - 'tailwind.config.ts'
       - 'postcss.config.mjs'
       - '/eslint.config.mjs'

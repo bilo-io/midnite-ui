@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 
-import { type ComponentDoc, COMPONENTS } from '../catalog';
+import { catalogFor, type ComponentDoc } from '../catalog';
 import { examplesFor } from '../examples';
-import { hrefFor } from '../router';
+import { hrefFor, inMode, type Mode } from '../router';
 import { CodeBlock } from './code-block';
 import { ExampleBlock } from './example-block';
 import { InlineCode, PropsTable } from './props-table';
@@ -11,11 +11,26 @@ import { REPO_URL } from './top-bar';
 
 const anchorFor = (key: string) => `example-${key.split('/')[1]}`;
 
-export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: string }) {
-  const examples = examplesFor(doc.id);
-  const index = COMPONENTS.findIndex((c) => c.id === doc.id);
-  const prev = COMPONENTS[index - 1];
-  const next = COMPONENTS[index + 1];
+const PACKAGE: Record<Mode, { name: string; src: string }> = {
+  web: { name: '@bilo-io/ui', src: 'packages/ui/src/components' },
+  mobile: { name: '@bilo-io/ui-native', src: 'packages/ui-native/src/components' },
+};
+
+export function ComponentPage({
+  doc,
+  example,
+  mode = 'web',
+}: {
+  doc: ComponentDoc;
+  example?: string;
+  mode?: Mode;
+}) {
+  const examples = examplesFor(doc.id, mode);
+  const { components } = catalogFor(mode);
+  const index = components.findIndex((c) => c.id === doc.id);
+  const prev = components[index - 1];
+  const next = components[index + 1];
+  const pkg = PACKAGE[mode];
 
   useEffect(() => {
     if (example)
@@ -23,7 +38,7 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
     else window.scrollTo({ top: 0 });
   }, [doc.id, example]);
 
-  const importLine = `import { ${doc.exports.join(', ')} } from '@bilo-io/ui';`;
+  const importLine = `import { ${doc.exports.join(', ')} } from '${pkg.name}';`;
 
   return (
     <div className="flex gap-10">
@@ -34,8 +49,14 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
           <p className="max-w-2xl text-base text-muted-foreground">
             <InlineCode text={doc.description} />
           </p>
+          {mode === 'mobile' ? (
+            <p className="max-w-2xl text-sm text-muted-foreground">
+              React Native, rendered here through react-native-web on a 390×844 screen. The code
+              panels hold the exact source of each preview.
+            </p>
+          ) : null}
           <a
-            href={`${REPO_URL}/tree/main/packages/ui/src/components`}
+            href={`${REPO_URL}/tree/main/${pkg.src}`}
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
           >
             Source <ExternalLink className="h-3 w-3" />
@@ -46,7 +67,7 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
 
         <div className="space-y-10">
           {examples.map((ex) => (
-            <ExampleBlock key={ex.key} example={ex} anchor={anchorFor(ex.key)} />
+            <ExampleBlock key={ex.key} example={ex} anchor={anchorFor(ex.key)} mode={mode} />
           ))}
         </div>
 
@@ -61,7 +82,7 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
         >
           {prev ? (
             <a
-              href={hrefFor({ page: 'component', id: prev.id })}
+              href={hrefFor(inMode({ page: 'component', id: prev.id }, mode))}
               className="group rounded-xl border border-border/60 p-4 hover:border-border"
             >
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -74,7 +95,7 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
           )}
           {next ? (
             <a
-              href={hrefFor({ page: 'component', id: next.id })}
+              href={hrefFor(inMode({ page: 'component', id: next.id }, mode))}
               className="group rounded-xl border border-border/60 p-4 text-right hover:border-border"
             >
               <span className="flex items-center justify-end gap-1 text-xs text-muted-foreground">
@@ -94,7 +115,9 @@ export function ComponentPage({ doc, example }: { doc: ComponentDoc; example?: s
           {examples.map((ex) => (
             <a
               key={ex.key}
-              href={hrefFor({ page: 'component', id: doc.id, example: ex.key.split('/')[1] })}
+              href={hrefFor(
+                inMode({ page: 'component', id: doc.id, example: ex.key.split('/')[1] }, mode),
+              )}
               className="block text-muted-foreground hover:text-foreground"
             >
               {ex.title}

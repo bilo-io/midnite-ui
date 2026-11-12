@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { COMPONENTS } from './catalog';
+import { COMPONENTS, NATIVE_COMPONENTS } from './catalog';
 import { searchComponents } from './search';
 
 const names = (q: string) => searchComponents(q, COMPONENTS).map((h) => h.doc.name);
@@ -32,5 +32,19 @@ describe('searchComponents', () => {
 
   it('is case and punctuation insensitive', () => {
     expect(names('Dark-Mode')).toEqual(['ThemeToggle']);
+  });
+});
+
+describe('searchComponents over the native catalog', () => {
+  const native = (q: string) => searchComponents(q, NATIVE_COMPONENTS).map((h) => h.doc.name);
+
+  it('finds React Native components by name and by platform keyword', () => {
+    expect(native('slider')[0]).toBe('Slider');
+    expect(native('android')).toHaveLength(NATIVE_COMPONENTS.length);
+    expect(native('panresponder')).toEqual(['Slider']);
+  });
+
+  it('does not list web-only components', () => {
+    expect(native('gauge')).toEqual([]);
   });
 });

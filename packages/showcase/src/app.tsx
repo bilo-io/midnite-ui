@@ -8,7 +8,8 @@ import { HomePage } from './components/home-page';
 import { Sidebar } from './components/sidebar';
 import { TokensPage } from './components/tokens-page';
 import { TopBar } from './components/top-bar';
-import { useRoute } from './router';
+import { hrefFor, inMode, modeOf, rememberMode, useRoute } from './router';
+import { PRODUCT } from './components/top-bar';
 
 export function App() {
   const route = useRoute();
@@ -32,26 +33,40 @@ export function App() {
 
   useEffect(() => setMenuOpen(false), [route]);
 
-  const doc = route.page === 'component' ? findComponent(route.id) : undefined;
+  const mode = modeOf(route);
+  useEffect(() => {
+    rememberMode(mode);
+    document.title = `Midnite ${PRODUCT[mode]} · showcase`;
+  }, [mode]);
+
+  const doc = route.page === 'component' ? findComponent(route.id, mode) : undefined;
 
   let page;
   if (route.page === 'tokens') page = <TokensPage />;
   else if (route.page === 'component' && doc)
-    page = <ComponentPage doc={doc} example={route.example} />;
+    page = <ComponentPage doc={doc} example={route.example} mode={mode} />;
   else if (route.page === 'component')
     page = (
       <div className="py-24 text-center">
         <h1 className="text-2xl font-semibold">No component called “{route.id}”</h1>
-        <a href="#/" className="mt-4 inline-block text-sm text-muted-foreground underline">
+        <a
+          href={hrefFor(inMode({ page: 'home' }, mode))}
+          className="mt-4 inline-block text-sm text-muted-foreground underline"
+        >
           Back to the overview
         </a>
       </div>
     );
-  else page = <HomePage />;
+  // Keyed by mode: the overview's filter state belongs to one catalog.
+  else page = <HomePage key={mode} mode={mode} />;
 
   return (
     <div className="min-h-screen">
-      <TopBar onSearch={() => setPaletteOpen(true)} onMenu={() => setMenuOpen(true)} />
+      <TopBar
+        route={route}
+        onSearch={() => setPaletteOpen(true)}
+        onMenu={() => setMenuOpen(true)}
+      />
 
       <div className="mx-auto flex max-w-[1400px] gap-10 px-4 sm:px-6">
         <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto py-8 lg:block">
@@ -87,7 +102,7 @@ export function App() {
         </div>
       ) : null}
 
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} mode={mode} />
     </div>
   );
 }

@@ -4,14 +4,14 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-// The showcase is a pure consumer of the published library: it may import
-// `@bilo-io/ui` (public entries only) and nothing else from
-// the workspace. This guard greps the source for any other workspace import.
+// The showcase is a pure consumer of the published libraries: it may import
+// `@bilo-io/ui` and `@bilo-io/ui-native` (public entries only) and nothing else
+// from the workspace. This guard greps the source for any other workspace import.
 
 const srcDir = fileURLToPath(new URL('./', import.meta.url));
 
 /** Quoted specifier for any workspace package the showcase must NOT import (legacy scope included). */
-const FORBIDDEN_IMPORT = /['"]@(?:bilo-io|midnite)\/(?!ui(?:\/|['"]))[^'"]+['"]/;
+const FORBIDDEN_IMPORT = /['"]@(?:bilo-io|midnite)\/(?!ui(?:-native)?(?:\/|['"]))[^'"]+['"]/;
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -25,7 +25,7 @@ function sourceFiles(dir: string): string[] {
 }
 
 describe('@bilo-io/showcase package boundary', () => {
-  it('imports only @bilo-io/ui from the workspace', () => {
+  it('imports only @bilo-io/ui and @bilo-io/ui-native from the workspace', () => {
     const offenders = sourceFiles(srcDir)
       .filter((file) => FORBIDDEN_IMPORT.test(readFileSync(file, 'utf8')))
       .map((file) => file.slice(srcDir.length));

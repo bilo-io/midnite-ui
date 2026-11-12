@@ -3,8 +3,8 @@ import { LayoutGrid, Palette } from 'lucide-react';
 
 import { cn } from '@bilo-io/ui';
 
-import { CATEGORIES, COMPONENTS } from '../catalog';
-import { hrefFor, type Route } from '../router';
+import { catalogFor } from '../catalog';
+import { hrefFor, inMode, modeOf, type Route } from '../router';
 
 function NavLink({
   href,
@@ -33,6 +33,8 @@ function NavLink({
 
 export function Sidebar({ route, onNavigate }: { route: Route; onNavigate?: () => void }) {
   const currentId = route.page === 'component' ? route.id : null;
+  const mode = modeOf(route);
+  const { components, categories } = catalogFor(mode);
   return (
     <nav
       aria-label="Components"
@@ -40,15 +42,15 @@ export function Sidebar({ route, onNavigate }: { route: Route; onNavigate?: () =
       onClick={(e) => (e.target as HTMLElement).closest('a') && onNavigate?.()}
     >
       <div className="space-y-0.5">
-        <NavLink href={hrefFor({ page: 'home' })} active={route.page === 'home'}>
+        <NavLink href={hrefFor(inMode({ page: 'home' }, mode))} active={route.page === 'home'}>
           <LayoutGrid className="h-4 w-4" /> Overview
         </NavLink>
-        <NavLink href={hrefFor({ page: 'tokens' })} active={route.page === 'tokens'}>
+        <NavLink href={hrefFor(inMode({ page: 'tokens' }, mode))} active={route.page === 'tokens'}>
           <Palette className="h-4 w-4" /> Design tokens
         </NavLink>
       </div>
-      {CATEGORIES.map((category) => {
-        const docs = COMPONENTS.filter((c) => c.category === category);
+      {categories.map((category) => {
+        const docs = components.filter((c) => c.category === category);
         if (docs.length === 0) return null;
         return (
           <div key={category} className="space-y-1">
@@ -59,7 +61,7 @@ export function Sidebar({ route, onNavigate }: { route: Route; onNavigate?: () =
               {docs.map((doc) => (
                 <NavLink
                   key={doc.id}
-                  href={hrefFor({ page: 'component', id: doc.id })}
+                  href={hrefFor(inMode({ page: 'component', id: doc.id }, mode))}
                   active={doc.id === currentId}
                 >
                   {doc.name}

@@ -1,7 +1,14 @@
+import type { Mode } from './router';
+
 // The showcase's table of contents: one entry per component page, in the order
 // the sidebar lists them. The live examples are NOT here — they are the files
 // under ./examples/<id>/, discovered by ./examples.ts, so adding a demo is adding
 // a file. catalog.test.ts holds the two in step.
+//
+// Two catalogs, one per platform: COMPONENTS is @bilo-io/ui (the Web / Desktop
+// showcase), NATIVE_COMPONENTS is @bilo-io/ui-native (the Mobile one, examples
+// under ./examples/native-<id>/). Ids repeat across them on purpose, so the
+// platform toggle can keep you on the same component.
 
 export type Category =
   | 'Actions & forms'
@@ -12,7 +19,8 @@ export type Category =
   | 'Theming'
   | 'Brand'
   | 'Icons'
-  | 'Reading';
+  | 'Reading'
+  | 'Midnite Mobile UI';
 
 export const CATEGORIES: readonly Category[] = [
   'Actions & forms',
@@ -25,6 +33,10 @@ export const CATEGORIES: readonly Category[] = [
   'Icons',
   'Reading',
 ];
+
+/** The Mobile showcase lists every React Native component under one heading. */
+export const NATIVE_CATEGORY = 'Midnite Mobile UI' satisfies Category;
+export const NATIVE_CATEGORIES: readonly Category[] = [NATIVE_CATEGORY];
 
 export type PropDoc = {
   name: string;
@@ -583,6 +595,301 @@ export const COMPONENTS: readonly ComponentDoc[] = [
   },
 ];
 
-export function findComponent(id: string): ComponentDoc | undefined {
-  return COMPONENTS.find((c) => c.id === id);
+const RN_KEYWORDS = ['react native', 'mobile', 'ios', 'android', 'native'];
+
+export const NATIVE_COMPONENTS: readonly ComponentDoc[] = [
+  {
+    id: 'button',
+    name: 'Button',
+    category: NATIVE_CATEGORY,
+    description:
+      'The primary action as a `Pressable`, with the web Button’s five variants and four sizes on the same tokens. `loading` swaps in a spinner and reports busy.',
+    exports: ['Button'],
+    keywords: ['cta', 'action', 'press', 'pressable', 'spinner', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'variant',
+        type: "'default' | 'secondary' | 'outline' | 'ghost' | 'destructive'",
+        default: "'default'",
+        description: 'Visual weight of the button.',
+      },
+      {
+        name: 'size',
+        type: "'default' | 'sm' | 'lg' | 'icon'",
+        default: "'default'",
+        description:
+          'Height and padding in dp (36, 32, 40; `icon` is 36×36). Label an icon button.',
+      },
+      {
+        name: 'children',
+        type: 'ReactNode',
+        description: 'A string is set in the label style; anything else renders as given.',
+      },
+      {
+        name: 'loading',
+        type: 'boolean',
+        default: 'false',
+        description: 'Shows an `ActivityIndicator`, blocks presses, sets `busy`.',
+      },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Blocks presses.' },
+      { name: 'textStyle', type: 'StyleProp<TextStyle>', description: 'Extra label style.' },
+      {
+        name: '...props',
+        type: 'PressableProps',
+        description: 'Any `Pressable` prop: `onPress`, `accessibilityLabel`, `hitSlop`, …',
+      },
+    ],
+  },
+  {
+    id: 'input',
+    name: 'Input',
+    category: NATIVE_CATEGORY,
+    description:
+      'A single-line `TextInput` on the field tokens, with the ring colour on focus. `label` draws a visible label and names the field.',
+    exports: ['Input'],
+    keywords: ['text field', 'form', 'textinput', 'keyboard', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'label',
+        type: 'string',
+        description: 'Visible label; also the accessible name unless `accessibilityLabel` is set.',
+      },
+      {
+        name: 'disabled',
+        type: 'boolean',
+        default: 'false',
+        description: 'Read-only, dimmed and reported disabled.',
+      },
+      {
+        name: '...props',
+        type: 'TextInputProps',
+        description: 'Any `TextInput` prop: `value`, `onChangeText`, `keyboardType`, …',
+      },
+    ],
+  },
+  {
+    id: 'textarea',
+    name: 'Textarea',
+    category: NATIVE_CATEGORY,
+    description: 'A multi-line field matching Input: at least 80dp tall, text from the top.',
+    exports: ['Textarea'],
+    keywords: ['multiline', 'form', 'textinput', ...RN_KEYWORDS],
+    props: [
+      { name: 'numberOfLines', type: 'number', default: '4', description: 'Initial rows.' },
+      { name: 'label', type: 'string', description: 'As on Input.' },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'As on Input.' },
+      { name: '...props', type: 'TextInputProps', description: 'Any `TextInput` prop.' },
+    ],
+  },
+  {
+    id: 'switch',
+    name: 'Switch',
+    category: NATIVE_CATEGORY,
+    description:
+      'A controlled on/off toggle with the switch role and an animated thumb, drawn like the web Switch rather than the platform control.',
+    exports: ['Switch'],
+    keywords: ['toggle', 'setting', 'boolean', ...RN_KEYWORDS],
+    props: [
+      { name: 'checked', type: 'boolean', description: 'Current state.' },
+      {
+        name: 'onCheckedChange',
+        type: '(checked: boolean) => void',
+        description: 'Called with the next state.',
+      },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Locks the switch.' },
+      {
+        name: 'accessibilityLabel',
+        type: 'string',
+        description: 'Name it when no visible text does.',
+      },
+    ],
+  },
+  {
+    id: 'tabs',
+    name: 'Tabs',
+    category: NATIVE_CATEGORY,
+    description:
+      'The segmented control: a tab list whose selected segment sits on the accent fill. `stretch` shares the full width, the usual phone layout.',
+    exports: ['Tabs', 'TabOption'],
+    keywords: ['segmented control', 'tablist', 'switcher', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'options',
+        type: 'TabOption<T>[]',
+        description: '`{ value, label, icon? }` per segment.',
+      },
+      { name: 'value', type: 'T', description: 'The selected segment.' },
+      { name: 'onChange', type: '(value: T) => void', description: 'Called on press.' },
+      {
+        name: 'accessibilityLabel',
+        type: 'string',
+        description: 'Accessible name of the tab list.',
+      },
+      {
+        name: 'stretch',
+        type: 'boolean',
+        default: 'false',
+        description: 'Segments share the full width.',
+      },
+    ],
+  },
+  {
+    id: 'slider',
+    name: 'Slider',
+    category: NATIVE_CATEGORY,
+    description:
+      'A range slider in pure React Native: a PanResponder over a painted track, no native module. Screen readers get the adjustable role; on the web it answers the arrow, Page and Home/End keys.',
+    exports: ['Slider', 'snapValue'],
+    keywords: ['range', 'knob', 'volume', 'drag', 'panresponder', 'adjustable', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'value',
+        type: 'number',
+        description: 'Controlled value. Omit it (and pass `defaultValue`) for uncontrolled.',
+      },
+      { name: 'defaultValue', type: 'number', default: 'min', description: 'Uncontrolled start.' },
+      { name: 'min', type: 'number', default: '0', description: 'Lowest value.' },
+      { name: 'max', type: 'number', default: '100', description: 'Highest value.' },
+      { name: 'step', type: 'number', default: '1', description: 'Snap and key increment.' },
+      {
+        name: 'onValueChange',
+        type: '(value: number) => void',
+        description: 'Called with each new value while dragging or stepping.',
+      },
+      {
+        name: 'onSlidingComplete',
+        type: '(value: number) => void',
+        description: 'Called once when a drag ends.',
+      },
+      {
+        name: 'color',
+        type: 'string',
+        default: 'primary token',
+        description:
+          'Fill and knob colour. (No gradients: RN cannot paint one without a native module.)',
+      },
+      {
+        name: 'label',
+        type: 'string',
+        description: 'Visible label with the value beside it; also the accessible name.',
+      },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Locks and dims it.' },
+    ],
+  },
+  {
+    id: 'card',
+    name: 'Card',
+    category: NATIVE_CATEGORY,
+    description:
+      'The bordered surface, with header, title and content parts. Each part is a `View` (the title a header-role `Text`) and forwards its props.',
+    exports: ['Card', 'CardHeader', 'CardTitle', 'CardContent'],
+    keywords: ['panel', 'surface', 'container', ...RN_KEYWORDS],
+    props: [
+      {
+        name: '...props',
+        type: 'ViewProps | TextProps',
+        description: 'Each part forwards its props and `style`, accessibility props included.',
+      },
+    ],
+  },
+  {
+    id: 'accordion',
+    name: 'Accordion',
+    category: NATIVE_CATEGORY,
+    description:
+      'A titled disclosure section with an optional count and trailing action. Uncontrolled; the trigger reports `expanded`, and the body animates with LayoutAnimation on device.',
+    exports: ['Accordion'],
+    keywords: ['disclosure', 'expand', 'section', 'collapse', ...RN_KEYWORDS],
+    props: [
+      { name: 'title', type: 'string', description: 'Section heading.' },
+      { name: 'count', type: 'number', description: 'A badge after the title.' },
+      { name: 'icon', type: 'ReactNode', description: 'Leading glyph.' },
+      { name: 'action', type: 'ReactNode', description: 'Trailing control, outside the trigger.' },
+      { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial state.' },
+      {
+        name: 'variant',
+        type: "'card' | 'bare'",
+        default: "'card'",
+        description: 'With or without the card surface.',
+      },
+    ],
+  },
+  {
+    id: 'theme-provider',
+    name: 'ThemeProvider',
+    category: NATIVE_CATEGORY,
+    description:
+      'Light and dark from the @bilo-io/ui tokens. Follows the device (`useColorScheme`) unless `scheme` pins one; `useTheme` hands any component the colours and radii.',
+    exports: ['ThemeProvider', 'useTheme', 'createTheme'],
+    keywords: ['theme', 'dark mode', 'tokens', 'colors', 'usecolorscheme', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'scheme',
+        type: "'light' | 'dark'",
+        default: 'device',
+        description: 'Pin the scheme, e.g. to an in-app theme switch.',
+      },
+      {
+        name: 'brandFontFamily',
+        type: 'string',
+        description:
+          'The family the app registered Damion under. Native only; the web uses brand.css.',
+      },
+      { name: 'children', type: 'ReactNode', description: 'The themed tree.' },
+    ],
+  },
+  {
+    id: 'wordmark',
+    name: 'Wordmark',
+    category: NATIVE_CATEGORY,
+    description:
+      'The wordmark and crescent. RN cannot clip a gradient to text, so the rainbow tone steps the ramp letter by letter; the crescent is the website mark, pre-inverted for dark.',
+    exports: ['Wordmark', 'MidniteLogo'],
+    keywords: ['brand', 'logo', 'crescent', 'damion', 'rainbow', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'product',
+        type: 'string',
+        description: 'The second half: "UI", "Mobile UI". Omit for "Midnite" alone.',
+      },
+      {
+        name: 'tone',
+        type: "'rainbow' | 'inherit'",
+        default: "'rainbow'",
+        description: 'Ramp and glow, or one colour (`color`, else foreground).',
+      },
+      {
+        name: 'size',
+        type: 'number',
+        default: '16',
+        description:
+          'Wordmark: the qualifier size in dp ("Midnite" is 1.35× it). MidniteLogo: the crescent.',
+      },
+      {
+        name: 'textSize',
+        type: 'number',
+        default: '16',
+        description: 'MidniteLogo only: the wordmark size beside the crescent.',
+      },
+      {
+        name: 'markOnly',
+        type: 'boolean',
+        default: 'false',
+        description: 'MidniteLogo only: the crescent without the wordmark.',
+      },
+    ],
+  },
+];
+
+export function catalogFor(mode: Mode): {
+  components: readonly ComponentDoc[];
+  categories: readonly Category[];
+} {
+  return mode === 'mobile'
+    ? { components: NATIVE_COMPONENTS, categories: NATIVE_CATEGORIES }
+    : { components: COMPONENTS, categories: CATEGORIES };
+}
+
+export function findComponent(id: string, mode: Mode = 'web'): ComponentDoc | undefined {
+  return catalogFor(mode).components.find((c) => c.id === id);
 }
