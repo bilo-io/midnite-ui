@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, ExternalLink } from 'lucide-react';
 
 import { catalogFor, type ComponentDoc } from '../catalog';
-import { examplesFor } from '../examples';
+import { anchorFor, examplesFor } from '../examples';
+import { NativeExamples, NativeExampleToc } from '../mobile/lazy';
 import { hrefFor, inMode, type Mode } from '../router';
 import { CodeBlock } from './code-block';
 import { ExampleBlock } from './example-block';
+import { ExampleToc, scrollToExample } from './example-toc';
 import { InlineCode, PropsTable } from './props-table';
 import { REPO_URL } from './top-bar';
-
-const anchorFor = (key: string) => `example-${key.split('/')[1]}`;
 
 const PACKAGE: Record<Mode, { name: string; src: string }> = {
   web: { name: '@bilo-io/ui', src: 'packages/ui/src/components' },
@@ -25,18 +25,18 @@ export function ComponentPage({
   example?: string;
   mode?: Mode;
 }) {
-  const examples = examplesFor(doc.id, mode);
   const { components } = catalogFor(mode);
   const index = components.findIndex((c) => c.id === doc.id);
   const prev = components[index - 1];
   const next = components[index + 1];
   const pkg = PACKAGE[mode];
 
+  // In Mobile mode the sections arrive with a lazy chunk; NativeExamples
+  // scrolls to `example` itself once they exist.
   useEffect(() => {
-    if (example)
-      document.getElementById(`example-${example}`)?.scrollIntoView({ behavior: 'smooth' });
+    if (example) scrollToExample(example);
     else window.scrollTo({ top: 0 });
-  }, [doc.id, example]);
+  }, [doc.id, example, mode]);
 
   const importLine = `import { ${doc.exports.join(', ')} } from '${pkg.name}';`;
 
@@ -66,9 +66,15 @@ export function ComponentPage({
         <CodeBlock code={importLine} />
 
         <div className="space-y-10">
-          {examples.map((ex) => (
-            <ExampleBlock key={ex.key} example={ex} anchor={anchorFor(ex.key)} mode={mode} />
-          ))}
+          {mode === 'mobile' ? (
+            <Suspense fallback={<MobileLoading />}>
+              <NativeExamples docId={doc.id} example={example} />
+            </Suspense>
+          ) : (
+            examplesFor(doc.id).map((ex) => (
+              <ExampleBlock key={ex.key} example={ex} anchor={anchorFor(ex.key)} />
+            ))
+          )}
         </div>
 
         <section id="props" className="scroll-mt-24 space-y-3">
@@ -112,17 +118,13 @@ export function ComponentPage({
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
             On this page
           </p>
-          {examples.map((ex) => (
-            <a
-              key={ex.key}
-              href={hrefFor(
-                inMode({ page: 'component', id: doc.id, example: ex.key.split('/')[1] }, mode),
-              )}
-              className="block text-muted-foreground hover:text-foreground"
-            >
-              {ex.title}
-            </a>
-          ))}
+          {mode === 'mobile' ? (
+            <Suspense fallback={null}>
+              <NativeExampleToc docId={doc.id} />
+            </Suspense>
+          ) : (
+            <ExampleToc docId={doc.id} examples={examplesFor(doc.id)} mode={mode} />
+          )}
           <button
             type="button"
             onClick={() => document.getElementById('props')?.scrollIntoView({ behavior: 'smooth' })}
@@ -132,6 +134,18 @@ export function ComponentPage({
           </button>
         </div>
       </aside>
+    </div>
+  );
+}
+
+/** Holds the place of the phone previews while the Mobile chunk loads. */
+function MobileLoading() {
+  return (
+    <div
+      role="status"
+      className="flex h-64 items-center justify-center rounded-xl border border-dashed border-border/60 text-sm text-muted-foreground"
+    >
+      Loading the React Native previews…
     </div>
   );
 }

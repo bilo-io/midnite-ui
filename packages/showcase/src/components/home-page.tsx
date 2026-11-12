@@ -1,15 +1,14 @@
-import { type ComponentType, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 
 import { Button, DynamicBackground, Wordmark, cn } from '@bilo-io/ui';
 
-import { catalogFor, type Category, COMPONENTS, type ComponentDoc } from '../catalog';
+import { catalogFor, type Category, COMPONENTS } from '../catalog';
 import { examplesFor } from '../examples';
+import { NativeCardPreview } from '../mobile/lazy';
 import { hrefFor, inMode, type Mode } from '../router';
 import { searchComponents } from '../search';
 import { CopyButton } from './code-block';
-import { NativeScreen, NativeTheme } from './native-stage';
-import { SCREEN_W } from './phone-frame';
 import { InlineCode } from './props-table';
 import { DOCS_URL } from './top-bar';
 
@@ -85,8 +84,7 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
         ) : (
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {results.map(({ doc }) => {
-              const first = examplesFor(doc.id, mode)[0];
-              const Preview = first?.Component;
+              const Preview = mode === 'web' ? examplesFor(doc.id)[0]?.Component : undefined;
               return (
                 <li key={doc.id}>
                   <a
@@ -99,7 +97,10 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
                       className="showcase-canvas relative flex h-44 items-center justify-center overflow-hidden border-b border-border/60"
                     >
                       {mode === 'mobile' ? (
-                        <NativeCardPreview doc={doc} Preview={Preview} />
+                        // No fallback: the card's canvas stays empty for the moment the chunk takes.
+                        <Suspense fallback={null}>
+                          <NativeCardPreview doc={doc} />
+                        </Suspense>
                       ) : (
                         /* Rendered larger than the card and scaled down, so a preview keeps its real proportions. */
                         <div
@@ -229,26 +230,5 @@ function MobileHero() {
         </p>
       </div>
     </section>
-  );
-}
-
-/** A native demo in a card: the top of a phone screen, at real width and scaled down. */
-function NativeCardPreview({
-  doc,
-  Preview,
-}: {
-  doc: ComponentDoc;
-  Preview: ComponentType | undefined;
-}) {
-  return (
-    <div
-      aria-label={`${doc.name} preview`}
-      className="pointer-events-none absolute left-1/2 top-4 shrink-0 origin-top -translate-x-1/2 scale-[0.62] overflow-hidden rounded-t-[28px] border border-b-0 border-border/60 shadow-lg"
-      style={{ width: SCREEN_W }}
-    >
-      <NativeTheme>
-        <NativeScreen>{Preview ? <Preview /> : null}</NativeScreen>
-      </NativeTheme>
-    </div>
   );
 }

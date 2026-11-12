@@ -1,12 +1,11 @@
 import type { ComponentType } from 'react';
 
-import type { Mode } from './router';
-
 // Every live demo is a file at ./examples/<component-id>/<NN>-<slug>.tsx whose
 // default export renders it. The same file is loaded twice: once as a module (the
 // demo) and once `?raw` (the code panel), so the code a reader copies is exactly
 // the code that drew the preview. The Mobile showcase's React Native demos sit
-// beside them as ./examples/native-<component-id>/…; the two sets never mix.
+// beside them as ./examples/native-<component-id>/…; the two sets never mix, and
+// the native ones are loaded by ./mobile (a lazy chunk), not here.
 
 export type Example = {
   componentId: string;
@@ -17,18 +16,15 @@ export type Example = {
   source: string;
 };
 
-type Module = { default: ComponentType };
+export type ExampleModule = { default: ComponentType };
 
-const webModules = import.meta.glob<Module>(['./examples/*/*.tsx', '!./examples/native-*/*.tsx'], {
-  eager: true,
-});
+const webModules = import.meta.glob<ExampleModule>(
+  ['./examples/*/*.tsx', '!./examples/native-*/*.tsx'],
+  {
+    eager: true,
+  },
+);
 const webSources = import.meta.glob<string>(['./examples/*/*.tsx', '!./examples/native-*/*.tsx'], {
-  eager: true,
-  query: '?raw',
-  import: 'default',
-});
-const nativeModules = import.meta.glob<Module>('./examples/native-*/*.tsx', { eager: true });
-const nativeSources = import.meta.glob<string>('./examples/native-*/*.tsx', {
   eager: true,
   query: '?raw',
   import: 'default',
@@ -53,8 +49,12 @@ export function titleFromSlug(slug: string): string {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-function load(
-  modules: Record<string, Module>,
+/** The DOM id of an example's section: `button/sizes` → `example-sizes`. */
+export const anchorFor = (key: string) => `example-${key.split('/')[1]}`;
+
+/** Groups glob results by component id, each list in file order. */
+export function load(
+  modules: Record<string, ExampleModule>,
   sources: Record<string, string>,
   idOf: (folder: string) => string,
 ): Map<string, Example[]> {
@@ -85,13 +85,6 @@ function load(
 /** The web demos, keyed by component id. */
 export const EXAMPLES: ReadonlyMap<string, Example[]> = load(webModules, webSources, (f) => f);
 
-/** The React Native demos, keyed by the native component id (the folder minus `native-`). */
-export const NATIVE_EXAMPLES: ReadonlyMap<string, Example[]> = load(
-  nativeModules,
-  nativeSources,
-  (folder) => folder.slice(NATIVE_PREFIX.length),
-);
-
-export function examplesFor(componentId: string, mode: Mode = 'web'): Example[] {
-  return (mode === 'mobile' ? NATIVE_EXAMPLES : EXAMPLES).get(componentId) ?? [];
+export function examplesFor(componentId: string): Example[] {
+  return EXAMPLES.get(componentId) ?? [];
 }

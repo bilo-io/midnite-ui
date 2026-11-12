@@ -603,7 +603,7 @@ export const NATIVE_COMPONENTS: readonly ComponentDoc[] = [
     name: 'Button',
     category: NATIVE_CATEGORY,
     description:
-      'The primary action as a `Pressable`, with the web Button’s five variants and four sizes on the same tokens. `loading` swaps in a spinner and reports busy.',
+      'The primary action as a `Pressable`, with the web Button’s five variants and four sizes on the same tokens. `loading` covers the label with a spinner and reports busy.',
     exports: ['Button'],
     keywords: ['cta', 'action', 'press', 'pressable', 'spinner', ...RN_KEYWORDS],
     props: [
@@ -629,7 +629,8 @@ export const NATIVE_COMPONENTS: readonly ComponentDoc[] = [
         name: 'loading',
         type: 'boolean',
         default: 'false',
-        description: 'Shows an `ActivityIndicator`, blocks presses, sets `busy`.',
+        description:
+          'Hides the content under an `ActivityIndicator` (the width holds), blocks presses, sets `busy`.',
       },
       { name: 'disabled', type: 'boolean', default: 'false', description: 'Blocks presses.' },
       { name: 'textStyle', type: 'StyleProp<TextStyle>', description: 'Extra label style.' },

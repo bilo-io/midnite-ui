@@ -10,7 +10,8 @@ import {
   catalogFor,
   findComponent,
 } from './catalog';
-import { EXAMPLES, NATIVE_EXAMPLES, parseExamplePath, titleFromSlug } from './examples';
+import { EXAMPLES, parseExamplePath, titleFromSlug } from './examples';
+import { NATIVE_EXAMPLES } from './mobile/mobile';
 
 describe('catalog', () => {
   it('has unique ids', () => {

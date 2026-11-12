@@ -52,6 +52,8 @@ tasks:
       - 'src/**/*'
       - 'vite.config.ts'
       - 'vitest.config.ts'
+      - 'vitest.setup.ts'
+      - 'react-native-web.config.ts'
       - 'tailwind.config.ts'
       - 'tsconfig.json'
 

@@ -32,4 +32,21 @@ describe('@bilo-io/showcase package boundary', () => {
 
     expect(offenders).toEqual([]);
   });
+
+  // The Mobile mode is a lazy chunk: react-native-web, @bilo-io/ui-native and
+  // the native demos load only when someone opens it. A static import of any of
+  // them from the rest of the app would pull them back into the main bundle.
+  it('reaches the Mobile mode only through mobile/lazy', () => {
+    const mobileOnly =
+      /(?:from|import)\s*\(?\s*['"](?:react-native|@bilo-io\/ui-native|[./]+\/mobile(?:\/(?!lazy['"])[^'"]*)?)['"]/;
+    const offenders = sourceFiles(srcDir)
+      .filter((file) => {
+        const rel = file.slice(srcDir.length);
+        return !rel.startsWith('mobile/') && !/^examples\/native-/.test(rel);
+      })
+      .filter((file) => mobileOnly.test(readFileSync(file, 'utf8')))
+      .map((file) => file.slice(srcDir.length));
+
+    expect(offenders).toEqual([]);
+  });
 });

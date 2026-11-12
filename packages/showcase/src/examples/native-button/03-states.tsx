@@ -12,7 +12,7 @@ export default function States() {
   return (
     <View style={styles.stack}>
       <Button loading={saving} onPress={save}>
-        {saving ? 'Saving…' : 'Save changes'}
+        Save changes
       </Button>
       <Button variant="outline" disabled>
         Disabled
