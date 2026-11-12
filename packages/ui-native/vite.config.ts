@@ -13,8 +13,7 @@ const r = (p: string) => resolve(here, p);
 // in the consuming app. `@bilo-io/ui` is a devDependency and is NOT external:
 // the token values are read from `@bilo-io/ui/tokens` at build time and inlined
 // into dist, so the published package has no runtime dependency on the web
-// library (and the 0.2.0 `@bilo-io/ui` on the registry, which predates
-// `./tokens`, never has to resolve).
+// library (and an RN app never installs its DOM-only dependencies).
 const pkg = JSON.parse(readFileSync(r('package.json'), 'utf8')) as {
   peerDependencies?: Record<string, string>;
 };

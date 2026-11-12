@@ -28,6 +28,8 @@ personal access token with the `read:packages` scope, then add to your `.npmrc`:
 
 ```bash
 pnpm add @bilo-io/ui @bilo-io/shell
+# React Native:
+pnpm add @bilo-io/ui-native
 ```
 
 `react` / `react-dom` v19 are peer dependencies. `@bilo-io/shell` additionally
@@ -66,6 +68,10 @@ See [Theming & tokens](https://bilo-io.github.io/midnite-ui/#/ui/theming) for th
 full token→color mapping.
 
 ### React Native (`@bilo-io/ui-native`)
+
+```bash
+pnpm add @bilo-io/ui-native
+```
 
 ```tsx
 import { Button, ThemeProvider } from '@bilo-io/ui-native';
