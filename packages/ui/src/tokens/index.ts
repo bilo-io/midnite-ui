@@ -141,6 +141,42 @@ export const accentHues = {
   },
 } as const;
 
+/** One theme's brand ramp: six stops, left to right, and the glow behind the letterforms. */
+export type BrandScale = {
+  ramp: readonly [Hsl, Hsl, Hsl, Hsl, Hsl, Hsl];
+  glow: Hsl;
+};
+
+/**
+ * The wordmark's rainbow ramp + glow — the TS mirror of `--brand-rainbow-0…5`
+ * and `--brand-glow` in `styles/brand.css` (the CSS leads). The light ramp is
+ * the darker re-cut that holds 4.5:1 on a light background.
+ */
+export const brand: { light: BrandScale; dark: BrandScale } = {
+  light: {
+    ramp: [
+      '217 84% 43%',
+      '235 58% 50%',
+      '258 62% 48%',
+      '271 65% 46%',
+      '285 56% 40%',
+      '308 58% 42%',
+    ],
+    glow: '258 62% 52%',
+  },
+  dark: {
+    ramp: [
+      '217 95% 58%',
+      '235 88% 68%',
+      '258 90% 66%',
+      '271 91% 65%',
+      '285 80% 60%',
+      '308 78% 58%',
+    ],
+    glow: '258 82% 62%',
+  },
+};
+
 /** Border-radius scale — derived from `--radius` (0.5rem), shadcn convention. */
 export const radius = {
   sm: 'calc(0.5rem - 4px)',
@@ -173,10 +209,11 @@ export const zIndex = {
 /** PLACEHOLDER — motion / easing tokens (durations + easing curves). */
 export const motion = { placeholder: true } as const;
 
-/** The full design-system token map. `color`/`radius` filled; the rest reserved. */
+/** The full design-system token map. `color`/`brand`/`radius` filled; the rest reserved. */
 export const tokens = {
   color,
   accentHues,
+  brand,
   radius,
   spacing,
   typography,

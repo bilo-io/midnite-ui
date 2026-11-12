@@ -24,6 +24,10 @@
       "types": "./dist/theme.d.ts",
       "default": "./dist/theme.js"
     },
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "default": "./dist/tokens/index.js"
+    },
     "./styles": "./dist/tokens.css",
     "./code-highlight.css": "./dist/code-highlight.css",
     "./brand.css": "./dist/brand.css",
