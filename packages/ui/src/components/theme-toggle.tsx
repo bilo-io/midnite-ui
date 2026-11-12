@@ -14,9 +14,9 @@ import { useTheme, type ThemePreference } from '../theme/theme-context';
 export type ThemeToggleLabels = {
   /** Accessible name of the trigger (default 'Toggle theme'). */
   toggle?: string;
-  /** Visible trigger text (expanded) / tooltip (collapsed) — default 'Theme'. */
+  /** Tooltip on the collapsed, icon-only trigger — default 'Theme'. */
   theme?: string;
-  /** Menu option labels. */
+  /** Menu option labels; the expanded trigger shows the selected one. */
   light?: string;
   dark?: string;
   system?: string;
@@ -72,6 +72,10 @@ export function ThemeToggle({
   }, [open]);
 
   const TriggerIcon = resolved === 'dark' ? Moon : Sun;
+  // The expanded trigger reads like every other sidenav row: the selected
+  // option's icon and label ("Dark", "System"), not a generic "Theme".
+  const selectedLabel = labels?.[preference] ?? DEFAULT_OPTION_LABELS[preference];
+  const SelectedIcon = ICONS.find((o) => o.value === preference)?.Icon ?? Laptop;
 
   return (
     <div ref={rootRef} className="group relative">
@@ -84,8 +88,8 @@ export function ThemeToggle({
           onClick={() => setOpen((v) => !v)}
           className="flex h-9 w-full items-center gap-3 rounded-md px-2.5 text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
         >
-          <TriggerIcon className="h-4 w-4 shrink-0" />
-          <span className="truncate text-sm">{themeLabel}</span>
+          <SelectedIcon className="h-4 w-4 shrink-0" />
+          <span className="truncate text-sm">{selectedLabel}</span>
         </button>
       ) : (
         <Button

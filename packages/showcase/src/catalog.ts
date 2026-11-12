@@ -478,7 +478,8 @@ export const COMPONENTS: readonly ComponentDoc[] = [
         name: 'expanded',
         type: 'boolean',
         default: 'false',
-        description: 'A labelled trigger instead of the icon-only one.',
+        description:
+          'A sidenav row showing the selected option (icon and label) instead of the icon-only trigger.',
       },
       { name: 'labels', type: 'ThemeToggleLabels', description: 'Overrides for every string.' },
     ],

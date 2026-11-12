@@ -38,3 +38,22 @@ export const SelectLight: Story = {
     await expect(canvas.getByRole('menuitemradio', { name: 'Light' })).toBeChecked();
   },
 };
+
+/** Expanded, the trigger reads as a sidenav row: the selected option's icon and label. */
+export const ExpandedShowsSelection: Story = {
+  args: { expanded: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Toggle theme' });
+    await userEvent.click(trigger);
+    await userEvent.click(
+      within(await canvas.findByRole('menu')).getByRole('menuitemradio', { name: 'Dark' }),
+    );
+    await expect(trigger).toHaveTextContent('Dark');
+    await userEvent.click(trigger);
+    await userEvent.click(
+      within(await canvas.findByRole('menu')).getByRole('menuitemradio', { name: 'System' }),
+    );
+    await expect(trigger).toHaveTextContent('System');
+  },
+};
