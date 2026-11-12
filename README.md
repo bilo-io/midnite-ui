@@ -3,7 +3,7 @@
 The design system extracted from [midnite](https://github.com/bilo-io/midnite-app):
 React primitives + design tokens, and a wired app shell — as installable packages.
 
-**Docs:** https://bilo-io.github.io/midnite-ui/ · **Showcase:** https://bilo-io.github.io/midnite-ui/showcase/ · **Storybook:** https://bilo-io.github.io/midnite-ui/storybook/
+**Docs:** https://midnite-design.vercel.app/ · **Showcase:** https://midnite-design.vercel.app/showcase/ · **Storybook:** https://midnite-design.vercel.app/storybook/ (mirrored on [GitHub Pages](https://bilo-io.github.io/midnite-ui/))
 
 **Agent logos:** every coding-agent mark as a linkable SVG at `https://bilo-io.github.io/midnite-ui/agents/<name>.svg` (e.g. [`claude-color.svg`](https://bilo-io.github.io/midnite-ui/agents/claude-color.svg)); the files live in [`packages/ui/assets/agents/`](packages/ui/assets/agents/) and render as `<AgentIcon agent="claude" />`.
 
@@ -106,6 +106,11 @@ moon run ui:storybook    # component workbench on :6007
 
 The dependency graph is strict and one-way — `ui ← shell ← docs` — enforced in CI
 by a `boundary.test.ts` in each package.
+
+**Social card:** the Open Graph image is [`scripts/og/og.html`](scripts/og/og.html), rendered to
+`packages/docs/public/og.jpg` by `node scripts/og/render.mjs` (run
+`pnpm --filter @bilo-io/ui exec playwright install chromium` once first). After a re-render, bump
+`?v=N` on the `og:image` / `twitter:image` URLs in both `index.html` files: scrapers cache by URL.
 
 ## Releasing
 
