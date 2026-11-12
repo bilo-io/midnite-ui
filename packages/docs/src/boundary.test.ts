@@ -24,10 +24,16 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
+/** The file's code, minus MDX code fences: a fenced sample is prose, not an import. */
+function code(file: string): string {
+  const text = readFileSync(file, 'utf8');
+  return file.endsWith('.mdx') ? text.replace(/^```[^\n]*\n[\s\S]*?^```/gm, '') : text;
+}
+
 describe('@bilo-io/docs package boundary', () => {
   it('imports only @bilo-io/ui + @bilo-io/shell from the workspace', () => {
     const offenders = sourceFiles(srcDir)
-      .filter((file) => FORBIDDEN_IMPORT.test(readFileSync(file, 'utf8')))
+      .filter((file) => FORBIDDEN_IMPORT.test(code(file)))
       .map((file) => file.slice(srcDir.length));
 
     expect(offenders).toEqual([]);

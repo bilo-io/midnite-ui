@@ -4,7 +4,11 @@ import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from '@bilo-io/ui/theme';
 
 import { App } from './app';
+import { restoreMode } from './router';
 import './styles.css';
+
+// Before the first render, so a bare visit reopens the last platform's overview.
+restoreMode();
 
 const container = document.getElementById('root');
 if (!container) throw new Error('showcase: missing #root element');

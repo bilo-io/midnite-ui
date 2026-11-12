@@ -93,6 +93,11 @@ export default defineConfig({
       entry: {
         index: r('src/index.ts'),
         theme: r('src/theme.ts'),
+        // The typed tokens alone: no React, no DOM, no CSS — what
+        // @bilo-io/ui-native (and any non-web consumer) imports. Emitted at
+        // dist/tokens/index.js, beside its .d.ts: a dist/tokens.js would shadow
+        // the `./tokens` directory that dist/index.d.ts re-exports from.
+        'tokens/index': r('src/tokens/index.ts'),
       },
       formats: ['es'],
     },

@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import * as ui from '@bilo-io/ui';
+import * as uiNative from '@bilo-io/ui-native';
 
-import { CATEGORIES, COMPONENTS } from './catalog';
+import {
+  CATEGORIES,
+  COMPONENTS,
+  NATIVE_CATEGORIES,
+  NATIVE_COMPONENTS,
+  catalogFor,
+  findComponent,
+} from './catalog';
 import { EXAMPLES, parseExamplePath, titleFromSlug } from './examples';
+import { NATIVE_EXAMPLES } from './mobile/mobile';
 
 describe('catalog', () => {
   it('has unique ids', () => {
@@ -48,6 +57,59 @@ describe('catalog', () => {
         expect(ex.source).toContain("from '@bilo-io/ui'");
       }
     }
+  });
+});
+
+describe('native catalog', () => {
+  it('has unique ids', () => {
+    const ids = NATIVE_COMPONENTS.map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('files every component under the one Mobile category', () => {
+    expect(NATIVE_CATEGORIES).toEqual(['Midnite Mobile UI']);
+    expect(NATIVE_COMPONENTS.filter((c) => c.category !== 'Midnite Mobile UI')).toEqual([]);
+  });
+
+  it('gives every component at least one live example, and no folder goes unlisted', () => {
+    const ids = new Set(NATIVE_COMPONENTS.map((c) => c.id));
+    expect(NATIVE_COMPONENTS.filter((c) => !NATIVE_EXAMPLES.get(c.id)?.length)).toEqual([]);
+    expect([...NATIVE_EXAMPLES.keys()].filter((id) => !ids.has(id))).toEqual([]);
+  });
+
+  it('keeps the two platforms apart', () => {
+    expect([...EXAMPLES.keys()].filter((id) => id.startsWith('native-'))).toEqual([]);
+    for (const list of EXAMPLES.values()) {
+      for (const ex of list) expect(ex.source).not.toContain('@bilo-io/ui-native');
+    }
+  });
+
+  it('names only runtime exports that @bilo-io/ui-native really has', () => {
+    const TYPE_ONLY = new Set(['TabOption']);
+    const missing = NATIVE_COMPONENTS.flatMap((c) => c.exports)
+      .filter((name) => !TYPE_ONLY.has(name))
+      .filter((name) => !(name in uiNative));
+    expect(missing).toEqual([]);
+  });
+
+  it('shows each example its own React Native source', () => {
+    for (const list of NATIVE_EXAMPLES.values()) {
+      for (const ex of list) {
+        expect(ex.source).toContain('export default function');
+        expect(ex.source).toContain("from '@bilo-io/ui-native'");
+        // Native demos are React Native only: no DOM elements, no web library.
+        expect(ex.source).not.toMatch(/<(div|span|p|button|input|label)[\s>]/);
+        expect(ex.source).not.toMatch(/from '@bilo-io\/ui'/);
+      }
+    }
+  });
+
+  it('looks components up per platform', () => {
+    expect(catalogFor('mobile').components).toBe(NATIVE_COMPONENTS);
+    expect(catalogFor('web').categories).toBe(CATEGORIES);
+    expect(findComponent('slider', 'mobile')?.exports).toContain('snapValue');
+    expect(findComponent('area-chart', 'mobile')).toBeUndefined();
+    expect(findComponent('area-chart')?.name).toBe('AreaChart');
   });
 });
 

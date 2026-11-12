@@ -10,6 +10,7 @@ dependency) — enforced by `src/boundary.test.ts`.
 | --- | --- |
 | `@bilo-io/ui` | The primitives (`Button`, `Card`, `Input`, `Tabs`, `Select`, `Accordion`, `Collapse`, `AreaChart`, `RadialGauge`, `MetricDial`, `ReadingLayout`, `Prose`, `TableOfContents`, `NeuroCloudBackground`, `PasscodePad`, brand icons, …), `cn`, and the typed token constants |
 | `@bilo-io/ui/theme` | `ThemeProvider`, `useTheme`, `themeInitScript`, `THEME_STORAGE_KEY` — light/dark/system/time resolution + the `.dark` toggle on `<html>` |
+| `@bilo-io/ui/tokens` | The token constants alone (`color`, `radius`, `brand`, …) as plain values, with no React or DOM import: what `@bilo-io/ui-native` reads |
 | `@bilo-io/ui/styles` | `tokens.css` — the HSL custom properties (`:root` + `.dark`), framework-agnostic |
 | `@bilo-io/ui/code-highlight.css` | highlight.js token palette matched to the design tokens |
 

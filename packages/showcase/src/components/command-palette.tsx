@@ -3,38 +3,46 @@ import { CornerDownLeft, Palette, Search } from 'lucide-react';
 
 import { cn } from '@bilo-io/ui';
 
-import { COMPONENTS } from '../catalog';
-import { navigate, type Route } from '../router';
+import { catalogFor } from '../catalog';
+import { inMode, type Mode, navigate, type Route } from '../router';
 import { searchComponents } from '../search';
 
 type Item = { key: string; label: string; hint: string; route: Route };
 
-const TOKENS_ITEM: Item = {
-  key: 'tokens',
-  label: 'Design tokens',
-  hint: 'Foundations',
-  route: { page: 'tokens' },
-};
-
-export function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function CommandPalette({
+  open,
+  onClose,
+  mode,
+}: {
+  open: boolean;
+  onClose: () => void;
+  /** Searches this platform's catalog, and navigates within it. */
+  mode: Mode;
+}) {
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
   const items = useMemo<Item[]>(() => {
-    const hits = searchComponents(query, COMPONENTS).map(({ doc }) => ({
+    const hits = searchComponents(query, catalogFor(mode).components).map(({ doc }) => ({
       key: doc.id,
       label: doc.name,
       hint: doc.category,
-      route: { page: 'component', id: doc.id } as Route,
+      route: inMode({ page: 'component', id: doc.id }, mode),
     }));
+    const tokens: Item = {
+      key: 'tokens',
+      label: 'Design tokens',
+      hint: 'Foundations',
+      route: inMode({ page: 'tokens' }, mode),
+    };
     const q = query.trim().toLowerCase();
     const showTokens =
       q === '' ||
       ['design tokens', 'colors', 'colours', 'radius', 'palette'].some((t) => t.includes(q));
-    return showTokens ? [...hits, TOKENS_ITEM] : hits;
-  }, [query]);
+    return showTokens ? [...hits, tokens] : hits;
+  }, [query, mode]);
 
   useEffect(() => {
     if (!open) return;

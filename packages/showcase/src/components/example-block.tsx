@@ -7,6 +7,7 @@ import { CodeBlock } from './code-block';
 
 type View = 'preview' | 'code';
 
+/** A web example: the live preview or its source, one at a time. (Native ones: ../mobile.) */
 export function ExampleBlock({ example, anchor }: { example: Example; anchor: string }) {
   const [view, setView] = useState<View>('preview');
   const { Component } = example;

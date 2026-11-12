@@ -10,9 +10,10 @@ React primitives + design tokens, and a wired app shell — as installable packa
 | Package | What it is |
 | --- | --- |
 | [`@bilo-io/ui`](packages/ui) | Leaf design system: ~25 generic React primitives (buttons, cards, inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield) + HSL design tokens + a light/dark/system/time theme runtime. Depends on nothing but React. |
+| [`@bilo-io/ui-native`](packages/ui-native) | The React Native companion: Button, Input, Textarea, Switch, Tabs, Slider, Card, Accordion, the Wordmark and a `ThemeProvider`, styled with plain `StyleSheet` from `@bilo-io/ui`'s tokens. No native modules; runs on iOS, Android and (via react-native-web) the web. |
 | [`@bilo-io/shell`](packages/shell) | The wired app shell: `AppFrame` (route-aware nav rail + mobile tabs + content region), `LockScreen`, `TitleBar` (frameless desktop chrome), an appearance runtime (accent gradients, density, motion, backgrounds), and a locale provider. Depends only on `@bilo-io/ui`. |
 | [`packages/docs`](packages/docs) | The documentation site — a Vite + MDX SPA **mounted inside the shell's `AppFrame`**, deployed to GitHub Pages. |
-| [`packages/showcase`](packages/showcase) | The component showcase — a searchable Vite SPA with a live example, its source and a props table for every `@bilo-io/ui` component, deployed under `/showcase/`. |
+| [`packages/showcase`](packages/showcase) | The component showcase — a searchable Vite SPA with a live example, its source and a props table for every `@bilo-io/ui` component, deployed under `/showcase/`. Its **Web / Desktop · Mobile** toggle switches to the `@bilo-io/ui-native` components, rendered in phone frames through react-native-web. |
 
 ## Install
 
@@ -64,6 +65,23 @@ content: [
 See [Theming & tokens](https://bilo-io.github.io/midnite-ui/#/ui/theming) for the
 full token→color mapping.
 
+### React Native (`@bilo-io/ui-native`)
+
+```tsx
+import { Button, ThemeProvider } from '@bilo-io/ui-native';
+
+<ThemeProvider>
+  <Button onPress={save}>Save</Button>
+</ThemeProvider>;
+```
+
+Peers on `react` 19 and `react-native` 0.79+, and no other dependencies. The
+components use the same token values as the web library: the build reads them
+from `@bilo-io/ui/tokens` and inlines them, so `@bilo-io/ui` is not installed
+with it. Canvas, SVG and portal-based pieces stay web-only. See
+[`packages/ui-native`](packages/ui-native) for the component list and what is
+not ported.
+
 ### App shell (`@bilo-io/shell`)
 
 ```tsx
@@ -104,8 +122,8 @@ moon run docs:dev        # docs site on :5173
 moon run ui:storybook    # component workbench on :6007
 ```
 
-The dependency graph is strict and one-way — `ui ← shell ← docs` — enforced in CI
-by a `boundary.test.ts` in each package.
+The dependency graph is strict and one-way — `ui ← shell ← docs`, and `ui ← ui-native` (tokens only, inlined at
+build time) — enforced in CI by a `boundary.test.ts` in each package.
 
 **Social card:** the Open Graph image is [`scripts/og/og.html`](scripts/og/og.html), rendered to
 `packages/docs/public/og.jpg` by `node scripts/og/render.mjs` (run
@@ -116,7 +134,7 @@ by a `boundary.test.ts` in each package.
 
 - **CI** (`.github/workflows/ci.yml`) runs `moon ci` on every PR and push to main.
 - **Pages** (`pages.yml`) deploys the docs site, the showcase and Storybook on every push to main.
-- **Publish** (`publish.yml`) publishes both libraries to GitHub Packages when a
+- **Publish** (`publish.yml`) publishes the three libraries to GitHub Packages when a
   GitHub Release is published (or via manual dispatch).
 
 ## License
