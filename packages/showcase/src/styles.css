@@ -117,7 +117,7 @@
 }
 
 .cascade[data-phase='in'] [data-c] {
-  animation: block-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: block-in 520ms cubic-bezier(0.25, 0.7, 0.35, 1) both;
   animation-delay: calc(var(--eo, 140ms) + var(--di, 0ms));
 }
 .cascade[data-phase='in'] circle[stroke-dasharray] {
@@ -130,10 +130,10 @@
   animation-delay: calc(var(--eo, 140ms) + 500ms);
 }
 .layer-out {
-  animation: layer-out 460ms cubic-bezier(0.4, 0, 0.6, 1) var(--xo, 0ms) both;
+  animation: layer-out 720ms cubic-bezier(0.5, 0, 0.8, 0.7) var(--xo, 0ms) both;
 }
 .layer-in {
-  animation: layer-in 560ms cubic-bezier(0.4, 0, 0.6, 1) var(--lo, 40ms) both;
+  animation: layer-in 420ms linear var(--lo, 40ms) both;
 }
 .hero-progress {
   transform-origin: left;

@@ -30,9 +30,9 @@ import { LAYOUTS, type Variant, layoutComponent, preloadLayout } from './index';
 // Auto-advance is the active chip's progress bar `animationend`, so pausing
 // the bar (hover, keyboard focus, a hidden tab, the button) pauses the show.
 
-const EXIT_MS = 700; // the leaving layer (cross-faded out over ~460ms) is unmounted after this
+const EXIT_MS = 900; // the leaving layer (cross-faded out over ~460ms) is unmounted after this
 const SETTLE_MS = 2200; // the arriving layer has finished building by now
-const EASE_IN_MS = 280; // arriving content starts fading in while the shapes are still moving
+const EASE_IN_MS = 160; // arriving content starts fading in while the shapes are still moving
 const TRAIL_MS = 80; // the phone frame trails the desktop by this much
 
 function useReducedMotion(): boolean {
@@ -201,7 +201,7 @@ function Layer({
   return (
     <div
       className={cn('absolute inset-0', phase === 'in' && 'layer-in', phase === 'out' && 'layer-out')}
-      style={{ '--lo': `${Math.max(0, (enter ?? 0) - 120)}ms`, '--xo': `${exit}ms` } as CSSProperties}
+      style={{ '--lo': `${Math.max(0, (enter ?? 0) - 100)}ms`, '--xo': `${exit}ms` } as CSSProperties}
     >
       <Cascade phase={phase} enter={enter}>
         <Suspense fallback={null}>
