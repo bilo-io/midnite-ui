@@ -48,8 +48,6 @@ function useReducedMotion(): boolean {
   return reduced;
 }
 
-const MAX_RANK = 12;
-
 /** Offset of `el` from `root`, ignoring transforms (so it is stable mid-animation). */
 function offsetWithin(el: HTMLElement, root: HTMLElement) {
   let x = 0;
