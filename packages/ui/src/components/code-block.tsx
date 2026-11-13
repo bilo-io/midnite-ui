@@ -67,11 +67,15 @@ export function CopyButton({
       type="button"
       aria-label={copied ? (labels?.copied ?? 'Copied') : (labels?.copy ?? 'Copy code')}
       onClick={() => {
-        void navigator.clipboard?.writeText(text).then(() => {
-          setCopied(true);
-          clearTimeout(timer.current);
-          timer.current = setTimeout(() => setCopied(false), 1500);
-        });
+        // writeText rejects when permission is denied or the page is unfocused.
+        void navigator.clipboard
+          ?.writeText(text)
+          .then(() => {
+            setCopied(true);
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => setCopied(false), 1500);
+          })
+          .catch(() => {});
       }}
       className={cn(
         'inline-flex h-7 w-7 items-center justify-center rounded-md border border-border/60 bg-background/80 text-muted-foreground backdrop-blur transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',

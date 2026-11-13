@@ -10,7 +10,7 @@ export function ExampleBlock({ example, anchor }: { example: Example; anchor: st
       <CodeDemo
         title={example.title}
         code={example.source}
-        previewClassName="showcase-canvas min-h-[180px] rounded-xl p-6 sm:p-10"
+        previewClassName="showcase-canvas bg-background min-h-[180px] rounded-xl p-6 sm:p-10"
       >
         <Component />
       </CodeDemo>
