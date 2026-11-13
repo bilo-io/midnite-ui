@@ -66,7 +66,7 @@
 
 /* The landing hero's motion. A switch is a shape morph: the MorphLayer under
    the layouts animates its slots with the Web Animations API (clip-path insets
-   and colour), the leaving content fades out fast, and the arriving content
+   and colour), the leaving content cross-fades out while the arriving content
    (`data-c` blocks, delayed in JS by tier via `--di`) grows in over the landed
    shapes with a short rise and fade. Only transform, opacity, clip-path and
    stroke offsets animate. */
@@ -130,10 +130,10 @@
   animation-delay: calc(var(--eo, 140ms) + 500ms);
 }
 .layer-out {
-  animation: layer-out 150ms ease-out var(--xo, 0ms) both;
+  animation: layer-out 460ms cubic-bezier(0.4, 0, 0.6, 1) var(--xo, 0ms) both;
 }
 .layer-in {
-  animation: layer-in 480ms ease-out var(--lo, 40ms) both;
+  animation: layer-in 560ms cubic-bezier(0.4, 0, 0.6, 1) var(--lo, 40ms) both;
 }
 .hero-progress {
   transform-origin: left;
