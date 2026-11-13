@@ -7,6 +7,9 @@ describe('hash routes', () => {
     ['', { page: 'home' }],
     ['#/', { page: 'home' }],
     ['#/tokens', { page: 'tokens' }],
+    ['#/examples', { page: 'examples' }],
+    ['#/examples/', { page: 'examples' }],
+    ['#/examples/forkful', { page: 'examples', id: 'forkful' }],
     ['#/button', { page: 'component', id: 'button' }],
     ['#/button/sizes', { page: 'component', id: 'button', example: 'sizes' }],
     ['#/mobile', { page: 'home', mode: 'mobile' }],
@@ -25,6 +28,8 @@ describe('hash routes', () => {
     for (const hash of [
       '#/',
       '#/tokens',
+      '#/examples',
+      '#/examples/pulse',
       '#/switch',
       '#/tabs/segmented',
       '#/mobile',
@@ -54,6 +59,10 @@ describe('switchMode', () => {
 
   it("falls back to the other platform's overview", () => {
     expect(to('#/area-chart', 'mobile')).toBe('#/mobile');
+  });
+
+  it('sends the web-only examples page to the other overview', () => {
+    expect(to('#/examples/pulse', 'mobile')).toBe('#/mobile');
   });
 
   it('keeps the tokens page and the overview', () => {

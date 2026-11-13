@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 
 import { Button, CopyButton, DynamicBackground, Wordmark, cn } from '@bilo-io/ui';
@@ -10,6 +10,9 @@ import { hrefFor, inMode, type Mode } from '../router';
 import { searchComponents } from '../search';
 import { InlineCode } from './props-table';
 import { DOCS_URL } from './top-bar';
+
+// The cycling layouts pull in every example screen; keep them out of the first paint.
+const HeroStage = lazy(() => import('../layouts/hero-stage'));
 
 const INSTALL: Record<Mode, string> = {
   web: 'pnpm add @bilo-io/ui',
@@ -32,6 +35,30 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
   return (
     <div className="space-y-14">
       {mode === 'mobile' ? <MobileHero /> : <WebHero />}
+
+      {mode === 'web' ? (
+        <section aria-labelledby="whole-apps" className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 id="whole-apps" className="text-2xl font-semibold tracking-tight">
+                Whole apps, from the same parts
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Six example layouts, desktop and phone, built only from the primitives above.
+              </p>
+            </div>
+            <a
+              href={hrefFor({ page: 'examples' })}
+              className="text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+            >
+              See them all
+            </a>
+          </div>
+          <Suspense fallback={<div className="showcase-canvas aspect-[16/10] rounded-2xl border border-border/60" />}>
+            <HeroStage />
+          </Suspense>
+        </section>
+      ) : null}
 
       <section id="browse" className="scroll-mt-20 space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">

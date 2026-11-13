@@ -5,7 +5,8 @@ import { cn } from '@bilo-io/ui';
 
 import { catalogFor } from '../catalog';
 import { inMode, type Mode, navigate, type Route } from '../router';
-import { searchComponents } from '../search';
+import { LAYOUTS } from '../layouts';
+import { searchComponents, searchExamples } from '../search';
 
 type Item = { key: string; label: string; hint: string; route: Route };
 
@@ -41,7 +42,20 @@ export function CommandPalette({
     const showTokens =
       q === '' ||
       ['design tokens', 'colors', 'colours', 'radius', 'palette'].some((t) => t.includes(q));
-    return showTokens ? [...hits, tokens] : hits;
+    // The example layouts are web-only, like their page: all of them under one
+    // entry when nothing is typed, each by name once it is.
+    const examples: Item[] =
+      mode !== 'web'
+        ? []
+        : q === ''
+          ? [{ key: 'examples', label: 'Examples', hint: 'Layouts', route: { page: 'examples' } }]
+          : searchExamples(query, LAYOUTS).map((l) => ({
+              key: `example-${l.id}`,
+              label: l.name,
+              hint: 'Example layout',
+              route: { page: 'examples', id: l.id },
+            }));
+    return [...hits, ...(showTokens ? [tokens] : []), ...examples];
   }, [query, mode]);
 
   useEffect(() => {

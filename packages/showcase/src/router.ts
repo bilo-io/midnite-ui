@@ -10,7 +10,10 @@ import { useEffect, useState } from 'react';
 export type Mode = 'web' | 'mobile';
 
 type Page =
-  { page: 'home' } | { page: 'tokens' } | { page: 'component'; id: string; example?: string };
+  | { page: 'home' }
+  | { page: 'tokens' }
+  | { page: 'examples'; id?: string }
+  | { page: 'component'; id: string; example?: string };
 
 /** A page, plus `mode: 'mobile'` in the Mobile showcase (web routes carry no mode). */
 export type Route = Page & { mode?: 'mobile' };
@@ -21,6 +24,7 @@ function parsePath(path: string): Page {
   if (path === '' || path === '/') return { page: 'home' };
   if (path === 'tokens') return { page: 'tokens' };
   const [id, example] = path.split('/');
+  if (id === 'examples') return example ? { page: 'examples', id: example } : { page: 'examples' };
   if (id) return example ? { page: 'component', id, example } : { page: 'component', id };
   return { page: 'home' };
 }
@@ -41,6 +45,7 @@ export function hrefFor(route: Route): string {
   const base = route.mode === 'mobile' ? `#/${MOBILE}` : '#';
   if (route.page === 'home') return route.mode === 'mobile' ? base : '#/';
   if (route.page === 'tokens') return `${base}/tokens`;
+  if (route.page === 'examples') return route.id ? `${base}/examples/${route.id}` : `${base}/examples`;
   return route.example ? `${base}/${route.id}/${route.example}` : `${base}/${route.id}`;
 }
 

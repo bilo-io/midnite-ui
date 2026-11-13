@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { LayoutGrid, Palette } from 'lucide-react';
+import { LayoutGrid, Palette, PanelsTopLeft } from 'lucide-react';
 
 import { cn } from '@bilo-io/ui';
 
@@ -48,6 +48,12 @@ export function Sidebar({ route, onNavigate }: { route: Route; onNavigate?: () =
         <NavLink href={hrefFor(inMode({ page: 'tokens' }, mode))} active={route.page === 'tokens'}>
           <Palette className="h-4 w-4" /> Design tokens
         </NavLink>
+        {/* Web-only: the example layouts are built from @bilo-io/ui. */}
+        {mode === 'web' ? (
+          <NavLink href={hrefFor({ page: 'examples' })} active={route.page === 'examples'}>
+            <PanelsTopLeft className="h-4 w-4" /> Examples
+          </NavLink>
+        ) : null}
       </div>
       {categories.map((category) => {
         const docs = components.filter((c) => c.category === category);

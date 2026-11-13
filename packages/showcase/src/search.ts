@@ -56,3 +56,35 @@ export function searchComponents(query: string, docs: readonly ComponentDoc[]): 
   // Stable: equal scores keep catalog order.
   return hits.sort((a, b) => b.score - a.score);
 }
+
+/** The example layouts matching a query, best first (all of them for an empty query). */
+export function searchExamples<T extends { name: string; description: string; keywords: string[] }>(
+  query: string,
+  layouts: readonly T[],
+): T[] {
+  const terms = normalize(query).split(' ').filter(Boolean);
+  if (terms.length === 0) return [...layouts];
+  const scored: { layout: T; score: number }[] = [];
+  for (const layout of layouts) {
+    const name = normalize(layout.name);
+    let total = 0;
+    for (const term of terms) {
+      const s = name.startsWith(term)
+        ? 80
+        : name.includes(term)
+          ? 60
+          : layout.keywords.some((k) => normalize(k).includes(term))
+            ? 40
+            : normalize(layout.description).includes(term) || 'example layout'.includes(term)
+              ? 10
+              : 0;
+      if (s === 0) {
+        total = 0;
+        break;
+      }
+      total += s;
+    }
+    if (total > 0) scored.push({ layout, score: total });
+  }
+  return scored.sort((a, b) => b.score - a.score).map((s) => s.layout);
+}
