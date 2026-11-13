@@ -22,7 +22,7 @@ import { LAYOUTS, type Variant, layoutComponent, preloadLayout } from './index';
 // A transition is a shape morph. Each layout has a skeleton of keyed slots
 // (./morph-geometry); a `MorphLayer` under the layouts animates every slot from
 // the old skeleton to the new one (position, size, corner radius, surface
-// tone) while the old layout's real content fades out in ~150ms. The new
+// tone) while the old layout's real content cross-fades out. The new
 // content then grows in over the landed shapes. The phone frame morphs in sync,
 // trailing the desktop by 80ms. Only clip-path, opacity, colour and stroke
 // offsets animate (Web Animations API and CSS), with no animation library.
@@ -30,9 +30,9 @@ import { LAYOUTS, type Variant, layoutComponent, preloadLayout } from './index';
 // Auto-advance is the active chip's progress bar `animationend`, so pausing
 // the bar (hover, keyboard focus, a hidden tab, the button) pauses the show.
 
-const EXIT_MS = 400; // the leaving layer (faded out after ~150ms) is unmounted after this
+const EXIT_MS = 900; // the leaving layer (cross-faded out over ~460ms) is unmounted after this
 const SETTLE_MS = 2200; // the arriving layer has finished building by now
-const EASE_IN_MS = 560; // arriving content starts growing in as the shapes land
+const EASE_IN_MS = 160; // arriving content starts fading in while the shapes are still moving
 const TRAIL_MS = 80; // the phone frame trails the desktop by this much
 
 function useReducedMotion(): boolean {
@@ -201,7 +201,7 @@ function Layer({
   return (
     <div
       className={cn('absolute inset-0', phase === 'in' && 'layer-in', phase === 'out' && 'layer-out')}
-      style={{ '--lo': `${Math.max(0, (enter ?? 0) - 80)}ms`, '--xo': `${exit}ms` } as CSSProperties}
+      style={{ '--lo': `${Math.max(0, (enter ?? 0) - 100)}ms`, '--xo': `${exit}ms` } as CSSProperties}
     >
       <Cascade phase={phase} enter={enter}>
         <Suspense fallback={null}>

@@ -22,6 +22,8 @@ export type Slot = {
   /** Corner radius in px. */
   r: number;
   tone: Tone;
+  /** A media slot (photo, map, chart, card art) wears its layout's hue instead of a neutral surface. */
+  hue?: number;
 };
 
 export type Geometry = ReadonlyArray<Slot | null>;
@@ -29,19 +31,24 @@ export type Geometry = ReadonlyArray<Slot | null>;
 export const SLOT_COUNT = 12;
 
 export const TONES: Record<Tone, string> = {
-  wash: 'hsl(var(--foreground) / 0.045)',
-  surface: 'hsl(var(--foreground) / 0.085)',
-  accent: 'hsl(var(--primary) / 0.2)',
-  hero: 'hsl(var(--primary) / 0.14)',
+  wash: 'hsl(var(--muted))',
+  surface: 'hsl(var(--card))',
+  accent: 'hsl(var(--primary) / 0.3)',
+  hero: 'hsl(var(--muted))',
 };
 
-const s = (x: number, y: number, w: number, h: number, tone: Tone = 'surface', r = 14): Slot => ({
+/** A slot's fill: its layout's hue for media, else its surface tone. */
+export const fill = (s: Slot): string =>
+  s.hue === undefined ? TONES[s.tone] : `hsl(${s.hue} 70% 58% / 0.6)`;
+
+const s = (x: number, y: number, w: number, h: number, tone: Tone = 'surface', r = 14, hue?: number): Slot => ({
   x,
   y,
   w,
   h,
   r,
   tone,
+  ...(hue === undefined ? {} : { hue }),
 });
 
 const build = (slots: Record<number, Slot>): Geometry =>
@@ -53,14 +60,14 @@ export const GEOMETRY: Record<string, Record<'desktop' | 'mobile', Geometry>> = 
       1: s(0, 0, 100, 8, 'surface', 0),
       2: s(2, 13, 17, 50, 'wash'),
       3: s(22, 13, 52, 10),
-      4: s(22, 26, 52, 34),
+      4: s(22, 26, 52, 34, 'surface', 14, 265),
       5: s(22, 63, 52, 34),
       6: s(76, 13, 22, 40),
     }),
     mobile: build({
       1: s(0, 0, 100, 8, 'surface', 0),
       3: s(3, 11, 94, 10),
-      4: s(3, 24, 94, 34),
+      4: s(3, 24, 94, 34, 'surface', 14, 265),
       5: s(3, 61, 94, 30),
       7: s(0, 92, 100, 8, 'surface', 0),
     }),
@@ -69,27 +76,27 @@ export const GEOMETRY: Record<string, Record<'desktop' | 'mobile', Geometry>> = 
     desktop: build({
       2: s(0, 0, 19, 100, 'surface', 0),
       3: s(24, 5, 48, 12, 'wash'),
-      4: s(24, 20, 48, 38),
-      5: s(24, 61, 48, 38),
+      4: s(24, 20, 48, 38, 'surface', 14, 320),
+      5: s(24, 61, 48, 38, 'surface', 14, 200),
       6: s(75, 0, 25, 100, 'surface', 0),
     }),
     mobile: build({
       1: s(0, 0, 100, 7, 'wash', 0),
       3: s(3, 9, 94, 10, 'wash'),
-      4: s(3, 21, 94, 50),
+      4: s(3, 21, 94, 50, 'surface', 14, 320),
       5: s(3, 73, 94, 17),
       7: s(0, 92, 100, 8, 'surface', 0),
     }),
   },
   wayfind: {
     desktop: build({
-      0: s(0, 0, 100, 100, 'hero', 0),
+      0: s(0, 0, 100, 100, 'hero', 0, 150),
       3: s(1.4, 2.3, 28.5, 12, 'surface', 16),
       4: s(1.4, 16, 28.5, 50, 'surface', 16),
       6: s(70.1, 2.3, 28.5, 52, 'surface', 16),
     }),
     mobile: build({
-      0: s(0, 0, 100, 100, 'hero', 0),
+      0: s(0, 0, 100, 100, 'hero', 0, 150),
       1: s(3, 2, 94, 14, 'surface', 18),
       7: s(0, 68, 100, 32, 'surface', 28),
     }),
@@ -97,12 +104,12 @@ export const GEOMETRY: Record<string, Record<'desktop' | 'mobile', Geometry>> = 
   forkful: {
     desktop: build({
       2: s(0, 0, 23, 100, 'surface', 0),
-      4: s(29, 10, 42, 78, 'accent', 24),
+      4: s(29, 10, 42, 78, 'accent', 24, 20),
       6: s(75, 0, 25, 100, 'surface', 0),
     }),
     mobile: build({
       1: s(0, 0, 100, 9, 'surface', 0),
-      4: s(8, 14, 84, 60, 'accent', 28),
+      4: s(8, 14, 84, 60, 'accent', 28, 20),
       5: s(4, 80, 92, 12),
     }),
   },
@@ -112,14 +119,14 @@ export const GEOMETRY: Record<string, Record<'desktop' | 'mobile', Geometry>> = 
       2: s(1.4, 12, 22, 85),
       3: s(25, 12, 50, 22),
       4: s(25, 37, 50, 12, 'wash'),
-      5: s(25, 52, 50, 45),
+      5: s(25, 52, 50, 45, 'surface', 14, 150),
       6: s(77, 12, 21.6, 85),
     }),
     mobile: build({
       1: s(3, 1.5, 94, 6, 'wash'),
       3: s(3, 10, 94, 16),
       4: s(3, 28, 94, 6, 'wash'),
-      5: s(3, 36, 94, 26),
+      5: s(3, 36, 94, 26, 'surface', 14, 150),
       8: s(3, 65, 94, 10),
       9: s(3, 87, 46, 11),
       10: s(51, 87, 46, 11),
@@ -129,16 +136,16 @@ export const GEOMETRY: Record<string, Record<'desktop' | 'mobile', Geometry>> = 
     desktop: build({
       1: s(20.5, 4, 77, 8, 'wash'),
       2: s(0, 0, 18, 100, 'surface', 0),
-      3: s(20.5, 16, 26.8, 19),
-      4: s(49, 16, 24, 19),
-      5: s(75, 16, 22.5, 19),
+      3: s(20.5, 16, 26.8, 19, 'surface', 14, 350),
+      4: s(49, 16, 24, 19, 'surface', 14, 210),
+      5: s(75, 16, 22.5, 19, 'surface', 14, 150),
       8: s(20.5, 38, 37.5, 34),
       9: s(60, 38, 37.5, 34),
       10: s(20.5, 75, 77, 15, 'accent'),
     }),
     mobile: build({
       1: s(0, 0, 100, 9, 'wash', 0),
-      3: s(4, 12, 92, 15),
+      3: s(4, 12, 92, 15, 'surface', 14, 350),
       4: s(4, 29, 92, 12, 'wash'),
       5: s(4, 43, 92, 22),
       8: s(4, 67, 92, 10),
