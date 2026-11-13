@@ -566,6 +566,73 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     ],
   },
   {
+    id: 'browser-icon',
+    wide: true,
+    name: 'Browser icon',
+    category: 'Icons',
+    description:
+      'The logos of nine browsers (Chrome, Firefox, Safari, Edge, Opera, Brave, Samsung Internet, Vivaldi, Internet Explorer), generated from the SVG files published at `/browsers/`. Gradient ids are scoped per instance.',
+    exports: ['BrowserIcon', 'BROWSER_IDS', 'browserName', 'browserColor', 'browserDownloadUrl'],
+    keywords: ['browser', 'logo', 'chrome', 'firefox', 'safari', 'edge', 'opera', 'brave', 'svg'],
+    props: [
+      { name: 'browser', type: 'BrowserId', description: 'One of `BROWSER_IDS`.' },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'Accessible name; omitted, the icon is decorative.',
+      },
+    ],
+  },
+  {
+    id: 'browser-support',
+    name: 'Browser support',
+    category: 'Layout & surfaces',
+    description:
+      'A warning callout shown only when the visitor\'s browser is missing from a supported list or older than its minimum version. SSR-safe, dependency-free, with the detection exported as pure functions.',
+    exports: [
+      'BrowserSupport',
+      'BrowserSupportList',
+      'useBrowserSupport',
+      'detectBrowser',
+      'checkBrowserSupport',
+      'compareVersions',
+    ],
+    keywords: ['browser', 'compatibility', 'user agent', 'outdated', 'upgrade', 'warning', 'detect'],
+    props: [
+      {
+        name: 'supported',
+        type: 'Partial<Record<BrowserId, string>>',
+        description: 'Minimum version per browser; unlisted browsers are unsupported.',
+      },
+      {
+        name: 'onCheck',
+        type: '(result: BrowserSupportResult) => void',
+        description: 'Called once each time the result changes.',
+      },
+      {
+        name: 'userAgent',
+        type: 'string',
+        description: 'Check this string instead of `navigator.userAgent`.',
+      },
+      {
+        name: 'showWhenSupported',
+        type: 'boolean',
+        default: 'false',
+        description: 'Render a status callout even when the browser is supported.',
+      },
+      {
+        name: 'children',
+        type: 'ReactNode | ((result) => ReactNode)',
+        description: 'Replaces the default body.',
+      },
+      {
+        name: 'labels',
+        type: 'BrowserSupportLabels',
+        description: 'Copy overrides; message entries are functions for interpolation.',
+      },
+    ],
+  },
+  {
     id: 'brand-icons',
     name: 'Brand icons',
     category: 'Icons',
