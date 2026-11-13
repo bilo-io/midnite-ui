@@ -30,6 +30,7 @@ export function MorphLayer({
   const root = useRef<HTMLDivElement>(null);
   const slots = useRef<Array<HTMLDivElement | null>>([]);
   const last = useRef<string | null>(null);
+  const fade = useRef<Animation | null>(null);
 
   useLayoutEffect(() => {
     const prevId = last.current;
@@ -53,7 +54,8 @@ export function MorphLayer({
       );
     });
     if (animate && typeof layer.animate === 'function') {
-      layer.animate(
+      fade.current?.cancel();
+      fade.current = layer.animate(
         [
           { opacity: 0, offset: 0 },
           { opacity: 1, offset: 0.08 },
