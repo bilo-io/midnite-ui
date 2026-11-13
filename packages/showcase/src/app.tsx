@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { findComponent } from './catalog';
 import { CommandPalette } from './components/command-palette';
 import { ComponentPage } from './components/component-page';
+import { ExamplesPage } from './components/examples-page';
 import { HomePage } from './components/home-page';
 import { Sidebar } from './components/sidebar';
 import { TokensPage } from './components/tokens-page';
@@ -43,6 +44,7 @@ export function App() {
 
   let page;
   if (route.page === 'tokens') page = <TokensPage />;
+  else if (route.page === 'examples') page = <ExamplesPage id={route.id} />;
   else if (route.page === 'component' && doc)
     page = <ComponentPage doc={doc} example={route.example} mode={mode} />;
   else if (route.page === 'component')
