@@ -24,6 +24,19 @@ export {
 } from './components/agent-icon';
 export { Button, buttonVariants, type ButtonProps } from './components/button';
 export { Card, CardHeader, CardTitle, CardContent } from './components/card';
+export {
+  CodeBlock,
+  CopyButton,
+  type CodeBlockLabels,
+  type CodeBlockProps,
+  type CodeLanguage,
+} from './components/code-block';
+export {
+  CodeDemo,
+  type CodeDemoLabels,
+  type CodeDemoProps,
+  type CodeDemoView,
+} from './components/code-demo';
 export { Collapse } from './components/collapse';
 export { ContextRing, type ContextRingLabels } from './components/context-ring';
 export { DynamicBackground, type BackgroundPattern } from './components/dynamic-background';

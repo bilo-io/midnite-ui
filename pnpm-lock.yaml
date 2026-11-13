@@ -196,9 +196,6 @@ importers:
       '@bilo-io/ui-native':
         specifier: workspace:*
         version: link:../ui-native
-      highlight.js:
-        specifier: ^11.11.1
-        version: 11.11.2
       lucide-react:
         specifier: ^1.17.0
         version: 1.31.0(react@19.2.8)
@@ -263,6 +260,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      highlight.js:
+        specifier: ^11.11.1
+        version: 11.11.2
       lucide-react:
         specifier: ^1.17.0
         version: 1.31.0(react@19.2.8)

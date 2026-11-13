@@ -54,6 +54,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "highlight.js": "^11.11.1",
     "lucide-react": "^1.17.0",
     "react-select": "^5.10.2",
     "tailwind-merge": "^3.6.0"
