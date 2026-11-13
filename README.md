@@ -7,6 +7,8 @@ React primitives + design tokens, and a wired app shell — as installable packa
 
 **Agent logos:** every coding-agent mark as a linkable SVG at `https://bilo-io.github.io/midnite-ui/agents/<name>.svg` (e.g. [`claude-color.svg`](https://bilo-io.github.io/midnite-ui/agents/claude-color.svg)); the files live in [`packages/ui/assets/agents/`](packages/ui/assets/agents/) and render as `<AgentIcon agent="claude" />`.
 
+**Browser logos:** the nine browser marks (from [alrra/browser-logos](https://github.com/alrra/browser-logos), MIT) as linkable SVGs at `https://bilo-io.github.io/midnite-ui/browsers/<name>.svg` (e.g. [`chrome.svg`](https://bilo-io.github.io/midnite-ui/browsers/chrome.svg)); the files live in [`packages/ui/assets/browsers/`](packages/ui/assets/browsers/) and render as `<BrowserIcon browser="chrome" />`. `<BrowserSupport supported={{ chrome: "90" }} />` shows a warning when the visitor's browser is unlisted or too old.
+
 | Package | What it is |
 | --- | --- |
 | [`@bilo-io/ui`](packages/ui) | Leaf design system: ~25 generic React primitives (buttons, cards, inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield) + HSL design tokens + a light/dark/system/time theme runtime. Depends on nothing but React. |

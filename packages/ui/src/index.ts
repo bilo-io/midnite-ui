@@ -110,4 +110,31 @@ export {
 export { Switch } from './components/switch';
 export { Tabs, type TabOption } from './components/tabs';
 export { ThemeToggle, type ThemeToggleLabels } from './components/theme-toggle';
+export {
+  BROWSER_IDS,
+  BrowserIcon,
+  browserColor,
+  browserDownloadUrl,
+  browserName,
+  type BrowserIconProps,
+  type BrowserId,
+} from './components/browser-icon';
+export {
+  BrowserSupport,
+  BrowserSupportList,
+  type BrowserSupportLabels,
+  type BrowserSupportListProps,
+  type BrowserSupportProps,
+} from './components/browser-support';
+export {
+  checkBrowserSupport,
+  compareVersions,
+  detectBrowser,
+  type BrowserSupportReason,
+  type BrowserSupportResult,
+  type DetectedBrowser,
+  type DetectHints,
+  type SupportedBrowsers,
+} from './lib/browser-support';
+export { useBrowserSupport } from './lib/use-browser-support';
 export { Textarea, type TextareaProps } from './components/textarea';

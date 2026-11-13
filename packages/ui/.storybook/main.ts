@@ -16,6 +16,7 @@ const config: StorybookConfig = {
   // brand font for the manager's wordmark (manager-head.html).
   staticDirs: [
     { from: '../assets/agents', to: '/agents' },
+    { from: '../assets/browsers', to: '/browsers' },
     { from: '../src/styles/brand', to: '/brand' },
   ],
 };
