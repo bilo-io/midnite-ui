@@ -30,9 +30,9 @@ import { LAYOUTS, type Variant, layoutComponent, preloadLayout } from './index';
 // Auto-advance is the active chip's progress bar `animationend`, so pausing
 // the bar (hover, keyboard focus, a hidden tab, the button) pauses the show.
 
-const EXIT_MS = 1000; // the leaving layer is unmounted after this
+const EXIT_MS = 1100; // the leaving layer is unmounted after this
 const SETTLE_MS = 2200; // the arriving layer has finished building by now
-const EASE_IN_MS = 300; // arriving blocks start this long after the transition begins
+const EASE_IN_MS = 140; // arriving blocks start this long after the transition begins
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(
@@ -59,11 +59,12 @@ function offsetWithin(el: HTMLElement, root: HTMLElement) {
   return { x, y };
 }
 
-function countUp(el: HTMLElement, delay: number, cancelled: () => boolean) {
+function countUp(el: HTMLElement, delay: number): () => void {
   const node = el.firstChild;
-  const final = node?.nodeValue ?? '';
+  const final = el.dataset.final ?? node?.nodeValue ?? '';
   const m = /\d[\d,]*(\.\d+)?/.exec(final);
-  if (!node || !m) return;
+  if (!node || !m) return () => {};
+  el.dataset.final = final;
   const target = Number(m[0].replace(/,/g, ''));
   const decimals = m[1] ? m[1].length - 1 : 0;
   const grouped = m[0].includes(',');
@@ -77,17 +78,22 @@ function countUp(el: HTMLElement, delay: number, cancelled: () => boolean) {
       }),
     );
   node.nodeValue = render(0);
-  setTimeout(() => {
+  let raf = 0;
+  const timer = setTimeout(() => {
     const t0 = performance.now();
     const step = (now: number) => {
-      if (cancelled()) return;
       const p = Math.min(1, (now - t0) / 650);
       node.nodeValue = render(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step);
+      if (p < 1) raf = requestAnimationFrame(step);
       else node.nodeValue = final;
     };
-    requestAnimationFrame(step);
+    raf = requestAnimationFrame(step);
   }, delay);
+  return () => {
+    clearTimeout(timer);
+    cancelAnimationFrame(raf);
+    node.nodeValue = final;
+  };
 }
 
 /**
@@ -112,7 +118,7 @@ function Cascade({
   useLayoutEffect(() => {
     const root = ref.current;
     if (!root) return;
-    let dead = false;
+    const cancels: Array<() => void> = [];
     let seen = -1;
     const aim = () => {
       const blocks = [...root.querySelectorAll<HTMLElement>('[data-c]')];
@@ -133,7 +139,7 @@ function Cascade({
         const tier = b.nested ? 2 : /^(HEADER|NAV|ASIDE)$/.test(b.el.tagName) ? 0 : 1;
         tiers[tier]!.push(b);
       }
-      const base = [0, 130, 440] as const;
+      const base = [0, 110, 380] as const;
       const step = [40, 32, 22] as const;
       const cap = [160, 340, 220] as const;
       for (const tier of [0, 1, 2] as const) {
@@ -147,7 +153,7 @@ function Cascade({
       }
       byDiag
         .filter((b) => !b.nested)
-        .forEach((b, rank) => b.el.style.setProperty('--do', `${Math.min(rank * 38, 380)}ms`));
+        .forEach((b, rank) => b.el.style.setProperty('--do', `${Math.min(rank * 36, 300)}ms`));
 
       for (const c of root.querySelectorAll<SVGCircleElement>('circle[stroke-dasharray]')) {
         c.style.setProperty('--len', String(parseFloat(c.getAttribute('stroke-dasharray') ?? '200')));
@@ -157,11 +163,10 @@ function Cascade({
         const len = Math.ceil(p.getTotalLength());
         p.dataset.draw = '';
         p.style.setProperty('--len', String(len));
-        p.style.strokeDasharray = String(len);
       }
       if (phase === 'in' && !counted.current) {
         const counters = root.querySelectorAll<HTMLElement>('[data-count]');
-        counters.forEach((el) => countUp(el, enter + 260, () => dead));
+        counters.forEach((el) => cancels.push(countUp(el, enter + 200)));
         counted.current = counters.length > 0;
       }
     };
@@ -169,7 +174,8 @@ function Cascade({
     const mo = new MutationObserver(aim);
     mo.observe(root, { childList: true, subtree: true });
     return () => {
-      dead = true;
+      cancels.forEach((c) => c());
+      counted.current = false;
       mo.disconnect();
     };
     // Aimed once per mount: a layer's phase and offsets are fixed for its life.
@@ -223,7 +229,8 @@ export default function HeroStage() {
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(() => typeof document !== 'undefined' && document.hidden);
   const [paused, setPaused] = useState(false);
-  const [narrow, setNarrow] = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+  // Unknown until the stage is measured, so the first paint is never the wrong frame.
+  const [narrow, setNarrow] = useState<boolean | null>(null);
   const stage = useRef<HTMLDivElement>(null);
   const busy = useRef(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -237,6 +244,11 @@ export default function HeroStage() {
   );
 
   useEffect(() => {
+    const t = setTimeout(() => !busy.current && setPhase('idle'), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
     const onVis = () => setHidden(document.hidden);
     document.addEventListener('visibilitychange', onVis);
     return () => document.removeEventListener('visibilitychange', onVis);
@@ -244,8 +256,13 @@ export default function HeroStage() {
 
   useLayoutEffect(() => {
     const el = stage.current;
-    if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => setNarrow(el.clientWidth < 640));
+    if (!el) return;
+    setNarrow(el.clientWidth < 640);
+    if (typeof ResizeObserver === 'undefined') return;
+    // A little hysteresis, so a stage sitting on the threshold does not flap.
+    const ro = new ResizeObserver(() =>
+      setNarrow((was) => (was ? el.clientWidth < 670 : el.clientWidth < 620)),
+    );
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -304,8 +321,8 @@ export default function HeroStage() {
     <div
       role="group"
       aria-label="Example layouts"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onPointerEnter={(e) => e.pointerType !== 'touch' && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
       onFocus={(e) => setFocused(e.target.matches(':focus-visible'))}
       onBlur={() => setFocused(false)}
       className="min-w-0 space-y-3"
@@ -316,7 +333,7 @@ export default function HeroStage() {
       >
         {/* A decorative picture of the layouts: nothing in it takes focus or clicks. */}
         <div inert aria-hidden className="pointer-events-none">
-          {narrow ? (
+          {narrow === null ? null : narrow ? (
             <div className="mx-auto w-full max-w-[260px]">
               <div key={animated ? swaps : 'still'} className={cn(animated && 'hero-camera-phone', reduced && 'hero-fade')}>
                 <PhoneFrame label={`${current.name}, mobile`} maxHeight={500}>
