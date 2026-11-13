@@ -22,15 +22,7 @@ hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('xml', xml);
 
 export type CodeLanguage =
-  | 'typescript'
-  | 'javascript'
-  | 'tsx'
-  | 'jsx'
-  | 'bash'
-  | 'html'
-  | 'xml'
-  | 'css'
-  | 'json';
+  'typescript' | 'javascript' | 'tsx' | 'jsx' | 'bash' | 'html' | 'xml' | 'css' | 'json';
 
 type Grammar = 'typescript' | 'javascript' | 'bash' | 'xml' | 'css' | 'json';
 

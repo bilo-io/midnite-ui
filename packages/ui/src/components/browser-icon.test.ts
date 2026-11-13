@@ -33,7 +33,7 @@ describe('BrowserIcon', () => {
     for (const id of BROWSER_IDS) expect(browserDownloadUrl(id)).toMatch(/^https:\/\//);
   });
 
-  it('uses each logo\'s own viewBox and leaves no placeholder behind', () => {
+  it("uses each logo's own viewBox and leaves no placeholder behind", () => {
     const html = (b: (typeof BROWSER_IDS)[number]) =>
       renderToStaticMarkup(createElement(BrowserIcon, { browser: b }));
     expect(html('chrome')).toContain('viewBox="-10 -10 276 276"');

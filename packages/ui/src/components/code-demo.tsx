@@ -89,9 +89,7 @@ export function CodeDemo({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
             {title ? <h3 className="text-base font-semibold tracking-tight">{title}</h3> : null}
-            {description ? (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            ) : null}
+            {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
           </div>
           {layout === 'tabs' ? (
             <Tabs

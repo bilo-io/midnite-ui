@@ -125,9 +125,9 @@ describe('checkBrowserSupport', () => {
       reason: 'ok',
       minVersion: '90',
     });
-    expect(
-      checkBrowserSupport(detectBrowser(UA.safariMac), { safari: '17.4.1' }).supported,
-    ).toBe(true);
+    expect(checkBrowserSupport(detectBrowser(UA.safariMac), { safari: '17.4.1' }).supported).toBe(
+      true,
+    );
   });
 
   it('outdated below the minimum', () => {

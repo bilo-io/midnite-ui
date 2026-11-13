@@ -588,7 +588,7 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     name: 'Browser support',
     category: 'Layout & surfaces',
     description:
-      'A warning callout shown only when the visitor\'s browser is missing from a supported list or older than its minimum version. SSR-safe, dependency-free, with the detection exported as pure functions.',
+      "A warning callout shown only when the visitor's browser is missing from a supported list or older than its minimum version. SSR-safe, dependency-free, with the detection exported as pure functions.",
     exports: [
       'BrowserSupport',
       'BrowserSupportList',
@@ -597,7 +597,15 @@ export const COMPONENTS: readonly ComponentDoc[] = [
       'checkBrowserSupport',
       'compareVersions',
     ],
-    keywords: ['browser', 'compatibility', 'user agent', 'outdated', 'upgrade', 'warning', 'detect'],
+    keywords: [
+      'browser',
+      'compatibility',
+      'user agent',
+      'outdated',
+      'upgrade',
+      'warning',
+      'detect',
+    ],
     props: [
       {
         name: 'supported',

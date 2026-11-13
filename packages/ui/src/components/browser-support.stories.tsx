@@ -30,7 +30,9 @@ type Story = StoryObj<typeof meta>;
 export const NotListed: Story = {
   play: async ({ canvasElement, args }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('alert')).toHaveTextContent('Internet Explorer 11.0 is not supported');
+    await expect(canvas.getByRole('alert')).toHaveTextContent(
+      'Internet Explorer 11.0 is not supported',
+    );
     await expect(canvas.getAllByRole('link')).toHaveLength(5);
     await expect(args.onCheck).toHaveBeenCalledTimes(1);
   },

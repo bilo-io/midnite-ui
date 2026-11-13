@@ -13,7 +13,7 @@ const supported = { chrome: '90', firefox: '88' };
 describe('BrowserSupport', () => {
   it('renders nothing when the browser is supported', () => {
     const { container } = render(<BrowserSupport supported={supported} userAgent={NEW_CHROME} />);
-    expect(container.innerHTML).toBe("");
+    expect(container.innerHTML).toBe('');
   });
 
   it('warns about a browser that is not listed, with the supported list', () => {
@@ -29,7 +29,9 @@ describe('BrowserSupport', () => {
 
   it('asks for a newer version when outdated', () => {
     render(<BrowserSupport supported={supported} userAgent={OLD_CHROME} />);
-    expect(screen.getByRole('alert').textContent).toContain('Chrome 60.0.0.0 is out of date. Version 90 or newer is needed.');
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Chrome 60.0.0.0 is out of date. Version 90 or newer is needed.',
+    );
   });
 
   it('shows a status when asked to render a supported browser', () => {
@@ -45,7 +47,9 @@ describe('BrowserSupport', () => {
         labels={{ notSupported: ({ name }) => `${name} wird nicht unterstützt` }}
       />,
     );
-    expect(screen.getByRole('alert').textContent).toContain('Internet Explorer wird nicht unterstützt');
+    expect(screen.getByRole('alert').textContent).toContain(
+      'Internet Explorer wird nicht unterstützt',
+    );
   });
 
   it('calls onCheck once per result, not once per render', () => {
@@ -65,7 +69,9 @@ describe('BrowserSupport', () => {
   it('reports supported results to onCheck even though nothing renders', () => {
     const onCheck = vi.fn();
     render(<BrowserSupport supported={supported} userAgent={NEW_CHROME} onCheck={onCheck} />);
-    expect(onCheck).toHaveBeenCalledWith(expect.objectContaining({ supported: true, reason: 'ok' }));
+    expect(onCheck).toHaveBeenCalledWith(
+      expect.objectContaining({ supported: true, reason: 'ok' }),
+    );
   });
 
   it('lets children replace the body, as nodes or a render prop', () => {
@@ -89,7 +95,7 @@ describe('BrowserSupport', () => {
     // jsdom's UA is not a known browser, so nothing is flagged.
     const onCheck = vi.fn();
     const { container } = render(<BrowserSupport supported={{}} onCheck={onCheck} />);
-    expect(container.innerHTML).toBe("");
+    expect(container.innerHTML).toBe('');
     expect(onCheck).toHaveBeenCalledTimes(1);
   });
 });
