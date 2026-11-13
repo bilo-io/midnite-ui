@@ -14,25 +14,26 @@ import { cn } from '@bilo-io/ui';
 
 import { hrefFor } from '../router';
 import { DesktopFrame, PhoneFrame } from './frames';
+import { MorphLayer } from './morph-layer';
 import { LAYOUTS, type Variant, layoutComponent, preloadLayout } from './index';
 
 // The landing hero: one frame that cycles through every example layout.
 //
-// A transition plays two layers at once inside a frame that never changes: the
-// layout leaving (blocks fly out along a diagonal sweep from the top-left) and
-// the layout arriving (blocks drop in from the opposite side with an
-// overshooting spring: shell, then content, then accents). A bright band
-// crosses the frame between them and the whole stage does a small dolly, with
-// the phone trailing the desktop. Blocks are the `data-c` elements; `Cascade`
-// numbers and aims them. Only transform, opacity, filter and stroke offsets
-// animate, with no animation library.
+// A transition is a shape morph. Each layout has a skeleton of keyed slots
+// (./morph-geometry); a `MorphLayer` under the layouts animates every slot from
+// the old skeleton to the new one (position, size, corner radius, surface
+// tone) while the old layout's real content fades out in ~150ms. The new
+// content then grows in over the landed shapes. The phone frame morphs in sync,
+// trailing the desktop by 80ms. Only clip-path, opacity, colour and stroke
+// offsets animate (Web Animations API and CSS), with no animation library.
 //
 // Auto-advance is the active chip's progress bar `animationend`, so pausing
 // the bar (hover, keyboard focus, a hidden tab, the button) pauses the show.
 
-const EXIT_MS = 1100; // the leaving layer is unmounted after this
+const EXIT_MS = 400; // the leaving layer (faded out after ~150ms) is unmounted after this
 const SETTLE_MS = 2200; // the arriving layer has finished building by now
-const EASE_IN_MS = 140; // arriving blocks start this long after the transition begins
+const EASE_IN_MS = 560; // arriving content starts growing in as the shapes land
+const TRAIL_MS = 80; // the phone frame trails the desktop by this much
 
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(
@@ -97,20 +98,17 @@ function countUp(el: HTMLElement, delay: number): () => void {
 }
 
 /**
- * Aims every `[data-c]` below it: a flight vector away from the top-left, an
- * exit delay by diagonal rank, an entrance delay by tier (shell, content,
- * accents), and the stroke lengths that charts and rings draw from. Re-aims as
- * lazy content mounts.
+ * Aims every `[data-c]` below it: an entrance delay by tier (shell, content,
+ * accents) and diagonal rank, and the stroke lengths that charts and rings draw
+ * from. Re-aims as lazy content mounts.
  */
 function Cascade({
   phase,
   enter = EASE_IN_MS,
-  exit = 0,
   children,
 }: {
   phase: 'in' | 'out' | 'idle';
   enter?: number;
-  exit?: number;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -144,17 +142,9 @@ function Cascade({
       const cap = [160, 340, 220] as const;
       for (const tier of [0, 1, 2] as const) {
         tiers[tier]!.forEach((b, rank) => {
-          const len = Math.hypot(b.cx - w * 0.1, b.cy - h * 0.1) || 1;
-          const reach = 40 + Math.min(40, (b.diag / 2) * 60);
-          b.el.style.setProperty('--dx', `${((b.cx - w * 0.1) / len) * reach}px`);
-          b.el.style.setProperty('--dy', `${((b.cy - h * 0.1) / len) * reach}px`);
           b.el.style.setProperty('--di', `${base[tier] + Math.min(rank * step[tier], cap[tier])}ms`);
         });
       }
-      byDiag
-        .filter((b) => !b.nested)
-        .forEach((b, rank) => b.el.style.setProperty('--do', `${Math.min(rank * 36, 300)}ms`));
-
       for (const c of root.querySelectorAll<SVGCircleElement>('circle[stroke-dasharray]')) {
         c.style.setProperty('--len', String(parseFloat(c.getAttribute('stroke-dasharray') ?? '200')));
       }
@@ -186,7 +176,7 @@ function Cascade({
       ref={ref}
       className="cascade relative h-full w-full"
       data-phase={phase}
-      style={{ '--eo': `${enter}ms`, '--xo': `${exit}ms` } as CSSProperties}
+      style={{ '--eo': `${enter}ms` } as CSSProperties}
     >
       {children}
     </div>
@@ -199,7 +189,7 @@ function Layer({
   variant,
   phase,
   enter,
-  exit,
+  exit = 0,
 }: {
   id: string;
   variant: Variant;
@@ -209,8 +199,11 @@ function Layer({
 }) {
   const View = layoutComponent(id, variant);
   return (
-    <div className={cn('absolute inset-0', phase === 'in' && 'layer-in', phase === 'out' && 'layer-out')}>
-      <Cascade phase={phase} enter={enter} exit={exit}>
+    <div
+      className={cn('absolute inset-0', phase === 'in' && 'layer-in', phase === 'out' && 'layer-out')}
+      style={{ '--lo': `${Math.max(0, (enter ?? 0) - 80)}ms`, '--xo': `${exit}ms` } as CSSProperties}
+    >
+      <Cascade phase={phase} enter={enter}>
         <Suspense fallback={null}>
           <View />
         </Suspense>
@@ -298,12 +291,12 @@ export default function HeroStage() {
 
   const current = LAYOUTS[index]!;
   const playing = !paused && !hovered && !focused && !hidden && !reduced;
-  const animated = !reduced && swaps > 0;
-  // The first layout builds in on arrival, a little sooner than between layouts.
+  // The first layout builds in on arrival, sooner than between layouts (no morph to wait for).
   const enter = swaps === 0 ? 120 : EASE_IN_MS;
 
   const layers = (variant: Variant, trail: number) => (
     <>
+      <MorphLayer id={current.id} variant={variant} trail={trail} animate={!reduced} />
       {prev !== null && !reduced ? (
         <Layer key={`out-${swaps}`} id={LAYOUTS[prev]!.id} variant={variant} phase="out" exit={trail} />
       ) : null}
@@ -335,7 +328,7 @@ export default function HeroStage() {
         <div inert aria-hidden className="pointer-events-none">
           {narrow === null ? null : narrow ? (
             <div className="mx-auto w-full max-w-[260px]">
-              <div key={animated ? swaps : 'still'} className={cn(animated && 'hero-camera-phone', reduced && 'hero-fade')}>
+              <div className={cn(reduced && 'hero-fade')}>
                 <PhoneFrame label={`${current.name}, mobile`} maxHeight={500}>
                   {layers('mobile', 0)}
                 </PhoneFrame>
@@ -343,39 +336,15 @@ export default function HeroStage() {
             </div>
           ) : (
             <div className="relative">
-              <div key={animated ? swaps : 'still'} className={cn(animated && 'hero-camera', reduced && 'hero-fade')}>
+              <div className={cn(reduced && 'hero-fade')}>
                 <DesktopFrame label={`${current.name}, desktop`}>{layers('desktop', 0)}</DesktopFrame>
               </div>
               <div className="absolute -bottom-3 right-[3%] w-[21%] drop-shadow-2xl">
-                <div key={animated ? swaps : 'still'} className={cn(animated && 'hero-camera-phone')}>
-                  <PhoneFrame label={`${current.name}, mobile`}>{layers('mobile', 120)}</PhoneFrame>
-                </div>
+                <PhoneFrame label={`${current.name}, mobile`}>{layers('mobile', TRAIL_MS)}</PhoneFrame>
               </div>
             </div>
           )}
         </div>
-        {animated ? (
-          <div key={swaps} aria-hidden className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-            <div className="hero-wipe absolute inset-y-[-10%] left-0 w-[34%]">
-              {/* The glow: a soft, blurred copy of the band behind it. */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent, hsl(280 95% 62% / 0.55) 30%, hsl(190 95% 55% / 0.85) 52%, hsl(335 95% 62% / 0.55) 74%, transparent)',
-                  filter: 'blur(14px)',
-                }}
-              />
-              <div
-                className="absolute inset-y-0 left-[44%] w-[12%]"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.95) 45%, hsl(190 100% 80% / 0.95) 55%, transparent)',
-                }}
-              />
-            </div>
-          </div>
-        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
