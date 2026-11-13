@@ -27,23 +27,26 @@ export function SwipeDeck({
   const [exit, setExit] = useState<1 | -1 | 0>(0);
   const start = useRef<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const deciding = useRef(false);
 
   useEffect(() => () => clearTimeout(timer.current), []);
-  useEffect(() => setIndex(0), [spots]);
 
   const top = spots[index];
   const decide = (dir: 1 | -1) => {
-    if (!top || exit) return;
+    if (!top || deciding.current) return;
+    deciding.current = true;
     setExit(dir);
     timer.current = setTimeout(() => {
       onDecide(top, dir === 1);
       setIndex((i) => i + 1);
       setExit(0);
       setDx(0);
+      deciding.current = false;
     }, 240);
   };
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (deciding.current) return;
     start.current = e.clientX;
     e.currentTarget.setPointerCapture(e.pointerId);
   };
@@ -55,6 +58,10 @@ export function SwipeDeck({
     start.current = null;
     if (Math.abs(dx) > THRESHOLD) decide(dx > 0 ? 1 : -1);
     else setDx(0);
+  };
+  const onPointerCancel = () => {
+    start.current = null;
+    setDx(0);
   };
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowRight') decide(1);
@@ -89,7 +96,7 @@ export function SwipeDeck({
               onPointerDown={isTop ? onPointerDown : undefined}
               onPointerMove={isTop ? onPointerMove : undefined}
               onPointerUp={isTop ? onPointerUp : undefined}
-              onPointerCancel={isTop ? onPointerUp : undefined}
+              onPointerCancel={isTop ? onPointerCancel : undefined}
               aria-hidden={!isTop}
               className="absolute inset-0 touch-pan-y select-none overflow-hidden rounded-3xl border border-border bg-card shadow-xl"
               style={{
@@ -112,7 +119,7 @@ export function SwipeDeck({
               <div className="space-y-1.5 p-4">
                 <div className="flex items-baseline justify-between">
                   <h3 className="text-lg font-semibold">{spot.name}</h3>
-                  <span className="flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />{spot.rating}</span>
+                  <span className="flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 fill-[hsl(var(--status-wip))] text-[hsl(var(--status-wip))]" />{spot.rating}</span>
                 </div>
                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-3.5 w-3.5" />{spot.cuisine} · {price(spot.price)} · {spot.km} km</p>
                 <div className="flex flex-wrap gap-1.5 pt-1">

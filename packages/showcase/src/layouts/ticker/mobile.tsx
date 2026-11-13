@@ -20,7 +20,7 @@ export default function TickerMobile() {
       </header>
       <Card data-c className="p-4">
         <p className="text-xs text-muted-foreground">Portfolio value</p>
-        <p className="text-3xl font-semibold tabular-nums">$48,215.60</p>
+        <p data-count className="text-3xl font-semibold tabular-nums">$48,215.60</p>
       </Card>
       <div data-c className="flex gap-2 overflow-hidden">
         {WATCHLIST.map((w) => (
@@ -29,7 +29,7 @@ export default function TickerMobile() {
       </div>
       <Card data-c className="space-y-2 p-4">
         <div className="flex items-end justify-between">
-          <div><p className="text-xs text-muted-foreground">{inst.name}</p><p className="text-2xl font-semibold tabular-nums">${fmt(inst.price)}</p></div>
+          <div><p className="text-xs text-muted-foreground">{inst.name}</p><p data-count className="text-2xl font-semibold tabular-nums">{`$${fmt(inst.price)}`}</p></div>
           <span className={cn('text-xs', inst.change >= 0 ? 'text-success' : 'text-destructive')}>{inst.change >= 0 ? '+' : ''}{inst.change}%</span>
         </div>
         <AreaChart className="h-28 w-full" series={[{ data: shown, hueVar: inst.change >= 0 ? '--success' : '--destructive' }]} />

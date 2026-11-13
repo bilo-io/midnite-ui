@@ -19,9 +19,15 @@ export default function TickerDesktop() {
   const inst = WATCHLIST.find((w) => w.sym === sym) ?? WATCHLIST[0]!;
   const [live, setLive] = useState(inst.series);
 
-  useEffect(() => setLive(inst.series), [inst]);
   useEffect(() => {
-    const id = setInterval(() => setLive(tick), 1500);
+    setLive(inst.series);
+  }, [inst]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      // A hidden tab or a reduced-motion reader has no use for a moving chart.
+      if (document.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      setLive(tick);
+    }, 1500);
     return () => clearInterval(id);
   }, []);
 
@@ -34,7 +40,7 @@ export default function TickerDesktop() {
       <header data-c className="col-span-3 flex items-center gap-3">
         <span className="flex items-center gap-2 text-lg font-semibold"><Mark letter="T" hue={150} /> Ticker</span>
         <span className="text-muted-foreground">Portfolio</span>
-        <span className="font-semibold tabular-nums">$48,215.60</span>
+        <span data-count className="font-semibold tabular-nums">$48,215.60</span>
         <span className="flex items-center gap-1 text-success"><TrendingUp className="h-4 w-4" />+1.8% today</span>
         <span className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground"><span className="h-2 w-2 animate-pulse rounded-full bg-success" />Market open</span>
       </header>
@@ -59,7 +65,7 @@ export default function TickerDesktop() {
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{inst.name}</p>
-              <p className="text-3xl font-semibold tabular-nums">${fmt(price)}</p>
+              <p data-count className="text-3xl font-semibold tabular-nums">{`$${fmt(price)}`}</p>
               <p className={cn('flex items-center gap-1 text-xs', inst.change >= 0 ? 'text-success' : 'text-destructive')}>
                 {inst.change >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}{inst.change}% today
               </p>

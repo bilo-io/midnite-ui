@@ -61,7 +61,9 @@ function useSource(id: string, variant: Variant): string | null {
   useEffect(() => {
     let live = true;
     setSource(null);
-    loadSource(id, variant).then((s) => live && setSource(s));
+    loadSource(id, variant)
+      .then((s) => live && setSource(s))
+      .catch(() => live && setSource('// The source could not be loaded.'));
     return () => {
       live = false;
     };
@@ -131,8 +133,10 @@ function Detail({ layout }: { layout: LayoutDoc }) {
 const Loading = () => <p className="p-6 text-sm text-muted-foreground">Loading…</p>;
 
 export function ExamplesPage({ id }: { id?: string }) {
-  useEffect(() => window.scrollTo?.(0, 0), [id]);
-  if (!id) return <Overview />;
+  useEffect(() => {
+    window.scrollTo?.(0, 0);
+  }, [id]);
+  if (!id) return <Overview key="overview" />;
   const layout = findLayout(id);
   if (!layout)
     return (

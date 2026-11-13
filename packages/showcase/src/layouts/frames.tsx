@@ -37,7 +37,7 @@ export function DesktopFrame({ children, label }: { children: ReactNode; label: 
         style={{ width: DESKTOP.w, height: DESKTOP.h + chrome, transform: `scale(${scale})` }}
       >
         <div aria-hidden className="flex h-8 items-center gap-1.5 border-b border-border bg-muted/60 px-3">
-          {['bg-destructive/70', 'bg-yellow-400/80', 'bg-success/80'].map((c) => (
+          {['bg-destructive/70', 'bg-[hsl(var(--status-wip))]', 'bg-success/80'].map((c) => (
             <span key={c} className={`h-2.5 w-2.5 rounded-full ${c}`} />
           ))}
           <span className="mx-auto h-4 w-64 rounded bg-background/70" />

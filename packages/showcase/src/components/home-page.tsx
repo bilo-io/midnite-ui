@@ -36,30 +36,6 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
     <div className="space-y-14">
       {mode === 'mobile' ? <MobileHero /> : <WebHero />}
 
-      {mode === 'web' ? (
-        <section aria-labelledby="whole-apps" className="space-y-4">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 id="whole-apps" className="text-2xl font-semibold tracking-tight">
-                Whole apps, from the same parts
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Six example layouts, desktop and phone, built only from the primitives above.
-              </p>
-            </div>
-            <a
-              href={hrefFor({ page: 'examples' })}
-              className="text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-            >
-              See them all
-            </a>
-          </div>
-          <Suspense fallback={<div className="showcase-canvas aspect-[16/10] rounded-2xl border border-border/60" />}>
-            <HeroStage />
-          </Suspense>
-        </section>
-      ) : null}
-
       <section id="browse" className="scroll-mt-20 space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -112,7 +88,7 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
             {results.map(({ doc }) => {
               const Preview = mode === 'web' ? examplesFor(doc.id)[0]?.Component : undefined;
               return (
-                <li key={doc.id}>
+                <li key={doc.id} className="min-w-0">
                   <a
                     href={hrefFor(inMode({ page: 'component', id: doc.id }, mode))}
                     className="group flex h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-card transition hover:-translate-y-0.5 hover:border-border hover:shadow-lg"
@@ -159,54 +135,64 @@ export function HomePage({ mode = 'web' }: { mode?: Mode }) {
   );
 }
 
-/** The Web / Desktop overview's hero. */
+/** The Web / Desktop overview's hero: the pitch beside the stage that cycles the example layouts. */
 function WebHero() {
   return (
-    <section className="relative -mx-4 overflow-hidden border-b border-border/60 px-4 pb-14 pt-16 sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-2xl lg:border lg:px-12">
+    <section className="relative -mx-4 overflow-hidden border-b border-border/60 px-4 pb-8 pt-8 sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-2xl lg:border lg:px-8 lg:pb-10 lg:pt-10">
       <DynamicBackground pattern="aurora" className="opacity-70" />
-      <div className="relative max-w-2xl space-y-6">
-        <p className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-success" />
-          {COMPONENTS.length} components · React 19 · Tailwind tokens
-        </p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          The building blocks of every <Wordmark className="leading-tight" /> app.
-        </h1>
-        <p className="text-base text-muted-foreground sm:text-lg">
-          Accessible primitives, data displays and animated backdrops on one set of HSL design
-          tokens. Every example below is live: the code you copy is the code that renders it.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          {/* A scroll, not `href="#browse"`: the hash is the router's, and would read as a component id. */}
-          <Button
-            size="lg"
-            onClick={() =>
-              document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' })
-            }
-          >
-            Browse components <ArrowRight className="ml-1.5 h-4 w-4" />
-          </Button>
-          <a href={DOCS_URL}>
-            <Button size="lg" variant="outline">
-              Read the docs
+      <div className="relative grid items-center gap-6 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:gap-8">
+        <div className="min-w-0 space-y-4">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-success" />
+            {COMPONENTS.length} components · React 19 · Tailwind tokens
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            The building blocks of every <Wordmark className="leading-tight" /> app.
+          </h1>
+          <p className="hidden text-base text-muted-foreground sm:block">
+            Accessible primitives, data displays and animated backdrops on one set of HSL design
+            tokens. Every example is live: the code you copy is the code that renders it. The
+            screens on the right are built from nothing else.
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* A scroll, not `href="#browse"`: the hash is the router's, and would read as a component id. */}
+            <Button
+              size="lg"
+              onClick={() =>
+                document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' })
+              }
+            >
+              Browse components <ArrowRight className="ml-1.5 h-4 w-4" />
             </Button>
-          </a>
-          <div className="flex h-11 items-center gap-3 rounded-md border border-border/60 bg-background/70 pl-4 pr-2 font-mono text-sm backdrop-blur">
-            <span className="text-muted-foreground">$</span> {INSTALL.web}
-            <CopyButton text={INSTALL.web} />
+            <a href={DOCS_URL}>
+              <Button size="lg" variant="outline">
+                Read the docs
+              </Button>
+            </a>
+            <div className="hidden h-11 items-center gap-3 rounded-md border border-border/60 bg-background/70 pl-4 pr-2 font-mono text-sm backdrop-blur sm:flex">
+              <span className="text-muted-foreground">$</span> {INSTALL.web}
+              <CopyButton text={INSTALL.web} />
+            </div>
           </div>
+          <p className="hidden text-xs text-muted-foreground lg:block">
+            Published to GitHub Packages, which needs a{' '}
+            <code className="font-mono">read:packages</code> token even for public packages.{' '}
+            <a
+              href={`${DOCS_URL}#/getting-started`}
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              Set up the registry
+            </a>
+            .
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Published to GitHub Packages, which needs a{' '}
-          <code className="font-mono">read:packages</code> token even for public packages.{' '}
-          <a
-            href={`${DOCS_URL}#/getting-started`}
-            className="underline underline-offset-2 hover:text-foreground"
-          >
-            Set up the registry
-          </a>
-          .
-        </p>
+        <Suspense
+          fallback={
+            <div className="showcase-canvas aspect-[4/5] rounded-2xl border border-border/60 sm:aspect-[16/10]" />
+          }
+        >
+          <HeroStage />
+        </Suspense>
       </div>
     </section>
   );

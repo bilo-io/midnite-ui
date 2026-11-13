@@ -12,6 +12,8 @@ describe('hash routes', () => {
     ['#/examples/forkful', { page: 'examples', id: 'forkful' }],
     ['#/button', { page: 'component', id: 'button' }],
     ['#/button/sizes', { page: 'component', id: 'button', example: 'sizes' }],
+    ['#/mobile/examples', { page: 'home', mode: 'mobile' }],
+    ['#/mobile/examples/pulse', { page: 'home', mode: 'mobile' }],
     ['#/mobile', { page: 'home', mode: 'mobile' }],
     ['#/mobile/', { page: 'home', mode: 'mobile' }],
     ['#/mobile/tokens', { page: 'tokens', mode: 'mobile' }],

@@ -55,7 +55,7 @@ export default function PulseDesktop() {
           </Card>
           <Card data-c className="space-y-2 p-4">
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><Heart className="h-3.5 w-3.5 text-destructive" />Heart rate</p>
-            <p className="text-2xl font-semibold tabular-nums">62 <span className="text-xs font-normal text-muted-foreground">bpm resting</span></p>
+            <p data-count className="text-2xl font-semibold tabular-nums">62 <span className="text-xs font-normal text-muted-foreground">bpm resting</span></p>
             <AreaChart className="w-full" series={[{ data: HEART, hueVar: '--destructive' }]} />
           </Card>
         </div>

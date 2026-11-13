@@ -57,7 +57,7 @@ export function MapCanvas({
             transform={`translate(${p.x} ${p.y}) scale(${on ? 1.3 : 1})`}
           >
             <circle r="17" fill={on ? 'hsl(var(--destructive))' : 'hsl(var(--card))'} stroke="hsl(var(--border))" strokeWidth="3" />
-            <text textAnchor="middle" dy="5" fontSize="15" fontWeight="700" fill={on ? 'white' : 'hsl(var(--foreground))'}>{p.kind[0]}</text>
+            <text textAnchor="middle" dy="5" fontSize="15" fontWeight="700" fill={on ? 'hsl(var(--destructive-foreground))' : 'hsl(var(--foreground))'}>{p.kind[0]}</text>
           </g>
         );
       })}

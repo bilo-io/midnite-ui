@@ -48,7 +48,7 @@ export default function WayfindDesktop() {
                 <span className="block font-medium">{p.name}</span>
                 <span className="text-xs text-muted-foreground">{p.kind} · {p.distance}</span>
               </span>
-              <span className="flex items-center gap-1 text-xs"><Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />{p.rating}</span>
+              <span className="flex items-center gap-1 text-xs"><Star className="h-3.5 w-3.5 fill-[hsl(var(--status-wip))] text-[hsl(var(--status-wip))]" />{p.rating}</span>
             </button>
           ))}
         </Card>
@@ -59,7 +59,7 @@ export default function WayfindDesktop() {
           <div>
             <h3 className="text-lg font-semibold">{place.name}</h3>
             <p className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" /> {place.rating} ({place.reviews.toLocaleString()}) · {place.kind}
+              <Star className="h-3.5 w-3.5 fill-[hsl(var(--status-wip))] text-[hsl(var(--status-wip))]" /> {place.rating} ({place.reviews.toLocaleString()}) · {place.kind}
             </p>
           </div>
           <div className="flex gap-2">
@@ -79,7 +79,7 @@ export default function WayfindDesktop() {
           ) : (
             <ul className="space-y-3">
               {REVIEWS.map((r) => (
-                <li key={r.who}><p className="font-medium">{r.who} <span className="text-yellow-500">{'★'.repeat(r.stars)}</span></p><p className="text-muted-foreground">{r.text}</p></li>
+                <li key={r.who}><p className="font-medium">{r.who} <span className="text-[hsl(var(--status-wip))]">{'★'.repeat(r.stars)}</span></p><p className="text-muted-foreground">{r.text}</p></li>
               ))}
             </ul>
           )}

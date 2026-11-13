@@ -37,7 +37,7 @@ export default function ForkfulDesktop() {
       </aside>
 
       <main data-c className="flex items-center justify-center p-6">
-        <SwipeDeck spots={spots} onDecide={(spot, liked) => liked && setMatches((m) => [spot, ...m])} />
+        <SwipeDeck key={spots.map((s) => s.id).join()} spots={spots} onDecide={(spot, liked) => liked && setMatches((m) => [spot, ...m])} />
       </main>
 
       <aside className="space-y-3 border-l border-border bg-card p-5">

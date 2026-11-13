@@ -32,7 +32,9 @@ function parsePath(path: string): Page {
 export function parseHash(hash: string): Route {
   const path = hash.replace(/^#\/?/, '');
   if (path === MOBILE || path.startsWith(`${MOBILE}/`)) {
-    return { ...parsePath(path.slice(MOBILE.length + 1)), mode: 'mobile' };
+    const page = parsePath(path.slice(MOBILE.length + 1));
+    // The example layouts are web-only: the Mobile showcase has no such page.
+    return { ...(page.page === 'examples' ? { page: 'home' as const } : page), mode: 'mobile' };
   }
   return parsePath(path);
 }
