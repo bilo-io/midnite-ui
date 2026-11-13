@@ -4,7 +4,7 @@ import { AGENT_IDS, agentFiles } from '@bilo-io/ui';
 
 // The same marks as files, for a README, a PR comment or any page that links
 // rather than imports. Served at /agents/ on the docs site.
-const BASE = 'https://bilo-io.github.io/midnite-ui/agents/';
+const BASE = 'https://midnite-design.vercel.app/agents/';
 
 const onDark = (file: string) => file.endsWith('-white') || file === 'grok-color';
 

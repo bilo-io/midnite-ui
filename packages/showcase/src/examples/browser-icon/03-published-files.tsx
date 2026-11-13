@@ -2,7 +2,7 @@ import { BROWSER_IDS } from '@bilo-io/ui';
 
 // The same logos as files, for a README or any page that links rather than
 // imports. Served at /browsers/ on the docs site.
-const BASE = 'https://bilo-io.github.io/midnite-ui/browsers/';
+const BASE = 'https://midnite-design.vercel.app/browsers/';
 
 export default function PublishedFiles() {
   return (
