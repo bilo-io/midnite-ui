@@ -1,6 +1,4 @@
-import { color, type ColorScale } from '@bilo-io/ui';
-
-import { CodeBlock } from './code-block';
+import { CodeBlock, color, type ColorScale } from '@bilo-io/ui';
 
 // Semantic colours come from the typed `color` map, so both themes render side
 // by side whatever the page theme is. The status/kind/node families exist only

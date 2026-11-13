@@ -38,6 +38,7 @@ tasks:
       - 'src/**/*'
       - 'assets/**/*'
       - 'scripts/agent-icons.mjs'
+      - 'scripts/browser-icons.mjs'
       - 'vite.config.ts'
       - 'vitest.config.ts'
       # Stories run as browser tests, so Storybook config (preview decorators,

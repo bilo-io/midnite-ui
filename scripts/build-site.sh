@@ -24,3 +24,6 @@ cp -R packages/ui/storybook-static/. _site/storybook/
 # The agent marks, linkable from anywhere at /agents/<name>.svg.
 mkdir -p _site/agents
 cp -R packages/ui/assets/agents/. _site/agents/
+# The browser logos, likewise at /browsers/<name>.svg.
+mkdir -p _site/browsers
+cp -R packages/ui/assets/browsers/. _site/browsers/

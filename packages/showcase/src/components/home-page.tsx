@@ -1,14 +1,13 @@
 import { Suspense, useMemo, useState } from 'react';
 import { ArrowRight, Search } from 'lucide-react';
 
-import { Button, DynamicBackground, Wordmark, cn } from '@bilo-io/ui';
+import { Button, CopyButton, DynamicBackground, Wordmark, cn } from '@bilo-io/ui';
 
 import { catalogFor, type Category, COMPONENTS } from '../catalog';
 import { examplesFor } from '../examples';
 import { NativeCardPreview } from '../mobile/lazy';
 import { hrefFor, inMode, type Mode } from '../router';
 import { searchComponents } from '../search';
-import { CopyButton } from './code-block';
 import { InlineCode } from './props-table';
 import { DOCS_URL } from './top-bar';
 

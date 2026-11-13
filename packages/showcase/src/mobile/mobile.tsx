@@ -1,7 +1,7 @@
 import { type ComponentType, useEffect } from 'react';
 
 import type { ComponentDoc } from '../catalog';
-import { CodeBlock } from '../components/code-block';
+import { CodeBlock } from '@bilo-io/ui';
 import { ExampleToc, scrollToExample } from '../components/example-toc';
 import { anchorFor, type Example, type ExampleModule, load, NATIVE_PREFIX } from '../examples';
 import { NativeScreen, NativeTheme } from './native-stage';

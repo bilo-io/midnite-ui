@@ -566,6 +566,81 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     ],
   },
   {
+    id: 'browser-icon',
+    wide: true,
+    name: 'Browser icon',
+    category: 'Icons',
+    description:
+      'The logos of nine browsers (Chrome, Firefox, Safari, Edge, Opera, Brave, Samsung Internet, Vivaldi, Internet Explorer), generated from the SVG files published at `/browsers/`. Gradient ids are scoped per instance.',
+    exports: ['BrowserIcon', 'BROWSER_IDS', 'browserName', 'browserColor', 'browserDownloadUrl'],
+    keywords: ['browser', 'logo', 'chrome', 'firefox', 'safari', 'edge', 'opera', 'brave', 'svg'],
+    props: [
+      { name: 'browser', type: 'BrowserId', description: 'One of `BROWSER_IDS`.' },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'Accessible name; omitted, the icon is decorative.',
+      },
+    ],
+  },
+  {
+    id: 'browser-support',
+    name: 'Browser support',
+    category: 'Layout & surfaces',
+    description:
+      "A warning callout shown only when the visitor's browser is missing from a supported list or older than its minimum version. SSR-safe, dependency-free, with the detection exported as pure functions.",
+    exports: [
+      'BrowserSupport',
+      'BrowserSupportList',
+      'useBrowserSupport',
+      'detectBrowser',
+      'checkBrowserSupport',
+      'compareVersions',
+    ],
+    keywords: [
+      'browser',
+      'compatibility',
+      'user agent',
+      'outdated',
+      'upgrade',
+      'warning',
+      'detect',
+    ],
+    props: [
+      {
+        name: 'supported',
+        type: 'Partial<Record<BrowserId, string>>',
+        description: 'Minimum version per browser; unlisted browsers are unsupported.',
+      },
+      {
+        name: 'onCheck',
+        type: '(result: BrowserSupportResult) => void',
+        description: 'Called once each time the result changes.',
+      },
+      {
+        name: 'userAgent',
+        type: 'string',
+        description: 'Check this string instead of `navigator.userAgent`.',
+      },
+      {
+        name: 'showWhenSupported',
+        type: 'boolean',
+        default: 'false',
+        description: 'Render a status callout even when the browser is supported.',
+      },
+      {
+        name: 'children',
+        type: 'ReactNode | ((result) => ReactNode)',
+        description: 'Replaces the default body.',
+      },
+      {
+        name: 'labels',
+        type: 'BrowserSupportLabels',
+        description: 'Copy overrides; message entries are functions for interpolation.',
+      },
+    ],
+  },
+  {
     id: 'brand-icons',
     name: 'Brand icons',
     category: 'Icons',
@@ -591,6 +666,79 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     keywords: ['typography', 'markdown', 'mdx', 'article', 'docs', 'toc'],
     props: [
       { name: 'children', type: 'ReactNode', description: 'Content built from the element map.' },
+    ],
+  },
+  {
+    id: 'code-block',
+    name: 'CodeBlock',
+    category: 'Reading',
+    description:
+      'Syntax-highlighted source on the shared highlight.js palette, with a copy button. Grammars are registered individually, so the bundle stays small.',
+    exports: ['CodeBlock', 'CopyButton'],
+    keywords: ['code', 'syntax', 'highlight', 'snippet', 'pre', 'copy'],
+    props: [
+      { name: 'code', type: 'string', description: 'The source to show.' },
+      {
+        name: 'language',
+        type: "'typescript' | 'javascript' | 'tsx' | 'jsx' | 'bash' | 'html' | 'xml' | 'css' | 'json'",
+        default: "'typescript'",
+        description: '`tsx`, `jsx` and `html` alias the typescript, javascript and xml grammars.',
+      },
+      { name: 'showCopy', type: 'boolean', default: 'true', description: 'Show the copy button.' },
+      {
+        name: 'labels',
+        type: '{ copy?: string; copied?: string }',
+        description: 'Accessible names for the copy button, for translation.',
+      },
+      { name: 'className', type: 'string', description: 'Classes for the wrapper.' },
+    ],
+  },
+  {
+    id: 'code-demo',
+    name: 'CodeDemo',
+    category: 'Reading',
+    description:
+      'A live demo with its source. Tabs swap preview and code; the stacked layout keeps the preview and collapses the code beneath it. Pass the source as a string, ideally a `?raw` import of the demo file.',
+    exports: ['CodeDemo'],
+    keywords: ['example', 'playground', 'preview', 'source', 'docs', 'snippet'],
+    props: [
+      { name: 'code', type: 'string', description: 'The source shown in the code panel.' },
+      { name: 'children', type: 'ReactNode', description: 'The live demo.' },
+      { name: 'title', type: 'string', description: 'Heading; also names the view tabs.' },
+      { name: 'description', type: 'ReactNode', description: 'Supporting text under the title.' },
+      {
+        name: 'language',
+        type: 'CodeLanguage',
+        default: "'tsx'",
+        description: 'Grammar for the code panel.',
+      },
+      {
+        name: 'layout',
+        type: "'tabs' | 'stacked'",
+        default: "'tabs'",
+        description: 'Preview/Code tabs, or the preview with a collapsible code panel.',
+      },
+      {
+        name: 'defaultView',
+        type: "'preview' | 'code'",
+        default: "'preview'",
+        description: 'Initial view when uncontrolled.',
+      },
+      {
+        name: 'view / onViewChange',
+        type: "'preview' | 'code'",
+        description: 'Controlled view.',
+      },
+      {
+        name: 'labels',
+        type: '{ preview?, code?, copy?, copied? }',
+        description: 'User-visible copy, for translation.',
+      },
+      {
+        name: 'previewClassName',
+        type: 'string',
+        description: 'Classes for the preview surface.',
+      },
     ],
   },
 ];

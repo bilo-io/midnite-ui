@@ -5,7 +5,7 @@ import { catalogFor, type ComponentDoc } from '../catalog';
 import { anchorFor, examplesFor } from '../examples';
 import { NativeExamples, NativeExampleToc } from '../mobile/lazy';
 import { hrefFor, inMode, type Mode } from '../router';
-import { CodeBlock } from './code-block';
+import { CodeBlock } from '@bilo-io/ui';
 import { ExampleBlock } from './example-block';
 import { ExampleToc, scrollToExample } from './example-toc';
 import { InlineCode, PropsTable } from './props-table';

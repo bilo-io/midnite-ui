@@ -24,6 +24,19 @@ export {
 } from './components/agent-icon';
 export { Button, buttonVariants, type ButtonProps } from './components/button';
 export { Card, CardHeader, CardTitle, CardContent } from './components/card';
+export {
+  CodeBlock,
+  CopyButton,
+  type CodeBlockLabels,
+  type CodeBlockProps,
+  type CodeLanguage,
+} from './components/code-block';
+export {
+  CodeDemo,
+  type CodeDemoLabels,
+  type CodeDemoProps,
+  type CodeDemoView,
+} from './components/code-demo';
 export { Collapse } from './components/collapse';
 export { ContextRing, type ContextRingLabels } from './components/context-ring';
 export { DynamicBackground, type BackgroundPattern } from './components/dynamic-background';
@@ -97,4 +110,31 @@ export {
 export { Switch } from './components/switch';
 export { Tabs, type TabOption } from './components/tabs';
 export { ThemeToggle, type ThemeToggleLabels } from './components/theme-toggle';
+export {
+  BROWSER_IDS,
+  BrowserIcon,
+  browserColor,
+  browserDownloadUrl,
+  browserName,
+  type BrowserIconProps,
+  type BrowserId,
+} from './components/browser-icon';
+export {
+  BrowserSupport,
+  BrowserSupportList,
+  type BrowserSupportLabels,
+  type BrowserSupportListProps,
+  type BrowserSupportProps,
+} from './components/browser-support';
+export {
+  checkBrowserSupport,
+  compareVersions,
+  detectBrowser,
+  type BrowserSupportReason,
+  type BrowserSupportResult,
+  type DetectedBrowser,
+  type DetectHints,
+  type SupportedBrowsers,
+} from './lib/browser-support';
+export { useBrowserSupport } from './lib/use-browser-support';
 export { Textarea, type TextareaProps } from './components/textarea';

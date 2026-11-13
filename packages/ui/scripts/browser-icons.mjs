@@ -1,0 +1,155 @@
+#!/usr/bin/env node
+// Generates src/components/browser-icons.generated.ts from the SVG files in
+// assets/browsers/ (MIT, alrra/browser-logos). The files are the source of truth —
+// what the sites serve at /browsers/ — so the component's markup is derived from
+// them rather than hand-copied, and a re-import is a re-run.
+//
+//   node scripts/browser-icons.mjs          # rewrite the generated module
+//   node scripts/browser-icons.mjs --check  # exit 1 if it is out of date
+//
+// browser-icon.test.ts runs the same check under `vitest`.
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = fileURLToPath(new URL('..', import.meta.url));
+export const ASSETS_DIR = join(root, 'assets/browsers');
+export const OUT_FILE = join(root, 'src/components/browser-icons.generated.ts');
+
+/** Display name, representative brand colour and official download page. Every svg needs an entry. */
+const META = {
+  brave: { name: 'Brave', color: '#FB542B', url: 'https://brave.com/download/' },
+  chrome: { name: 'Chrome', color: '#4285F4', url: 'https://www.google.com/chrome/' },
+  edge: { name: 'Edge', color: '#0C59A4', url: 'https://www.microsoft.com/edge/download' },
+  firefox: { name: 'Firefox', color: '#FF7139', url: 'https://www.mozilla.org/firefox/new/' },
+  ie: {
+    name: 'Internet Explorer',
+    color: '#1EBBEE',
+    url: 'https://www.microsoft.com/edge/download',
+  },
+  opera: { name: 'Opera', color: '#FF1B2D', url: 'https://www.opera.com/download' },
+  safari: { name: 'Safari', color: '#006CFF', url: 'https://www.apple.com/safari/' },
+  samsung: {
+    name: 'Samsung Internet',
+    color: '#7882FF',
+    url: 'https://www.samsung.com/us/support/owners/app/samsung-internet',
+  },
+  vivaldi: { name: 'Vivaldi', color: '#EF3939', url: 'https://vivaldi.com/download/' },
+};
+
+/**
+ * Turns `<style>.b{color-interpolation-filters:srgb}</style>` + `class="b"` into
+ * presentation attributes. A global stylesheet inside an inline svg leaks into the
+ * host page (`.b` would restyle any element with that class), so it cannot ship.
+ */
+function inlineStyles(markup, id) {
+  const rules = {};
+  const stripped = markup.replace(/<style[^>]*>([\s\S]*?)<\/style>/g, (_, css) => {
+    for (const m of css.matchAll(/\.([\w-]+)\s*\{([^}]*)\}/g)) {
+      rules[m[1]] = m[2]
+        .split(';')
+        .filter(Boolean)
+        .map((d) => d.split(':').map((s) => s.trim()))
+        .map(([k, v]) => `${k}="${v}"`)
+        .join(' ');
+    }
+    return '';
+  });
+  const out = stripped.replace(/\sclass="([^"]+)"/g, (_, names) => {
+    const attrs = names.split(/\s+/).map((n) => {
+      if (!(n in rules)) throw new Error(`${id}.svg: class "${n}" has no rule to inline`);
+      return rules[n];
+    });
+    return ` ${attrs.join(' ')}`;
+  });
+  if (/<style|class=/.test(out)) throw new Error(`${id}.svg: leftover <style>/class`);
+  return out;
+}
+
+/** Rewrites every id and reference to `<id>-<orig>-__UID__`; BrowserIcon swaps the placeholder per instance. */
+function scopeIds(markup, id) {
+  const ids = [...markup.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+  const scoped = (orig) => `${id}-${orig}-__UID__`;
+  let out = markup
+    .replace(/\sid="([^"]+)"/g, (_, o) => ` id="${scoped(o)}"`)
+    .replace(/url\((['"]?)#([^)'"]+)\1\)/g, (_, q, o) => `url(${q}#${scoped(o)}${q})`)
+    // x:href / xlink:href: the namespace prefixes are declared on the root svg,
+    // which is dropped, so use the plain SVG 2 `href`.
+    .replace(/\s(?:\w+:)?href="#([^"]+)"/g, (_, o) => ` href="#${scoped(o)}"`);
+  for (const o of ids) {
+    if (new RegExp(`["(]#${o}["')]`).test(out)) throw new Error(`${id}.svg: unscoped ref to #${o}`);
+  }
+  return out;
+}
+
+const parse = (svg, id) => {
+  const root = /<svg([^>]*)>/.exec(svg);
+  const viewBox = /viewBox="([^"]+)"/.exec(root?.[1] ?? '')?.[1];
+  if (!viewBox) throw new Error(`${id}.svg has no viewBox`);
+  const inner = svg
+    .replace(/^[\s\S]*?<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/\sxmlns:\w+="[^"]*"/g, '')
+    .trim();
+  return { viewBox, inner };
+};
+
+export function buildBrowserIconModule(dir = ASSETS_DIR) {
+  const ids = readdirSync(dir)
+    .filter((f) => f.endsWith('.svg'))
+    .map((f) => f.slice(0, -4))
+    .sort();
+
+  const entries = ids.map((id) => {
+    const meta = META[id];
+    if (!meta) throw new Error(`assets/browsers/${id}.svg has no entry in META`);
+    const { viewBox, inner } = parse(readFileSync(join(dir, `${id}.svg`), 'utf8'), id);
+    return { id, ...meta, viewBox, art: scopeIds(inlineStyles(inner, id), id) };
+  });
+
+  const body = entries
+    .map(
+      (e) => `  ${e.id}: {
+    name: ${JSON.stringify(e.name)},
+    color: ${JSON.stringify(e.color)},
+    url: ${JSON.stringify(e.url)},
+    viewBox: ${JSON.stringify(e.viewBox)},
+    art: ${JSON.stringify(e.art)},
+  },`,
+    )
+    .join('\n');
+
+  return `// GENERATED by scripts/browser-icons.mjs from assets/browsers/*.svg — do not edit.
+// Logos: MIT, alrra/browser-logos. Re-run \`node scripts/browser-icons.mjs\` after changing a file.
+
+export const BROWSER_ICON_DATA = {
+${body}
+} as const satisfies Record<string, BrowserIconData>;
+
+export type BrowserIconData = {
+  /** Display name, used as the accessible label. */
+  readonly name: string;
+  /** A representative brand colour. */
+  readonly color: string;
+  /** The official download page. */
+  readonly url: string;
+  /** The source file's viewBox (the logos differ). */
+  readonly viewBox: string;
+  /** Self-coloured artwork; ids are \`<id>-<orig>-__UID__\`, scoped per instance by BrowserIcon. */
+  readonly art: string;
+};
+`;
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const next = buildBrowserIconModule();
+  if (process.argv.includes('--check')) {
+    const current = readFileSync(OUT_FILE, 'utf8');
+    if (current !== next) {
+      console.error('browser-icons.generated.ts is stale — run `node scripts/browser-icons.mjs`');
+      process.exit(1);
+    }
+  } else {
+    writeFileSync(OUT_FILE, next);
+  }
+}
