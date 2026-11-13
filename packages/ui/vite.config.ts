@@ -37,6 +37,8 @@ function copyStylesheets() {
       cpSync(r('src/styles/brand'), r('dist/brand'), { recursive: true });
       // The agent marks as files, for consumers that link rather than import.
       cpSync(r('assets/agents'), r('dist/agents'), { recursive: true });
+      // The browser logos (MIT, alrra/browser-logos) likewise.
+      cpSync(r('assets/browsers'), r('dist/browsers'), { recursive: true });
     },
   };
 }

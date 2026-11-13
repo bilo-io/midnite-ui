@@ -32,7 +32,8 @@
     "./code-highlight.css": "./dist/code-highlight.css",
     "./brand.css": "./dist/brand.css",
     "./brand/*": "./dist/brand/*",
-    "./agents/*": "./dist/agents/*"
+    "./agents/*": "./dist/agents/*",
+    "./browsers/*": "./dist/browsers/*"
   },
   "sideEffects": [
     "**/*.css"
