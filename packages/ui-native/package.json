@@ -1,6 +1,6 @@
 {
   "name": "@bilo-io/ui-native",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "midnite design system — React Native primitives on the @bilo-io/ui design tokens",
   "license": "MIT",
   "repository": {
