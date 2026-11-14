@@ -137,4 +137,10 @@ export {
   type SupportedBrowsers,
 } from './lib/browser-support';
 export { useBrowserSupport } from './lib/use-browser-support';
+export {
+  PointerTrail,
+  type PointerTrailProps,
+  type PointerTrailTone,
+  type PointerTrailVariant,
+} from './components/pointer-trail';
 export { Textarea, type TextareaProps } from './components/textarea';

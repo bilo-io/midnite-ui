@@ -450,6 +450,61 @@ export const COMPONENTS: readonly ComponentDoc[] = [
     ],
   },
   {
+    id: 'pointer-trail',
+    wide: true,
+    name: 'PointerTrail',
+    category: 'Backdrops',
+    description:
+      'A theme-aware pointer follower and trail with four variants (`trail`, `fluid`, `aurora`, `ring`). Follows the active theme’s `--foreground` text colour by default, or swirls the primary brand gradient like fluid. Sleeps when idle and turns off under `prefers-reduced-motion` or on touch devices.',
+    exports: ['PointerTrail', 'PointerTrailVariant', 'PointerTrailTone'],
+    keywords: [
+      'cursor',
+      'mouse',
+      'pointer',
+      'trail',
+      'fluid',
+      'aurora',
+      'ring',
+      'gradient',
+      'follower',
+      'effect',
+    ],
+    props: [
+      {
+        name: 'variant',
+        type: "'trail' | 'fluid' | 'aurora' | 'ring'",
+        default: "'trail'",
+        description:
+          '`trail` paints a theme-coloured dot + trailing chain; `fluid` swirls and morphs the primary gradient like liquid; `aurora` rotates a blue-violet-pink orb; `ring` pairs a precision dot with a lagging outer ring.',
+      },
+      {
+        name: 'tone',
+        type: "'foreground' | 'gradient'",
+        default: "'foreground' ('gradient' for fluid/aurora)",
+        description:
+          'Follow the active theme’s `--foreground` text colour, or paint with the animated primary gradient.',
+      },
+      {
+        name: 'length',
+        type: 'number',
+        default: '15',
+        description: 'Number of trailing nodes rendered for `trail`, `fluid` and `aurora`.',
+      },
+      {
+        name: 'contained',
+        type: 'boolean',
+        default: 'false',
+        description:
+          'Confines the effect to its positioned parent (`position: absolute; inset: 0`) instead of the viewport, gliding along a figure-8 orbit when idle.',
+      },
+      {
+        name: 'className',
+        type: 'string',
+        description: 'Extra classes for the `.pointer-fx` host.',
+      },
+    ],
+  },
+  {
     id: 'passcode-pad',
     name: 'PasscodePad',
     category: 'Security',

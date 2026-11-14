@@ -43,6 +43,8 @@ describe('catalog', () => {
       'ChartSeries',
       'BackgroundPattern',
       'RailConfig',
+      'PointerTrailVariant',
+      'PointerTrailTone',
     ]);
     const missing = COMPONENTS.flatMap((c) => c.exports)
       .filter((name) => !TYPE_ONLY.has(name))

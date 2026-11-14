@@ -55,6 +55,12 @@
   --node-logic: 38 92% 50%;
   --node-data: 173 80% 40%;
   --node-storage: 333 80% 52%;
+
+  /* pointer effect tokens — follows --foreground (text color) across all themes */
+  --pointer: var(--foreground);
+  --pointer-glow: var(--foreground);
+  --pointer-alpha: 0.88;
+  --pointer-blend: normal;
 }
 
 .dark {
@@ -98,6 +104,11 @@
   --node-logic: 38 92% 60%;
   --node-data: 173 70% 50%;
   --node-storage: 333 75% 62%;
+
+  --pointer: var(--foreground);
+  --pointer-glow: var(--foreground);
+  --pointer-alpha: 0.92;
+  --pointer-blend: normal;
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
@@ -220,4 +231,215 @@
   html:not([data-motion='full']) .gradient-border--always::after {
     animation: none;
   }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   PointerTrail — theme-aware cursor follower & variants (trail, fluid, aurora, ring)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+@keyframes pointer-fluid-morph {
+  0%,
+  100% {
+    border-radius: 56% 44% 62% 38% / 45% 55% 45% 55%;
+  }
+  33% {
+    border-radius: 42% 58% 40% 60% / 58% 42% 58% 42%;
+  }
+  66% {
+    border-radius: 60% 40% 46% 54% / 42% 60% 40% 58%;
+  }
+}
+
+.pointer-fx {
+  --pointer: var(--foreground);
+  --pointer-glow: var(--foreground);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  display: none;
+}
+
+.pointer-fx[data-contained] {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .pointer-fx[data-ready] {
+    display: block;
+  }
+}
+
+.pointer-dot,
+.pointer-trail,
+.pointer-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: translate3d(var(--x, 0px), var(--y, 0px), 0) translate(-50%, -50%);
+  transition: opacity 0.3s ease-out;
+  will-change: transform;
+}
+
+.pointer-dot,
+.pointer-trail {
+  background: hsl(var(--pointer, var(--foreground)));
+  mix-blend-mode: var(--pointer-blend, normal);
+}
+
+.pointer-dot {
+  width: 18px;
+  height: 18px;
+  box-shadow:
+    0 0 14px hsl(var(--pointer-glow, var(--foreground)) / 0.35),
+    0 0 28px hsl(var(--pointer-glow, var(--foreground)) / 0.18);
+  transition: opacity 0.3s ease-out, transform 0s, width 0.2s, height 0.2s;
+}
+
+.pointer-trail {
+  width: calc(7px * (1 - var(--n, 0) * 0.8));
+  height: calc(7px * (1 - var(--n, 0) * 0.8));
+  box-shadow: 0 0 10px hsl(var(--pointer-glow, var(--foreground)) / 0.28);
+}
+
+.pointer-fx[data-active] .pointer-dot {
+  opacity: var(--pointer-alpha, 0.88);
+}
+
+.pointer-fx[data-active] .pointer-trail {
+  opacity: calc((1 - var(--n, 0)) * var(--pointer-alpha, 0.88));
+}
+
+.pointer-fx[data-down] .pointer-dot {
+  width: 36px;
+  height: 36px;
+}
+
+/* Tone: gradient (or Variant: fluid) — animated primary brand gradient that swirls & morphs like fluid */
+.pointer-fx[data-tone='gradient'] .pointer-dot,
+.pointer-fx[data-tone='gradient'] .pointer-trail,
+.pointer-fx[data-variant='fluid'] .pointer-dot,
+.pointer-fx[data-variant='fluid'] .pointer-trail {
+  background: var(
+    --accent-gradient,
+    conic-gradient(
+      from var(--gradient-angle),
+      hsl(var(--node-trigger, 217 91% 60%)),
+      hsl(var(--node-action, 262 83% 62%)),
+      hsl(var(--node-storage, 333 80% 58%)),
+      hsl(var(--node-data, 173 80% 45%)),
+      hsl(var(--node-trigger, 217 91% 60%))
+    )
+  );
+  mix-blend-mode: normal;
+  box-shadow:
+    0 0 20px hsl(var(--node-action, 262 83% 62%) / 0.55),
+    0 0 38px hsl(var(--node-trigger, 217 91% 60%) / 0.35);
+  animation:
+    gradient-border-spin 2.8s linear infinite,
+    pointer-fluid-morph 3.2s ease-in-out infinite;
+}
+
+.pointer-fx[data-variant='fluid'] .pointer-dot {
+  width: 22px;
+  height: 22px;
+}
+
+.pointer-fx[data-variant='fluid'] .pointer-trail {
+  width: calc(14px * (1 - var(--n, 0) * 0.72));
+  height: calc(14px * (1 - var(--n, 0) * 0.72));
+  animation-delay: calc(var(--n, 0) * -1.4s);
+  box-shadow: 0 0 14px hsl(var(--node-action, 262 83% 62%) / 0.45);
+}
+
+.pointer-fx[data-variant='fluid'][data-down] .pointer-dot {
+  width: 40px;
+  height: 40px;
+}
+
+/* Variant: aurora — blue -> violet -> pink rotating aurora orb & trailing sparkles */
+.pointer-fx[data-variant='aurora'] .pointer-dot {
+  width: 18px;
+  height: 18px;
+  background: conic-gradient(
+    from var(--gradient-angle),
+    #3b82f6,
+    #8b5cf6 35%,
+    #ec4899 70%,
+    #6366f1 90%,
+    #3b82f6
+  );
+  mix-blend-mode: normal;
+  box-shadow: 0 0 22px rgb(139 92 246 / 0.55), 0 0 42px rgb(236 72 153 / 0.35);
+  animation: gradient-border-spin 3.6s linear infinite;
+}
+
+.pointer-fx[data-variant='aurora'] .pointer-trail {
+  background: conic-gradient(from var(--gradient-angle), #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  mix-blend-mode: normal;
+  box-shadow: 0 0 12px rgb(139 92 246 / 0.45);
+  animation: gradient-border-spin 3.6s linear infinite;
+  animation-delay: calc(var(--n, 0) * -1.2s);
+}
+
+.pointer-fx[data-variant='aurora'][data-down] .pointer-dot {
+  width: 34px;
+  height: 34px;
+}
+
+/* Variant: ring — precision inner dot + lagging outer ring */
+.pointer-fx[data-variant='ring'] .pointer-dot {
+  width: 7px;
+  height: 7px;
+  mix-blend-mode: normal;
+  box-shadow: 0 0 10px hsl(var(--pointer-glow, var(--foreground)) / 0.45);
+}
+
+.pointer-fx[data-variant='ring'] .pointer-ring {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid hsl(var(--pointer, var(--foreground)) / 0.65);
+  box-shadow: 0 0 18px hsl(var(--pointer-glow, var(--foreground)) / 0.25);
+  transition: opacity 0.3s ease-out, transform 0s, width 0.2s, height 0.2s, border-color 0.2s;
+}
+
+.pointer-fx[data-variant='ring'][data-tone='gradient'] .pointer-ring {
+  border: 2px solid transparent;
+  background:
+    conic-gradient(
+        from var(--gradient-angle),
+        hsl(var(--node-trigger, 217 91% 60%)),
+        hsl(var(--node-action, 262 83% 62%)),
+        hsl(var(--node-storage, 333 80% 58%)),
+        hsl(var(--node-data, 173 80% 45%)),
+        hsl(var(--node-trigger, 217 91% 60%))
+      )
+      border-box;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradient-border-spin 3.2s linear infinite;
+}
+
+.pointer-fx[data-variant='ring'][data-active] .pointer-ring {
+  opacity: 0.9;
+}
+
+.pointer-fx[data-variant='ring'][data-down] .pointer-dot {
+  width: 10px;
+  height: 10px;
+}
+
+.pointer-fx[data-variant='ring'][data-down] .pointer-ring {
+  width: 48px;
+  height: 48px;
+  border-color: hsl(var(--pointer, var(--foreground)) / 0.9);
 }
