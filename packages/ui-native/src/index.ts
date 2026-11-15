@@ -13,10 +13,17 @@ export {
   rampAt,
   toDp,
   type ColorName,
+  type ElevationLevel,
+  type ElevationStyle,
+  type KindAccent,
+  type SpaceStep,
+  type StatusAccent,
+  type TypeStep,
   type ColorScheme,
   type Theme,
   type ThemeOptions,
 } from './theme/palette';
+export { contrastRatio, LOW_CONTRAST_ACCENTS } from './theme/contrast';
 export { ThemeProvider, useTheme, type ThemeProviderProps } from './theme/theme-provider';
 
 export { Accordion, type AccordionProps } from './components/accordion';
