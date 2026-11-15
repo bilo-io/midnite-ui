@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { accentHues, brand, color, radius, tokens } from './index';
+import { accentHues, brand, color, motion, overlay, radius, shadow, spacing, tokens, typography, zIndex } from './index';
 
 describe('color tokens', () => {
   it('exposes the same semantic keys for light and dark (theming is complete)', () => {
@@ -57,6 +57,7 @@ describe('DS taxonomy', () => {
         'brand',
         'color',
         'motion',
+        'overlay',
         'radius',
         'shadow',
         'spacing',
@@ -66,11 +67,56 @@ describe('DS taxonomy', () => {
     );
   });
 
-  it('marks not-yet-formalized scales as placeholders', () => {
-    expect(tokens.spacing).toEqual({ placeholder: true });
-    expect(tokens.typography).toEqual({ placeholder: true });
-    expect(tokens.shadow).toEqual({ placeholder: true });
-    expect(tokens.motion).toEqual({ placeholder: true });
-    expect(tokens.zIndex.placeholder).toBe(true);
+  it('leaves no placeholder on the four formalized scales', () => {
+    for (const scale of [tokens.spacing, tokens.typography, tokens.shadow, tokens.motion]) {
+      expect(scale).not.toHaveProperty('placeholder');
+    }
+  });
+
+  it('adds the mobile radius, stacking and overlay tokens', () => {
+    expect(radius.full).toBe('9999px');
+    expect([zIndex.fab, zIndex.scrim, zIndex.sheet]).toEqual([40, 45, 50]);
+    expect(overlay.scrim).toEqual({ hsl: '0 0% 0%', alpha: 0.5 });
+  });
+});
+
+describe('formalized scales', () => {
+  // Same grammar as ui-native's `toDp`: rem or px, or a bare 0.
+  const toPx = (length: string) => {
+    const m = /^(-?[\d.]+)(rem|px)?$/.exec(length);
+    if (!m) throw new Error(`unreadable length ${length}`);
+    return Number(m[1]) * (m[2] === 'rem' ? 16 : 1);
+  };
+
+  it('spacing parses and matches the Tailwind steps in dp', () => {
+    const steps = ['0', '0.5', '1', '2', '3', '4', '5', '6', '8', '10', '12'] as const;
+    expect(Object.keys(spacing).sort()).toEqual([...steps].sort());
+    expect(steps.map((k) => toPx(spacing[k]))).toEqual([0, 2, 4, 8, 12, 16, 20, 24, 32, 40, 48]);
+  });
+
+  it('type sizes parse and match the scale', () => {
+    const pairs = Object.entries(typography.fontSize).map(
+      ([k, v]) => [k, toPx(v.fontSize), toPx(v.lineHeight)] as const,
+    );
+    expect(pairs).toEqual([
+      ['xs', 12, 16],
+      ['sm', 14, 20],
+      ['base', 16, 24],
+      ['lg', 18, 28],
+      ['xl', 20, 28],
+      ['2xl', 24, 32],
+    ]);
+    expect(typography.fontWeight).toEqual({ regular: 400, medium: 500, semibold: 600 });
+  });
+
+  it('elevation, motion match the spec', () => {
+    expect(Object.values(shadow).map((s) => [toPx(s.offsetY), toPx(s.blur), s.opacity, s.elevation])).toEqual([
+      [0, 0, 0, 0],
+      [1, 2, 0.05, 1],
+      [2, 6, 0.1, 3],
+      [6, 12, 0.15, 6],
+    ]);
+    expect(motion.duration).toEqual({ fast: 120, base: 200, slow: 320 });
+    expect(motion.easing.standard).toEqual([0.2, 0, 0, 1]);
   });
 });
