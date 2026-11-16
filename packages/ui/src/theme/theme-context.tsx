@@ -11,8 +11,8 @@ import {
 } from 'react';
 import { THEME_STORAGE_KEY } from './theme-script';
 
-export type ThemePreference = 'light' | 'dark' | 'system' | 'time';
-export type ResolvedTheme = 'light' | 'dark';
+export type ThemePreference = 'light' | 'dawn' | 'dusk' | 'dark' | 'system' | 'time';
+export type ResolvedTheme = 'light' | 'dawn' | 'dusk' | 'dark';
 
 type ThemeContextValue = {
   preference: ThemePreference;
@@ -27,11 +27,15 @@ function systemTheme(): ResolvedTheme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-// Light during the day (08:00–18:00 local), dark the rest of the time.
+// Dawn around sunrise, light during the day, dusk around sunset, dark at night.
 function timeOfDayTheme(): ResolvedTheme {
   if (typeof window === 'undefined') return 'dark';
-  const hour = new Date().getHours();
-  return hour >= 8 && hour < 18 ? 'light' : 'dark';
+  const d = new Date();
+  const hour = d.getHours() + d.getMinutes() / 60;
+  if (hour >= 5.75 && hour < 6.5) return 'dawn';
+  if (hour >= 6.5 && hour < 18) return 'light';
+  if (hour >= 18 && hour < 18.75) return 'dusk';
+  return 'dark';
 }
 
 function resolve(pref: ThemePreference): ResolvedTheme {
@@ -43,13 +47,21 @@ function resolve(pref: ThemePreference): ResolvedTheme {
 function readStoredPreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
   const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return stored === 'light' || stored === 'dark' || stored === 'time' ? stored : 'system';
+  return stored === 'light' || stored === 'dawn' || stored === 'dusk' || stored === 'dark' || stored === 'time'
+    ? stored
+    : 'system';
 }
 
 function applyResolved(resolved: ResolvedTheme) {
   const root = document.documentElement;
-  root.classList.toggle('dark', resolved === 'dark');
-  root.style.colorScheme = resolved;
+  const isDark = resolved === 'dark' || resolved === 'dusk';
+  root.classList.toggle('dark', isDark);
+  if (resolved === 'dawn' || resolved === 'dusk') {
+    root.setAttribute('data-theme', resolved);
+  } else {
+    root.removeAttribute('data-theme');
+  }
+  root.style.colorScheme = isDark ? 'dark' : 'light';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -70,8 +82,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mql.removeEventListener('change', onChange);
   }, [preference]);
 
-  // Re-evaluate periodically so the theme flips at the 08:00/18:00 boundary
-  // while the page stays open.
+  // Re-evaluate periodically so the theme flips at the dawn/day/dusk/night
+  // boundaries while the page stays open.
   useEffect(() => {
     if (preference !== 'time') return;
     const tick = () => setResolved(timeOfDayTheme());

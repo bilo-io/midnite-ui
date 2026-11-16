@@ -72,6 +72,23 @@ function ThemePanel({ name, scale }: { name: string; scale: ColorScale }) {
   );
 }
 
+const WALLPAPERS = [
+  { name: 'Agents', file: 'midnite-marble-wallpaper-agents-20261114-193630.png' },
+  { name: 'Browser', file: 'midnite-marble-wallpaper-browser-20261114-194411.png' },
+  { name: 'Gamer', file: 'midnite-marble-wallpaper-gamer-20261114-193630.png' },
+  { name: 'Health', file: 'midnite-marble-wallpaper-health-20261114-194411.png' },
+  { name: 'Media', file: 'midnite-marble-wallpaper-media-20261114-193630.png' },
+  { name: 'Mind', file: 'midnite-marble-wallpaper-mind-20261114-193630.png' },
+  { name: 'Money', file: 'midnite-marble-wallpaper-money-20261114-194411.png' },
+  { name: 'Science', file: 'midnite-marble-wallpaper-science-20261114-194411.png' },
+  { name: 'Startup', file: 'midnite-marble-wallpaper-startup-20261114-194411.png' },
+  { name: 'Studio', file: 'midnite-marble-wallpaper-studio-20261114-193820.png' },
+  { name: 'Vanguard', file: 'midnite-marble-wallpaper-vanguard-20261114-193630.png' },
+  { name: 'Midnite Classic I', file: 'a-wallpaper-using-the-midnite-logo-as-th-20261001-173944.png' },
+  { name: 'Midnite Classic II', file: 'create-another-1080p-style-wallpaper-lik-20261001-173752.png' },
+  { name: 'Midnite Classic III', file: 'create-another-1080p-style-wallpaper-lik-20261002-052844-1.png' },
+];
+
 export function TokensPage() {
   return (
     <div className="space-y-12">
@@ -119,6 +136,38 @@ export function TokensPage() {
               <div className={`h-20 w-20 border-2 border-foreground/70 bg-muted ${cls}`} />
               <p className="font-mono text-xs text-muted-foreground">rounded-{r}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight">Wallpapers</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Themed desktop wallpapers served from{' '}
+            <code className="font-mono text-xs">/wallpapers/&lt;file&gt;</code> (excluded from{' '}
+            <code className="font-mono text-xs">@bilo-io/ui</code>).
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {WALLPAPERS.map((w) => (
+            <a
+              key={w.file}
+              href={`/wallpapers/${w.file}`}
+              download={w.file}
+              className="group overflow-hidden rounded-xl border border-border/60 bg-card/40 transition-colors hover:border-border"
+            >
+              <img
+                src={`/wallpapers/${w.file}`}
+                alt={`${w.name} wallpaper`}
+                loading="lazy"
+                className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="flex items-center justify-between px-3 py-2 text-xs">
+                <span className="font-medium text-foreground">{w.name}</span>
+                <span className="font-mono text-muted-foreground">Download</span>
+              </div>
+            </a>
           ))}
         </div>
       </section>
