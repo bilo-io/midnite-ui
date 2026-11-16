@@ -82,8 +82,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return () => mql.removeEventListener('change', onChange);
   }, [preference]);
 
-  // Re-evaluate periodically so the theme flips at the 08:00/18:00 boundary
-  // while the page stays open.
+  // Re-evaluate periodically so the theme flips at the dawn/day/dusk/night
+  // boundaries while the page stays open.
   useEffect(() => {
     if (preference !== 'time') return;
     const tick = () => setResolved(timeOfDayTheme());

@@ -90,7 +90,7 @@ export function ThemeToggle({
     };
   }, [open]);
 
-  const TriggerIcon = resolved === 'dark' ? Moon : Sun;
+  const TriggerIcon = ICONS[resolved];
   // The expanded trigger reads like every other sidenav row: the saved
   // preference's icon and label ("System" with the laptop), not a generic
   // "Theme". The collapsed trigger shows the resolved light/dark glyph instead.

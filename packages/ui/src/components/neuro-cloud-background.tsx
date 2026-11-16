@@ -290,7 +290,7 @@ export function NeuroCloudBackground({
     });
     mo.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class', 'data-accent', 'data-accent-2'],
+      attributeFilter: ['class', 'data-theme', 'data-accent', 'data-accent-2'],
     });
 
     /**
