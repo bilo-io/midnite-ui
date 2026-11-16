@@ -9,6 +9,10 @@ React primitives + design tokens, and a wired app shell — as installable packa
 
 **Browser logos:** the nine browser marks (from [alrra/browser-logos](https://github.com/alrra/browser-logos), MIT) as linkable SVGs at `https://midnite-design.vercel.app/browsers/<name>.svg` (e.g. [`chrome.svg`](https://midnite-design.vercel.app/browsers/chrome.svg)); the files live in [`packages/ui/assets/browsers/`](packages/ui/assets/browsers/) and render as `<BrowserIcon browser="chrome" />`. `<BrowserSupport supported={{ chrome: "90" }} />` shows a warning when the visitor's browser is unlisted or too old.
 
+**Forge logos:** GitHub (dark and white), GitLab, Bitbucket and Azure DevOps marks as linkable SVGs at `https://midnite-design.vercel.app/forges/<name>.svg` (e.g. [`logo-github.svg`](https://midnite-design.vercel.app/forges/logo-github.svg)); the files live in [`packages/ui/assets/forges/`](packages/ui/assets/forges/).
+
+**Midnite marks:** the crescent mark (colour, ink and white SVGs, plus a PNG) at `https://midnite-design.vercel.app/midnite/<name>`; the files live in [`packages/ui/assets/midnite/`](packages/ui/assets/midnite/).
+
 | Package | What it is |
 | --- | --- |
 | [`@bilo-io/ui`](packages/ui) | Leaf design system: ~25 generic React primitives (buttons, cards, inputs, tabs, gauges, charts, reading typography, the neuro-cloud starfield) + HSL design tokens + a light/dark/system/time theme runtime. Depends on nothing but React. |

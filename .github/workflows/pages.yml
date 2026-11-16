@@ -51,6 +51,9 @@ jobs:
           cp -R packages/ui/assets/agents/. _site/agents/
           mkdir -p _site/browsers
           cp -R packages/ui/assets/browsers/. _site/browsers/
+          mkdir -p _site/forges _site/midnite
+          cp -R packages/ui/assets/forges/. _site/forges/
+          cp -R packages/ui/assets/midnite/. _site/midnite/
           # Pages runs Jekyll by default, which drops _-prefixed asset dirs.
           touch _site/.nojekyll
 
