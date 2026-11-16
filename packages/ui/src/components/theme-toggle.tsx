@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Check, Clock, Laptop, Moon, Sun, type LucideIcon } from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Check, Clock, Laptop, Moon, Sun, Sunrise, Sunset, type LucideIcon } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { Button } from './button';
 import { useTheme, type ThemePreference } from '../theme/theme-context';
@@ -21,15 +21,19 @@ export type ThemeToggleLabels = {
   theme?: string;
   /** Menu option labels; the expanded trigger shows the selected one. */
   light?: string;
+  dawn?: string;
+  dusk?: string;
   dark?: string;
   system?: string;
   time?: string;
 };
 
-const ORDER: readonly ThemePreference[] = ['light', 'dark', 'system', 'time'];
+const ORDER: readonly ThemePreference[] = ['light', 'dawn', 'dusk', 'dark', 'system', 'time'];
 
 const ICONS: Record<ThemePreference, LucideIcon> = {
   light: Sun,
+  dawn: Sunrise,
+  dusk: Sunset,
   dark: Moon,
   system: Laptop,
   time: Clock,
@@ -37,6 +41,8 @@ const ICONS: Record<ThemePreference, LucideIcon> = {
 
 const DEFAULT_OPTION_LABELS: Record<ThemePreference, string> = {
   light: 'Light',
+  dawn: 'Dawn',
+  dusk: 'Dusk',
   dark: 'Dark',
   system: 'System',
   time: 'Time',
@@ -45,9 +51,11 @@ const DEFAULT_OPTION_LABELS: Record<ThemePreference, string> = {
 export function ThemeToggle({
   expanded,
   labels,
+  menuFooter,
 }: {
   expanded?: boolean;
   labels?: ThemeToggleLabels;
+  menuFooter?: ReactNode;
 }) {
   const toggleLabel = labels?.toggle ?? 'Toggle theme';
   const themeLabel = labels?.theme ?? 'Theme';
@@ -162,6 +170,7 @@ export function ThemeToggle({
               </button>
             );
           })}
+          {menuFooter}
         </div>
       ) : null}
     </div>

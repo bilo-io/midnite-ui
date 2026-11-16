@@ -243,6 +243,9 @@ export function NeuroCloudBackground({
     // Cursor state (animated mode wires the listeners; declared here so the
     // shared draw helpers can read them without TDZ issues on the static path).
     let mouse: { x: number; y: number } | null = null;
+    let mvx = 0;
+    let mvy = 0;
+    let lastMouseTime = 0;
     let held = false;
     // Neuron indices currently gathered by the held cursor (kept until release).
     const capturedSet = new Set<number>();
@@ -251,8 +254,8 @@ export function NeuroCloudBackground({
     let repaint: (() => void) | null = null;
 
     const reseed = () => {
-      // ~6× the old galaxy density (a 25% bump over the last one), capped for perf.
-      const count = Math.min(1440, Math.max(500, Math.round((w * h) / 840)));
+      // Leaner star count for smoother 60fps perf while keeping a rich galaxy feel.
+      const count = Math.min(820, Math.max(260, Math.round((w * h) / 1450)));
       stars = seedStars(count);
       hx = stars.map((s) => s.fx * w);
       hy = stars.map((s) => s.fy * h);
@@ -419,6 +422,14 @@ export function NeuroCloudBackground({
     };
 
     const drawStars = (t: number) => {
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      const maxDim = Math.hypot(cx, cy) || 1;
+      // Subtle cursor-position parallax across the galaxy depth layers.
+      const parX = animate && mouse ? (mouse.x - cx) * 0.018 : 0;
+      const parY = animate && mouse ? (mouse.y - cy) * 0.018 : 0;
+
+      ctx.fillStyle = `hsl(${starColor})`;
       for (let i = 0; i < stars.length; i++) {
         const s = stars[i]!;
         const twinkle = animate ? 0.6 + 0.4 * Math.sin(t * s.tw + s.ph) : 1;
@@ -433,23 +444,38 @@ export function NeuroCloudBackground({
         const a = Math.min(1, (s.a * twinkle + 0.35 * glint) * (gathered ? 1.8 : 1));
         const r =
           s.r * (s.bright ? 0.9 + 0.2 * twinkle : 1) * (gathered ? 1.25 : 1) * (1 + glint * 0.5);
-        // Gentle idle drift layered over the physics so the cloud never sits still.
-        const dxi = animate ? Math.sin(t * 0.31 + s.ph * 2.1) * 1.6 : 0;
-        const dyi = animate ? Math.cos(t * 0.24 + s.ph * 1.7) * 1.6 : 0;
-        const x = px[i]! + dxi;
-        const y = py[i]! + dyi;
+
+        let x = px[i]!;
+        let y = py[i]!;
+        if (animate) {
+          // Differential galaxy swirl + breathing radial warp around the center.
+          const dx0 = x - cx;
+          const dy0 = y - cy;
+          const distNorm = Math.hypot(dx0, dy0) / maxDim;
+          const swirlAngle = Math.sin(t * 0.14 + distNorm * 2.4) * 0.022 * (1.2 - distNorm * 0.5);
+          const radialWarp = 1 + 0.014 * Math.sin(t * 0.32 + distNorm * 3.8 + s.ph * 0.25);
+          const cosA = Math.cos(swirlAngle);
+          const sinA = Math.sin(swirlAngle);
+          const wx = (dx0 * cosA - dy0 * sinA) * radialWarp;
+          const wy = (dx0 * sinA + dy0 * cosA) * radialWarp;
+          const depth = 0.4 + s.r * 0.45;
+          x = cx + wx + Math.sin(t * 0.31 + s.ph * 2.1) * 1.4 - parX * depth;
+          y = cy + wy + Math.cos(t * 0.24 + s.ph * 1.7) * 1.4 - parY * depth;
+        }
+
+        ctx.globalAlpha = a;
         ctx.beginPath();
-        ctx.fillStyle = `hsl(${starColor} / ${a.toFixed(3)})`;
         ctx.arc(x, y, r, 0, TAU);
         ctx.fill();
         if (s.bright) {
           // Cheap halo for anchors (no gradient): one large, faint disc.
+          ctx.globalAlpha = a * 0.12;
           ctx.beginPath();
-          ctx.fillStyle = `hsl(${starColor} / ${(a * 0.12).toFixed(3)})`;
           ctx.arc(x, y, r * 3.2, 0, TAU);
           ctx.fill();
         }
       }
+      ctx.globalAlpha = 1;
     };
 
     /** Draw one thought path at time `t`; returns false once fully decayed. */
@@ -620,10 +646,23 @@ export function NeuroCloudBackground({
     };
     const onMove = (e: PointerEvent) => {
       const at = toLocal(e);
+      const tMs = performance.now();
       // While gathering, keep the last in-bounds position so the swarm doesn't
       // drop the moment the pointer grazes the canvas edge.
-      if (at) mouse = at;
-      else if (!held) mouse = null;
+      if (at) {
+        if (mouse && lastMouseTime > 0) {
+          const dtM = Math.max(0.008, Math.min(0.1, (tMs - lastMouseTime) / 1000));
+          const instVx = Math.max(-1800, Math.min(1800, (at.x - mouse.x) / dtM));
+          const instVy = Math.max(-1800, Math.min(1800, (at.y - mouse.y) / dtM));
+          mvx = mvx * 0.55 + instVx * 0.45;
+          mvy = mvy * 0.55 + instVy * 0.45;
+        }
+        lastMouseTime = tMs;
+        mouse = at;
+      } else if (!held) {
+        mouse = null;
+        lastMouseTime = 0;
+      }
     };
     const onLeave = () => {
       if (!held) mouse = null;
@@ -665,6 +704,12 @@ export function NeuroCloudBackground({
     window.addEventListener('pointerout', onLeave, { passive: true });
 
     const step = (t: number, dt: number) => {
+      const mDecay = Math.max(0, 1 - 5.5 * dt);
+      mvx *= mDecay;
+      mvy *= mDecay;
+      const wakeRadius = WELL_RADIUS * 1.35;
+      const speedMag = Math.hypot(mvx, mvy);
+
       for (let i = 0; i < stars.length; i++) {
         const gathered = held && mouse != null && capturedSet.has(i);
         // Captured neurons detach from their home spring — they belong to the
@@ -709,6 +754,13 @@ export function NeuroCloudBackground({
               ax -= ux * push;
               ay -= uy * push;
             }
+          }
+          // Subtle cursor-speed slipstream wake: fast sweeps bend nearby stars along motion.
+          if (!gathered && speedMag > 20 && d < wakeRadius) {
+            const wq = 1 - d / wakeRadius;
+            const wake = wq * wq * 0.38;
+            ax += mvx * wake;
+            ay += mvy * wake;
           }
         }
 
