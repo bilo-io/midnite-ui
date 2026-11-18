@@ -17,6 +17,8 @@ const config: StorybookConfig = {
   staticDirs: [
     { from: '../assets/agents', to: '/agents' },
     { from: '../assets/browsers', to: '/browsers' },
+    { from: '../assets/forges', to: '/forges' },
+    { from: '../assets/midnite', to: '/midnite' },
     { from: '../src/styles/brand', to: '/brand' },
   ],
 };

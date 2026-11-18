@@ -75,9 +75,17 @@ export function PointerTrail({
         speed: 0.12 + (((i * 37) % 10) / 10) * 0.1,
       }));
       let seen = false;
+      let active = false;
       let hovering = false;
       let raf = 0;
       let last = performance.now();
+
+      const setActive = (next: boolean) => {
+        if (next === active) return;
+        active = next;
+        if (next) root.setAttribute('data-active', '');
+        else root.removeAttribute('data-active');
+      };
 
       const place = (el: HTMLElement, x: number, y: number) => {
         el.style.setProperty('--x', `${x.toFixed(1)}px`);
@@ -85,6 +93,7 @@ export function PointerTrail({
       };
 
       const toLocal = (clientX: number, clientY: number) => {
+        if (!contained) return { x: clientX, y: clientY };
         const rect = root.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return { x: clientX, y: clientY };
         const scaleX = root.offsetWidth > 0 ? root.offsetWidth / rect.width : 1;
@@ -121,7 +130,7 @@ export function PointerTrail({
           if (!seen) {
             seen = true;
             snapAll(pointer.x, pointer.y);
-            root.setAttribute('data-active', '');
+            setActive(true);
           }
         }
 
@@ -175,7 +184,7 @@ export function PointerTrail({
           seen = true;
           snapAll(pointer.x, pointer.y);
         }
-        root.setAttribute('data-active', '');
+        setActive(true);
         schedule();
       };
       const onLeave = () => {
@@ -183,11 +192,11 @@ export function PointerTrail({
         if (contained) {
           schedule();
         } else {
-          root.removeAttribute('data-active');
+          setActive(false);
         }
       };
       const onEnter = () => {
-        if (seen) root.setAttribute('data-active', '');
+        if (seen) setActive(true);
       };
       const onDown = (e: Event) => {
         const pe = e as PointerEvent;
@@ -198,9 +207,9 @@ export function PointerTrail({
         if (document.hidden) {
           cancelAnimationFrame(raf);
           raf = 0;
-          if (!contained) root.removeAttribute('data-active');
+          if (!contained) setActive(false);
         } else if (seen || contained) {
-          root.setAttribute('data-active', '');
+          setActive(true);
           schedule();
         }
       };
@@ -215,7 +224,7 @@ export function PointerTrail({
       root.setAttribute('data-ready', '');
 
       if (contained) {
-        root.setAttribute('data-active', '');
+        setActive(true);
         schedule();
       }
 
