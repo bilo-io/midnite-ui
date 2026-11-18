@@ -105,17 +105,35 @@ const [loaded] = useFonts({ Damion: require('./assets/Damion-Regular.ttf') });
 
 ## Components
 
-| Component                                        | Notes                                                                                                                                                                      |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`                                         | `variant`: default, secondary, outline, ghost, destructive. `size`: default, sm, lg, icon. `loading` covers the label with a spinner (the width holds) and reports busy.   |
-| `Input`, `Textarea`                              | Labelled `TextInput`s with the web focus ring and disabled state.                                                                                                          |
-| `Switch`                                         | Controlled; the switch role and an animated thumb drawn like the web Switch, not the platform control.                                                                     |
-| `Tabs`                                           | A segmented control (tablist/tab roles); `stretch` fills the row.                                                                                                          |
-| `Slider`                                         | A `PanResponder` over a painted track. Adjustable role with increment/decrement actions; arrow, Page and Home/End keys on the web. `snapValue` and `valueAt` are exported. |
-| `Card`, `CardHeader`, `CardTitle`, `CardContent` | The web Card's surface, border and spacing.                                                                                                                                |
-| `Accordion`                                      | One collapsible section (stack several), with a count badge, icon and trailing action; `LayoutAnimation` on toggle (see below); `card` or `bare`.                          |
-| `Wordmark`, `MidniteLogo`                        | The brand mark: per-letter colours along the brand ramp with the glow.                                                                                                     |
-| `ThemeProvider`, `useTheme`, `createTheme`       | The palette, `alpha()`, radii and brand ramp for a scheme.                                                                                                                 |
+| Component                                        | Notes                                                                                                                                                                             |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`                                         | `variant`: default, secondary, outline, ghost, destructive. `size`: default, sm, lg, icon. `loading` covers the label with a spinner (the width holds) and reports busy.          |
+| `Input`, `Textarea`                              | Labelled `TextInput`s with the web focus ring and disabled state.                                                                                                                 |
+| `Switch`                                         | Controlled; the switch role and an animated thumb drawn like the web Switch, not the platform control.                                                                            |
+| `Tabs`                                           | A segmented control (tablist/tab roles); `stretch` fills the row.                                                                                                                 |
+| `Slider`                                         | A `PanResponder` over a painted track. Adjustable role with increment/decrement actions; arrow, Page and Home/End keys on the web. `snapValue` and `valueAt` are exported.        |
+| `Card`, `CardHeader`, `CardTitle`, `CardContent` | The web Card's surface, border and spacing.                                                                                                                                       |
+| `Accordion`                                      | One collapsible section (stack several), with a count badge, icon and trailing action; `LayoutAnimation` on toggle (see below); `card` or `bare`.                                 |
+| `Wordmark`, `MidniteLogo`                        | The brand mark: per-letter colours along the brand ramp with the glow.                                                                                                            |
+| `ThemeProvider`, `useTheme`, `createTheme`       | The palette, `alpha()`, radii and brand ramp for a scheme, plus `space`, `type`, `font`, `elevation`, `motion`, `accents` and `scrim`.                                            |
+| `AppBar`                                         | 56dp top bar: leading slot, a title block (a button with `onTitlePress`), trailing slot; `insetTop` pads the safe area.                                                           |
+| `BottomNav`                                      | Equal-width tabs (tablist/tab roles), the active one on an accent pill, count (`99+`) or dot badges. Maps straight from an expo-router `tabBar`; `badgeText` is exported.         |
+| `Fab`                                            | 56dp primary disc at `elevation[3]`, absolutely positioned; scales 0.96 while pressed.                                                                                            |
+| `SpeedDial`                                      | A `Fab` that fans actions out above it over the scrim, staggered; scrim or action press closes it; disabled actions read "Coming soon".                                           |
+| `Sheet`                                          | `side="left"` drawer or `side="bottom"` sheet with snap points, on `Modal` + `Animated` + `PanResponder`; swipe, scrim or Android back closes. `modal={false}` draws it in place. |
+| `ListRow`                                        | 56dp row (72 with a subtitle), leading/trailing slots, `meta` value, hairline divider; press and 400ms long-press.                                                                |
+| `Badge`                                          | `tone`: neutral, primary, success, warning, danger, info. Semantic tones are the hue at 0.15 behind foreground text with a dot carrying the hue.                                  |
+| `Chip`                                           | Label or filter pill; a hex `color` picks black or white text (`contrastTextForHex`).                                                                                             |
+| `Avatar`                                         | Picture or initials on a muted disc (also when the image fails); 24, 32 or 40dp. `initialsOf` is exported.                                                                        |
+| `SegmentedControl`                               | Full-width segments under a key/label API (the stretched `Tabs`).                                                                                                                 |
+| `IconButton`                                     | Round icon-only button, ghost or filled, 32 or 40dp with a 44dp minimum hit target.                                                                                               |
+| `EmptyState`, `Skeleton`                         | The "nothing here" block with an optional action; a pulsing placeholder that holds still under reduce motion.                                                                     |
+
+Every component takes `style` and `testID`, reads only `useTheme()`, and takes its icons as `ReactNode` props: the library has no icon dependency.
+
+### Contrast
+
+`contrastRatio(a, b)` is WCAG contrast over the theme's colour strings (a translucent colour is composited first), and `contrastOverTint` measures text over a tinted row or badge. `LOW_CONTRAST_ACCENTS` lists the accents under 3:1 against their scheme's background (light `status.wip`, `status.done`, `status.abandoned`, `kind.unknown`); draw one of those as a stroke or dot with a 1dp `border` outline. `contrast.test.ts` pins the list and checks every text pair the mobile app uses.
 
 ### Accordion animation on Android
 

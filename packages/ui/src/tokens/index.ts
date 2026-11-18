@@ -5,10 +5,9 @@
 // values to TypeScript (charts, canvas, inline styles, docs specimens). Keep the
 // two in sync — the CSS leads, this follows.
 //
-// The DS taxonomy below is structured end-to-end: `color` + `radius` are filled
-// from today's system; `spacing`/`typography`/`shadow`/`zIndex`/`motion` are
-// **placeholders** — the app uses Tailwind's default scales today, so these are
-// reserved here (clearly marked) until the design system formalizes its own.
+// The DS taxonomy below is filled end-to-end: `spacing`/`typography`/`shadow`/
+// `motion` carry Tailwind's default values (what web already uses), so React
+// Native consumers can read them without a second source.
 
 /** A bare HSL triplet (`H S% L%`), consumed as `hsl(var(--token))` / `hsl(${value})`. */
 export type Hsl = string;
@@ -183,33 +182,79 @@ export const radius = {
   md: 'calc(0.5rem - 2px)',
   lg: '0.5rem',
   base: '0.5rem',
+  full: '9999px',
 } as const;
 
-// ── DS taxonomy placeholders ────────────────────────────────────────────────
-// Reserved so the system is structurally complete + obviously extensible. The
-// app uses Tailwind's default scales for these today; formalize as the design
-// system grows. Marked `placeholder: true` so docs/tooling can flag them.
+// ── Scales ──────────────────────────────────────────────────────────────────
+// The values equal Tailwind's defaults, which web already uses, so no web
+// consumer changes. Lengths are rem (or px) strings so React Native's `toDp`
+// reads them.
 
-/** PLACEHOLDER — spacing scale (Tailwind's default rem scale is used today). */
-export const spacing = { placeholder: true } as const;
+/** Spacing scale — Tailwind's default steps, in rem. Keys are the Tailwind step names. */
+export const spacing = {
+  '0': '0',
+  '0.5': '0.125rem',
+  '1': '0.25rem',
+  '2': '0.5rem',
+  '3': '0.75rem',
+  '4': '1rem',
+  '5': '1.25rem',
+  '6': '1.5rem',
+  '8': '2rem',
+  '10': '2.5rem',
+  '12': '3rem',
+} as const;
 
-/** PLACEHOLDER — typography scale (font families/sizes/weights/line-heights). */
-export const typography = { placeholder: true } as const;
+/** Typography scale — sizes with their line heights, weights and families. */
+export const typography = {
+  fontSize: {
+    xs: { fontSize: '0.75rem', lineHeight: '1rem' },
+    sm: { fontSize: '0.875rem', lineHeight: '1.25rem' },
+    base: { fontSize: '1rem', lineHeight: '1.5rem' },
+    lg: { fontSize: '1.125rem', lineHeight: '1.75rem' },
+    xl: { fontSize: '1.25rem', lineHeight: '1.75rem' },
+    '2xl': { fontSize: '1.5rem', lineHeight: '2rem' },
+  },
+  fontWeight: { regular: 400, medium: 500, semibold: 600 },
+  fontFamily: {
+    sans: 'system-ui, sans-serif',
+    mono: 'ui-monospace, Menlo, monospace',
+  },
+} as const;
 
-/** PLACEHOLDER — shadow / elevation scale. */
-export const shadow = { placeholder: true } as const;
+/**
+ * Elevation scale. `offsetY` and `blur` are CSS-shadow lengths (the shadow's
+ * colour is always black); `elevation` is the Android elevation for the same step.
+ */
+export const shadow = {
+  '0': { offsetY: '0', blur: '0', opacity: 0, elevation: 0 },
+  '1': { offsetY: '1px', blur: '2px', opacity: 0.05, elevation: 1 },
+  '2': { offsetY: '2px', blur: '6px', opacity: 0.1, elevation: 3 },
+  '3': { offsetY: '6px', blur: '12px', opacity: 0.15, elevation: 6 },
+} as const;
 
-/** z-index scale — the few stacking levels the UI relies on today. */
+/** z-index scale — the stacking levels the UI relies on. */
 export const zIndex = {
   dropdown: 50,
   tooltip: 50,
+  fab: 40,
+  scrim: 45,
+  sheet: 50,
   placeholder: true,
 } as const;
 
-/** PLACEHOLDER — motion / easing tokens (durations + easing curves). */
-export const motion = { placeholder: true } as const;
+/** Motion tokens — durations in ms and the standard easing as cubic-bezier control points. */
+export const motion = {
+  duration: { fast: 120, base: 200, slow: 320 },
+  easing: { standard: [0.2, 0, 0, 1] },
+} as const;
 
-/** The full design-system token map. `color`/`brand`/`radius` filled; the rest reserved. */
+/** Overlay tokens — the scrim behind a sheet or speed dial: black at 0.5, in both schemes. */
+export const overlay = {
+  scrim: { hsl: '0 0% 0%', alpha: 0.5 },
+} as const;
+
+/** The full design-system token map. every scale filled. */
 export const tokens = {
   color,
   accentHues,
@@ -220,4 +265,5 @@ export const tokens = {
   shadow,
   zIndex,
   motion,
+  overlay,
 } as const;

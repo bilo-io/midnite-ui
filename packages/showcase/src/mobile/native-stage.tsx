@@ -10,7 +10,9 @@ import { ThemeProvider, useTheme } from '@bilo-io/ui-native';
  */
 export function NativeTheme({ children }: { children: ReactNode }) {
   const { resolved } = useWebTheme();
-  return <ThemeProvider scheme={resolved}>{children}</ThemeProvider>;
+  // ui-native has light and dark only; dusk is a dark theme on the web, dawn a light one.
+  const scheme = resolved === 'dark' || resolved === 'dusk' ? 'dark' : 'light';
+  return <ThemeProvider scheme={scheme}>{children}</ThemeProvider>;
 }
 
 /** A React Native screen body: the background token, the example padded inside. */
