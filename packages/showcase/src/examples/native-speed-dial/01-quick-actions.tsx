@@ -10,7 +10,7 @@ export default function QuickActions() {
     <Text style={{ color, fontSize: 18 }}>{g}</Text>
   );
   return (
-    <View style={{ flex: 1, minHeight: 420, margin: -20 }}>
+    <View style={{ flex: 1, minHeight: 780, margin: -20 }}>
       <SpeedDial
         open={open}
         onOpenChange={setOpen}

@@ -69,23 +69,26 @@ export function SpeedDial({
 
   useEffect(() => {
     const duration = reduceMotion ? 0 : theme.motion.base;
-    Animated.timing(turn, {
-      toValue: open ? 1 : 0,
-      duration,
-      easing: theme.motion.easing,
-      useNativeDriver,
-    }).start();
-    if (!open) {
-      items.current.forEach((v) => v.setValue(0));
-      return;
-    }
+    const timing = (v: Animated.Value, toValue: number) =>
+      Animated.timing(v, { toValue, duration, easing: theme.motion.easing, useNativeDriver });
+    if (!open) items.current.forEach((v) => v.setValue(0));
     // Nearest the FAB first, so the fan grows upward.
-    Animated.stagger(
-      reduceMotion ? 0 : STAGGER,
-      items.current.map((v) =>
-        Animated.timing(v, { toValue: 1, duration, easing: theme.motion.easing, useNativeDriver }),
-      ),
-    ).start();
+    const anim = open
+      ? Animated.parallel([
+          timing(turn, 1),
+          Animated.stagger(
+            reduceMotion ? 0 : STAGGER,
+            items.current.map((v) => timing(v, 1)),
+          ),
+        ])
+      : timing(turn, 0);
+    // Next frame: the actions' animated views attach in this commit, and a
+    // detach/re-attach (StrictMode does one) stops an animation already running.
+    const frame = requestAnimationFrame(() => anim.start());
+    return () => {
+      cancelAnimationFrame(frame);
+      anim.stop();
+    };
   }, [open, reduceMotion, theme.motion, turn]);
 
   const bottom = offsetBottom ?? theme.space[4];

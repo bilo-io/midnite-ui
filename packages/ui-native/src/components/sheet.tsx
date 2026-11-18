@@ -74,15 +74,29 @@ export function Sheet({
       setSnap(0);
       drag.setValue(0);
     }
-    Animated.timing(progress, {
+  }, [open, drag]);
+
+  // Animate only once the panel is mounted.
+  useEffect(() => {
+    if (!visible) return;
+    const anim = Animated.timing(progress, {
       toValue: open ? 1 : 0,
       duration: reduceMotion ? 0 : theme.motion.base,
       easing: theme.motion.easing,
       useNativeDriver,
-    }).start(({ finished }) => {
-      if (finished && !open) setVisible(false);
     });
-  }, [open, progress, drag, reduceMotion, theme.motion]);
+    // Next frame: the panel's animated views attach in this commit, and a
+    // detach/re-attach (StrictMode does one) stops any animation already running.
+    const frame = requestAnimationFrame(() =>
+      anim.start(({ finished }) => {
+        if (finished && !open) setVisible(false);
+      }),
+    );
+    return () => {
+      cancelAnimationFrame(frame);
+      anim.stop();
+    };
+  }, [open, visible, progress, reduceMotion, theme.motion]);
 
   const close = () => onOpenChange(false);
   const closeRef = useRef(close);
@@ -114,11 +128,19 @@ export function Sheet({
     [side, travel, snap, snapPoints.length, drag],
   );
 
-  const offset = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: side === 'left' ? [-travel, 0] : [travel, 0],
-  });
-  const translate = Animated.add(offset, drag);
+  // Memoised: a fresh node each render detaches the old one, and a detached
+  // Animated.Value stops its running animation mid-slide.
+  const translate = useMemo(
+    () =>
+      Animated.add(
+        progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: side === 'left' ? [-travel, 0] : [travel, 0],
+        }),
+        drag,
+      ),
+    [progress, drag, side, travel],
+  );
 
   const body = (
     <View style={[StyleSheet.absoluteFill, !modal && styles.inPlace]} testID={testID}>
