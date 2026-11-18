@@ -1083,6 +1083,293 @@ export const NATIVE_COMPONENTS: readonly ComponentDoc[] = [
       },
     ],
   },
+  {
+    id: 'app-bar',
+    name: 'AppBar',
+    category: NATIVE_CATEGORY,
+    description:
+      'The 56dp top bar: a leading slot, a title block that can be a switcher button, and a trailing slot. Pads the safe-area top inset you pass it.',
+    exports: ['AppBar'],
+    keywords: ['header', 'toolbar', 'navigation bar', 'title', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'title',
+        type: 'ReactNode',
+        description: 'A string is set base/semibold with a middle ellipsis.',
+      },
+      { name: 'subtitle', type: 'string', description: 'xs, muted, one line.' },
+      { name: 'leading', type: 'ReactNode', description: 'Usually an IconButton.' },
+      { name: 'trailing', type: 'ReactNode', description: 'Usually an Avatar.' },
+      { name: 'onTitlePress', type: '() => void', description: 'Makes the title block a button.' },
+      { name: 'insetTop', type: 'number', default: '0', description: 'Safe-area top inset in dp.' },
+    ],
+  },
+  {
+    id: 'bottom-nav',
+    name: 'BottomNav',
+    category: NATIVE_CATEGORY,
+    description:
+      'The tab bar: equal-width tabs, the active one on an accent pill, with count (99+) or dot badges. Its props map straight from an expo-router `tabBar`.',
+    exports: ['BottomNav', 'badgeText'],
+    keywords: ['tab bar', 'tabs', 'navigation', 'expo-router', 'badge', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'items',
+        type: '{ key; label; icon; badge?: number | boolean }[]',
+        description: '`icon` is a node or `({ color, focused }) => node`.',
+      },
+      { name: 'activeKey', type: 'string', description: 'The selected tab.' },
+      { name: 'onChange', type: '(key: string) => void', description: 'Called on press.' },
+      { name: 'insetBottom', type: 'number', default: '0', description: 'Safe-area bottom inset.' },
+      {
+        name: 'hideLabels',
+        type: 'boolean',
+        default: 'false',
+        description: 'Icons only; tabs keep their names.',
+      },
+    ],
+  },
+  {
+    id: 'fab',
+    name: 'Fab',
+    category: NATIVE_CATEGORY,
+    description:
+      'The floating action button: a 56dp primary disc at elevation 3, absolutely positioned bottom-right or bottom-left. Shrinks a touch while pressed.',
+    exports: ['Fab'],
+    keywords: ['floating action button', 'primary action', 'plus', ...RN_KEYWORDS],
+    props: [
+      { name: 'icon', type: 'ReactNode', description: 'Drawn in primaryForeground by you.' },
+      { name: 'label', type: 'string', description: 'The accessible name.' },
+      { name: 'onPress', type: '() => void', description: 'Called on press.' },
+      {
+        name: 'position',
+        type: "'bottom-right' | 'bottom-left'",
+        default: "'bottom-right'",
+        description: 'Corner.',
+      },
+      {
+        name: 'offsetBottom',
+        type: 'number',
+        default: 'space[4]',
+        description: 'Distance from the bottom edge.',
+      },
+    ],
+  },
+  {
+    id: 'speed-dial',
+    name: 'SpeedDial',
+    category: NATIVE_CATEGORY,
+    description:
+      'A Fab that fans its actions out above it over the scrim, staggered. Tapping the scrim or an action closes it; a disabled action reads "Coming soon".',
+    exports: ['SpeedDial'],
+    keywords: ['fab', 'menu', 'quick actions', 'speed dial', ...RN_KEYWORDS],
+    props: [
+      { name: 'open', type: 'boolean', description: 'Controlled.' },
+      {
+        name: 'onOpenChange',
+        type: '(open: boolean) => void',
+        description: 'Called to open or close.',
+      },
+      {
+        name: 'actions',
+        type: '{ key; label; icon; onPress; disabled? }[]',
+        description: 'The first sits nearest the FAB.',
+      },
+      { name: 'icon', type: 'ReactNode', description: 'Rotates 45° while open (plus → ×).' },
+      { name: 'openIcon', type: 'ReactNode', description: 'Shown instead while open.' },
+      {
+        name: 'label',
+        type: 'string',
+        default: "'Actions'",
+        description: 'The FAB’s accessible name.',
+      },
+    ],
+  },
+  {
+    id: 'sheet',
+    name: 'Sheet',
+    category: NATIVE_CATEGORY,
+    description:
+      'A panel that slides in from the left (a drawer) or up from the bottom (with snap points) over the scrim. Swipe it back, tap the scrim, or press Android back to close.',
+    exports: ['Sheet'],
+    keywords: ['drawer', 'bottom sheet', 'modal', 'panel', 'snap', ...RN_KEYWORDS],
+    props: [
+      { name: 'open', type: 'boolean', description: 'Controlled.' },
+      { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Called to close.' },
+      { name: 'side', type: "'left' | 'bottom'", description: 'Where it comes from.' },
+      {
+        name: 'title',
+        type: 'string',
+        description: 'lg/semibold header, also its accessible name.',
+      },
+      {
+        name: 'widthFraction',
+        type: 'number',
+        default: '0.86',
+        description: 'Left only; capped at 360dp.',
+      },
+      {
+        name: 'snapPoints',
+        type: 'number[]',
+        default: '[0.5, 0.9]',
+        description: 'Bottom only; screen fractions.',
+      },
+      {
+        name: 'modal',
+        type: 'boolean',
+        default: 'true',
+        description: '`false` draws in place instead of a Modal.',
+      },
+    ],
+  },
+  {
+    id: 'list-row',
+    name: 'ListRow',
+    category: NATIVE_CATEGORY,
+    description:
+      'A list row: 56dp (72 with a subtitle), leading and trailing slots, a right-aligned meta value and a hairline divider. Pressable, and long-pressable at 400ms.',
+    exports: ['ListRow'],
+    keywords: ['row', 'cell', 'list item', 'settings', ...RN_KEYWORDS],
+    props: [
+      { name: 'title', type: 'string', description: 'sm/medium.' },
+      { name: 'subtitle', type: 'string', description: 'xs, muted.' },
+      { name: 'leading', type: 'ReactNode', description: 'An avatar, dot or icon.' },
+      { name: 'trailing', type: 'ReactNode', description: 'A chevron, switch or check.' },
+      { name: 'meta', type: 'string', description: 'A short muted value on the right.' },
+      { name: 'onPress', type: '() => void', description: 'Makes it a button.' },
+      { name: 'onLongPress', type: '() => void', description: 'Fires after 400ms.' },
+      { name: 'numberOfLines', type: 'number', default: '1', description: 'Title line clamp.' },
+      { name: 'divider', type: 'boolean', default: 'true', description: 'The hairline under it.' },
+    ],
+  },
+  {
+    id: 'badge',
+    name: 'Badge',
+    category: NATIVE_CATEGORY,
+    description:
+      'A status pill. Semantic tones are their hue at 0.15 behind foreground text, with a full-strength dot carrying the hue (outlined where it falls under 3:1).',
+    exports: ['Badge'],
+    keywords: ['status', 'pill', 'tag', 'label', ...RN_KEYWORDS],
+    props: [
+      {
+        name: 'tone',
+        type: "'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info'",
+        default: "'neutral'",
+        description: 'Maps through the semantic tokens.',
+      },
+      { name: 'children', type: 'ReactNode', description: 'The text.' },
+    ],
+  },
+  {
+    id: 'chip',
+    name: 'Chip',
+    category: NATIVE_CATEGORY,
+    description:
+      'A compact label or filter pill. Given a hex `color` (a project option colour) it picks black or white text by relative luminance, so it always reads.',
+    exports: ['Chip', 'contrastTextForHex'],
+    keywords: ['filter', 'tag', 'label', 'pill', 'option', ...RN_KEYWORDS],
+    props: [
+      { name: 'label', type: 'string', description: 'xs/medium.' },
+      { name: 'color', type: 'string', description: '`#rrggbb` fill.' },
+      { name: 'selected', type: 'boolean', description: 'Accent fill when no colour is given.' },
+      { name: 'onPress', type: '() => void', description: 'Makes it a button.' },
+      { name: 'leading', type: 'ReactNode', description: 'A check or icon.' },
+    ],
+  },
+  {
+    id: 'avatar',
+    name: 'Avatar',
+    category: NATIVE_CATEGORY,
+    description:
+      'A round picture, or initials on a muted disc when there is none or it fails to load.',
+    exports: ['Avatar', 'initialsOf'],
+    keywords: ['profile', 'user', 'picture', 'initials', ...RN_KEYWORDS],
+    props: [
+      { name: 'uri', type: 'string', description: 'The picture.' },
+      { name: 'name', type: 'string', description: 'Initials and accessible name.' },
+      { name: 'size', type: '24 | 32 | 40', default: '32', description: 'Diameter in dp.' },
+    ],
+  },
+  {
+    id: 'segmented-control',
+    name: 'SegmentedControl',
+    category: NATIVE_CATEGORY,
+    description:
+      'Full-width segments (Board | List | Graph): the stretched Tabs under a key/label API.',
+    exports: ['SegmentedControl'],
+    keywords: ['segments', 'tabs', 'toggle group', 'view switcher', ...RN_KEYWORDS],
+    props: [
+      { name: 'segments', type: '{ key; label; icon? }[]', description: 'The choices.' },
+      { name: 'value', type: 'string', description: 'The selected key.' },
+      { name: 'onChange', type: '(key: string) => void', description: 'Called on press.' },
+      {
+        name: 'accessibilityLabel',
+        type: 'string',
+        default: "'View'",
+        description: 'The tab list’s name.',
+      },
+    ],
+  },
+  {
+    id: 'icon-button',
+    name: 'IconButton',
+    category: NATIVE_CATEGORY,
+    description: 'A round icon-only button, ghost or filled, with a 44dp minimum hit target.',
+    exports: ['IconButton'],
+    keywords: ['icon', 'button', 'toolbar', ...RN_KEYWORDS],
+    props: [
+      { name: 'icon', type: 'ReactNode', description: 'The glyph.' },
+      { name: 'label', type: 'string', description: 'The accessible name.' },
+      { name: 'onPress', type: '() => void', description: 'Called on press.' },
+      {
+        name: 'variant',
+        type: "'ghost' | 'filled'",
+        default: "'ghost'",
+        description: 'Filled sits on secondary.',
+      },
+      { name: 'size', type: '32 | 40', default: '40', description: 'Diameter in dp.' },
+      { name: 'disabled', type: 'boolean', default: 'false', description: 'Locks and dims it.' },
+    ],
+  },
+  {
+    id: 'empty-state',
+    name: 'EmptyState',
+    category: NATIVE_CATEGORY,
+    description:
+      'The centred "nothing here" block: icon, title, a line of body and an optional action.',
+    exports: ['EmptyState'],
+    keywords: ['empty', 'no results', 'placeholder', 'zero state', ...RN_KEYWORDS],
+    props: [
+      { name: 'icon', type: 'ReactNode', description: 'Above the title.' },
+      { name: 'title', type: 'string', description: 'base/semibold.' },
+      { name: 'body', type: 'string', description: 'sm, muted.' },
+      { name: 'action', type: '{ label; onPress }', description: 'An outline Button.' },
+    ],
+  },
+  {
+    id: 'skeleton',
+    name: 'Skeleton',
+    category: NATIVE_CATEGORY,
+    description:
+      'A loading placeholder block that pulses; it holds still when the OS asks for reduced motion.',
+    exports: ['Skeleton'],
+    keywords: ['loading', 'placeholder', 'shimmer', 'pulse', ...RN_KEYWORDS],
+    props: [
+      { name: 'width', type: 'number | `${number}%`', description: 'dp or a percentage.' },
+      { name: 'height', type: 'number', description: 'dp.' },
+      { name: 'radius', type: 'number', default: 'radius.sm', description: 'Corner radius in dp.' },
+    ],
+  },
+  {
+    id: 'app-frame',
+    name: 'App frame',
+    category: NATIVE_CATEGORY,
+    description:
+      'The mobile shell composed from the parts: AppBar, a list of ListRows, BottomNav, a SpeedDial and the left Sheet.',
+    exports: ['AppBar', 'BottomNav', 'SpeedDial', 'Sheet', 'ListRow'],
+    keywords: ['shell', 'layout', 'scaffold', 'composition', ...RN_KEYWORDS],
+    props: [],
+  },
 ];
 
 export function catalogFor(mode: Mode): {
