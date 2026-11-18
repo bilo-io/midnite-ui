@@ -72,7 +72,9 @@ export function BottomNav({
           <Pressable
             key={item.key}
             accessibilityRole="tab"
-            accessibilityLabel={count ? `${item.label}, ${count}` : item.label}
+            accessibilityLabel={
+              count ? `${item.label}, ${count}` : dot ? `${item.label}, new` : item.label
+            }
             {...a11yState({ selected })}
             onPress={() => onChange(item.key)}
             style={styles.item}

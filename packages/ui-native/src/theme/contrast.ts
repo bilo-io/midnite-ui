@@ -18,9 +18,10 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 /** `hsl(…)`, `hsla(…)` (comma or space form) or `#rrggbb` → linear-free sRGB 0–1 plus alpha. */
 export function parseColor(input: string): Rgba {
   const value = input.trim();
-  const hex = /^#([0-9a-f]{6})$/i.exec(value);
+  const hex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i.exec(value);
   if (hex) {
-    const n = parseInt(hex[1]!, 16);
+    const digits = hex[1]!.length === 3 ? hex[1]!.replace(/./g, '$&$&') : hex[1]!;
+    const n = parseInt(digits, 16);
     return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255, 1];
   }
   const fn = /^hsla?\(([^)]*)\)$/i.exec(value);

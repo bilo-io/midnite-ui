@@ -15,6 +15,7 @@ describe('contrastRatio', () => {
     expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21, 5);
     expect(contrastRatio('#ffffff', '#ffffff')).toBeCloseTo(1, 5);
     expect(contrastRatio('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)')).toBeCloseTo(21, 5);
+    expect(contrastRatio('000', '#fff')).toBeCloseTo(21, 5);
   });
 
   it('composites a translucent colour over the background', () => {

@@ -31,9 +31,12 @@ describe('BottomNav', () => {
     render(<Controlled onChange={onChange} />);
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'true');
-    fireEvent.click(screen.getByRole('tab', { name: 'Reviews' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Reviews, new' }));
     expect(onChange).toHaveBeenCalledWith('reviews');
-    expect(screen.getByRole('tab', { name: 'Reviews' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Reviews, new' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
     expect(screen.getByRole('tab', { name: 'History' })).toHaveAttribute('aria-selected', 'false');
   });
 
@@ -42,6 +45,7 @@ describe('BottomNav', () => {
     expect(screen.getByText('99+')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Tasks, 99+' })).toBeInTheDocument();
     expect(screen.getByTestId('reviews-badge')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Reviews, new' })).toBeInTheDocument();
     expect(badgeText(7)).toBe('7');
     expect(badgeText(99)).toBe('99');
     expect(badgeText(100)).toBe('99+');

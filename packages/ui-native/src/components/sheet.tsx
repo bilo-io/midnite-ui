@@ -31,6 +31,9 @@ export type SheetProps = {
    * in a native `Modal`: for a sheet inside a frame, such as a showcase phone.
    */
   modal?: boolean;
+  /** Safe-area insets in dp: a drawer pads both, a bottom sheet the bottom. */
+  insetTop?: number;
+  insetBottom?: number;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -53,12 +56,17 @@ export function Sheet({
   widthFraction = 0.86,
   snapPoints = DEFAULT_SNAPS,
   modal = true,
+  insetTop = 0,
+  insetBottom = 0,
   style,
   testID,
 }: SheetProps) {
   const theme = useTheme();
   const reduceMotion = useReduceMotion();
-  const { width: screenW, height: screenH } = useWindowDimensions();
+  const window = useWindowDimensions();
+  // In place, the sheet sizes against its parent, not the window.
+  const [frame, setFrame] = useState<{ width: number; height: number } | null>(null);
+  const { width: screenW, height: screenH } = !modal && frame ? frame : window;
   const [visible, setVisible] = useState(open);
   const [snap, setSnap] = useState(0);
   const progress = useRef(new Animated.Value(0)).current;
@@ -142,6 +150,39 @@ export function Sheet({
     [progress, drag, side, travel],
   );
 
+  const header = (
+    <>
+      {side === 'bottom' ? (
+        <View
+          style={[
+            styles.grabber,
+            {
+              marginTop: theme.space[2],
+              backgroundColor: theme.colors.border,
+              borderRadius: theme.radius.full,
+            },
+          ]}
+        />
+      ) : null}
+      {title ? (
+        <Text
+          accessibilityRole="header"
+          style={[
+            theme.type.lg,
+            {
+              color: theme.colors.popoverForeground,
+              fontWeight: theme.font.semibold,
+              paddingHorizontal: theme.space[4],
+              paddingTop: theme.space[side === 'left' ? 6 : 3],
+            },
+          ]}
+        >
+          {title}
+        </Text>
+      ) : null}
+    </>
+  );
+
   const body = (
     <View style={[StyleSheet.absoluteFill, !modal && styles.inPlace]} testID={testID}>
       <Animated.View style={[StyleSheet.absoluteFill, { opacity: progress }]}>
@@ -155,7 +196,9 @@ export function Sheet({
       </Animated.View>
       <View pointerEvents="box-none" style={side === 'left' ? styles.leftDock : styles.bottomDock}>
         <Animated.View
-          {...pan.panHandlers}
+          // A drawer swipes sideways from anywhere; a bottom sheet drags by its
+          // header, so a list inside it keeps its vertical scroll.
+          {...(side === 'left' ? pan.panHandlers : {})}
           accessibilityViewIsModal
           aria-modal
           accessibilityLabel={title}
@@ -163,11 +206,20 @@ export function Sheet({
             theme.elevation[2],
             { backgroundColor: theme.colors.popover },
             side === 'left'
-              ? [styles.left, { width: panelW, transform: [{ translateX: translate }] }]
+              ? [
+                  styles.left,
+                  {
+                    width: panelW,
+                    paddingTop: insetTop,
+                    paddingBottom: insetBottom,
+                    transform: [{ translateX: translate }],
+                  },
+                ]
               : [
                   styles.bottom,
                   {
-                    height: panelH,
+                    height: panelH + insetBottom,
+                    paddingBottom: insetBottom,
                     maxWidth: BOTTOM_MAX,
                     borderTopLeftRadius: theme.radius.lg * 2,
                     borderTopRightRadius: theme.radius.lg * 2,
@@ -177,41 +229,29 @@ export function Sheet({
             style,
           ]}
         >
-          {side === 'bottom' ? (
-            <View
-              style={[
-                styles.grabber,
-                {
-                  marginTop: theme.space[2],
-                  backgroundColor: theme.colors.border,
-                  borderRadius: theme.radius.full,
-                },
-              ]}
-            />
-          ) : null}
-          {title ? (
-            <Text
-              accessibilityRole="header"
-              style={[
-                theme.type.lg,
-                {
-                  color: theme.colors.popoverForeground,
-                  fontWeight: theme.font.semibold,
-                  paddingHorizontal: theme.space[4],
-                  paddingTop: theme.space[side === 'left' ? 6 : 3],
-                },
-              ]}
-            >
-              {title}
-            </Text>
-          ) : null}
+          {side === 'bottom' ? <View {...pan.panHandlers}>{header}</View> : header}
           <View style={[styles.content, { padding: theme.space[4] }]}>{children}</View>
         </Animated.View>
       </View>
     </View>
   );
 
-  if (!modal) return visible ? body : null;
+  if (!modal) {
+    return (
+      <>
+        {/* Always mounted, so the frame is known before the first open. */}
+        <View
+          pointerEvents="none"
+          style={StyleSheet.absoluteFill}
+          onLayout={(e) => {
+            const { width, height } = e.nativeEvent.layout;
+            setFrame((f) => (f?.width === width && f.height === height ? f : { width, height }));
+          }}
+        />
+        {visible ? body : null}
+      </>
+    );
+  }
   return (
     <Modal transparent visible={visible} animationType="none" onRequestClose={close}>
       {body}

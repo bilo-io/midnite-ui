@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
-import { contrastRatio, NON_TEXT_CONTRAST } from '../theme/contrast';
+import { contrastOverTint, NON_TEXT_CONTRAST } from '../theme/contrast';
 import { withAlpha } from '../theme/palette';
 import { useTheme } from '../theme/theme-provider';
+
+const TINT = 0.15;
 
 export type BadgeTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -28,8 +30,14 @@ export function Badge({ tone = 'neutral', children, style, testID }: BadgeProps)
     info: theme.accents.status.todo,
   };
   const tinted = hue[tone];
+  const outline = useMemo(
+    () =>
+      tinted !== undefined &&
+      contrastOverTint(tinted, tinted, TINT, theme.colors.background) < NON_TEXT_CONTRAST,
+    [tinted, theme.colors.background],
+  );
   const fill = tinted
-    ? withAlpha(tinted, 0.15)
+    ? withAlpha(tinted, TINT)
     : tone === 'primary'
       ? theme.colors.primary
       : theme.colors.muted;
@@ -58,8 +66,8 @@ export function Badge({ tone = 'neutral', children, style, testID }: BadgeProps)
           style={[
             styles.dot,
             { backgroundColor: tinted, borderRadius: theme.radius.full },
-            // Under the 3:1 non-text floor, a dot gets a 1dp border outline.
-            contrastRatio(tinted, theme.colors.background) < NON_TEXT_CONTRAST && {
+            // Under the 3:1 non-text floor against the tint it sits on, a dot gets a 1dp border outline.
+            outline && {
               borderWidth: 1,
               borderColor: theme.colors.border,
             },

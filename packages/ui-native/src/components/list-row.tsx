@@ -36,27 +36,20 @@ export function ListRow({
 }: ListRowProps) {
   const theme = useTheme();
   const interactive = Boolean(onPress || onLongPress);
-  return (
-    <Pressable
-      accessibilityRole={interactive ? 'button' : undefined}
-      disabled={!interactive}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      delayLongPress={400}
-      testID={testID}
-      style={({ pressed }) => [
-        styles.row,
-        {
-          minHeight: subtitle ? 72 : 56,
-          paddingHorizontal: theme.space[4],
-          gap: theme.space[3],
-          borderBottomColor: theme.colors.border,
-        },
-        divider && styles.divider,
-        pressed && interactive && { backgroundColor: theme.colors.accent },
-        style,
-      ]}
-    >
+  const look = (pressed: boolean): StyleProp<ViewStyle> => [
+    styles.row,
+    {
+      minHeight: subtitle ? 72 : 56,
+      paddingHorizontal: theme.space[4],
+      gap: theme.space[3],
+      borderBottomColor: theme.colors.border,
+    },
+    divider && styles.divider,
+    pressed && { backgroundColor: theme.colors.accent },
+    style,
+  ];
+  const body = (
+    <>
       {leading}
       <View style={styles.body}>
         <Text
@@ -75,6 +68,25 @@ export function ListRow({
         <Text style={[theme.type.sm, { color: theme.colors.mutedForeground }]}>{meta}</Text>
       ) : null}
       {trailing}
+    </>
+  );
+  if (!interactive) {
+    return (
+      <View testID={testID} style={look(false)}>
+        {body}
+      </View>
+    );
+  }
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={400}
+      testID={testID}
+      style={({ pressed }) => look(pressed)}
+    >
+      {body}
     </Pressable>
   );
 }

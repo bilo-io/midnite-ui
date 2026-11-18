@@ -89,7 +89,7 @@ export function SpeedDial({
       cancelAnimationFrame(frame);
       anim.stop();
     };
-  }, [open, reduceMotion, theme.motion, turn]);
+  }, [open, reduceMotion, theme.motion, turn, actions.length]);
 
   const bottom = offsetBottom ?? theme.space[4];
   const inset = theme.space[4] + (FAB_SIZE - ACTION) / 2;

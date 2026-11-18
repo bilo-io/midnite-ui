@@ -35,6 +35,7 @@ export function AppBar({
       <Text
         numberOfLines={1}
         ellipsizeMode="middle"
+        maxFontSizeMultiplier={1.4}
         accessibilityRole={onTitlePress ? undefined : 'header'}
         style={[
           theme.type.base,

@@ -29,6 +29,7 @@ describe('ListRow', () => {
   it('is not a button without a handler, and grows with a subtitle', () => {
     render(<ListRow title="Version" subtitle="0.5.0" testID="row" />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getByTestId('row')).not.toHaveAttribute('aria-disabled');
     expect(screen.getByTestId('row')).toHaveStyle({ minHeight: '72px' });
   });
 });

@@ -24,8 +24,21 @@ describe('Chip', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('is plain text without onPress', () => {
-    render(<Chip label="ui" />);
+  it('is plain text without onPress, and not announced as disabled', () => {
+    render(<Chip label="ui" testID="c" />);
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.getByTestId('c')).not.toHaveAttribute('aria-disabled');
+  });
+
+  it('reads a GitHub label colour without the # and ignores what it cannot read', () => {
+    render(
+      <>
+        <Chip label="bug" color="d73a4a" testID="gh" />
+        <Chip label="odd" color="rebeccapurple" />
+      </>,
+    );
+    expect(screen.getByTestId('gh')).toHaveStyle({ backgroundColor: 'rgb(215, 58, 74)' });
+    expect(screen.getByText('bug')).toHaveStyle({ color: '#000000' });
+    expect(screen.getByText('odd')).toBeInTheDocument();
   });
 });
