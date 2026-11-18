@@ -62,7 +62,9 @@ describe.each(['light', 'dark'] as const)('the %s scheme', (scheme) => {
 
 describe('LOW_CONTRAST_ACCENTS', () => {
   it('is pinned: a token change that moves an accent across 3:1 shows up here', () => {
-    expect(LOW_CONTRAST_ACCENTS.map(({ scheme, group, name }) => `${scheme}:${group}.${name}`)).toEqual([
+    expect(
+      LOW_CONTRAST_ACCENTS.map(({ scheme, group, name }) => `${scheme}:${group}.${name}`),
+    ).toEqual([
       'light:status.wip',
       'light:status.done',
       'light:status.abandoned',

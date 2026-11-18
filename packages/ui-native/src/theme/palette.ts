@@ -34,6 +34,13 @@ export function hsl(triplet: Hsl, alpha?: number): string {
   return alpha === undefined ? `hsl(${h}, ${s}, ${l})` : `hsla(${h}, ${s}, ${l}, ${alpha})`;
 }
 
+/** An `hsl()` colour from the theme at an alpha (`hsl(…)` → `hsla(…, alpha)`); for accents, which `alpha()` does not cover. */
+export function withAlpha(color: string, alpha: number): string {
+  const match = /^hsla?\(([^,]+),\s*([^,]+),\s*([^,)]+)(?:,[^)]*)?\)$/.exec(color.trim());
+  if (!match) throw new Error(`ui-native: cannot add alpha to "${color}"`);
+  return `hsla(${match[1]}, ${match[2]}, ${match[3]}, ${alpha})`;
+}
+
 /** A token length (`0.5rem`, `4px`, `calc(0.5rem - 2px)`) in dp. */
 export function toDp(length: string): number {
   const body = length.trim().replace(/^calc\((.*)\)$/, '$1');

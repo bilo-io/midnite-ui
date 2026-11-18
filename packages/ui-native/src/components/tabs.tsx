@@ -19,6 +19,7 @@ export type TabsProps<T extends string> = {
   /** Stretch the segments to share the full width — the usual phone layout. */
   stretch?: boolean;
   style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 /**
@@ -33,12 +34,14 @@ export function Tabs<T extends string>({
   accessibilityLabel,
   stretch = false,
   style,
+  testID,
 }: TabsProps<T>) {
   const theme = useTheme();
   return (
     <View
       accessibilityRole="tablist"
       accessibilityLabel={accessibilityLabel}
+      testID={testID}
       style={[
         styles.list,
         {

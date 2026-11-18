@@ -69,7 +69,11 @@ export function contrastOverTint(fg: string, tint: string, alpha: number, bg: st
   const asHex = (rgb: Rgba) =>
     `#${rgb
       .slice(0, 3)
-      .map((c) => Math.round(c * 255).toString(16).padStart(2, '0'))
+      .map((c) =>
+        Math.round(c * 255)
+          .toString(16)
+          .padStart(2, '0'),
+      )
       .join('')}`;
   return contrastRatio(fg, asHex(under));
 }
@@ -88,19 +92,19 @@ export const NON_TEXT_CONTRAST = 3;
  * Every accent under 3:1 against its scheme's background. A component drawing
  * one of these as a stroke or dot adds a 1dp `border` outline so it still reads.
  */
-export const LOW_CONTRAST_ACCENTS: readonly LowContrastAccent[] = (['light', 'dark'] as const).flatMap(
-  (scheme) => {
-    const bg = hsl(color[scheme].background);
-    return (['status', 'kind'] as const).flatMap((group) =>
-      Object.entries(accentHues[group][scheme]).flatMap(([name, triplet]) => {
-        const ratio = contrastRatio(hsl(triplet), bg);
-        return ratio < NON_TEXT_CONTRAST
-          ? [{ scheme, group, name: name as StatusAccent | KindAccent, ratio: +ratio.toFixed(2) }]
-          : [];
-      }),
-    );
-  },
-);
+export const LOW_CONTRAST_ACCENTS: readonly LowContrastAccent[] = (
+  ['light', 'dark'] as const
+).flatMap((scheme) => {
+  const bg = hsl(color[scheme].background);
+  return (['status', 'kind'] as const).flatMap((group) =>
+    Object.entries(accentHues[group][scheme]).flatMap(([name, triplet]) => {
+      const ratio = contrastRatio(hsl(triplet), bg);
+      return ratio < NON_TEXT_CONTRAST
+        ? [{ scheme, group, name: name as StatusAccent | KindAccent, ratio: +ratio.toFixed(2) }]
+        : [];
+    }),
+  );
+});
 
 /** Whether an accent needs the 1dp outline in this scheme. */
 export function isLowContrastAccent(
@@ -108,5 +112,12 @@ export function isLowContrastAccent(
   group: 'status' | 'kind',
   name: string,
 ): boolean {
-  return LOW_CONTRAST_ACCENTS.some((a) => a.scheme === scheme && a.group === group && a.name === name);
+  return LOW_CONTRAST_ACCENTS.some(
+    (a) => a.scheme === scheme && a.group === group && a.name === name,
+  );
+}
+
+/** Black or white text for a `#rrggbb` fill, whichever reads (WCAG luminance split at 0.179). */
+export function contrastTextForHex(hex: string): '#000000' | '#ffffff' {
+  return luminance(parseColor(hex)) > 0.179 ? '#000000' : '#ffffff';
 }
