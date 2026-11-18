@@ -1,4 +1,4 @@
-import { brand, color } from '@bilo-io/ui/tokens';
+import { accentHues, brand, color } from '@bilo-io/ui/tokens';
 import { describe, expect, it } from 'vitest';
 
 import { createTheme, hsl, rampAt, toDp } from './palette';
@@ -35,7 +35,45 @@ describe('createTheme', () => {
   });
 
   it('turns the radius scale into dp', () => {
-    expect(createTheme('light').radius).toEqual({ sm: 4, md: 6, lg: 8 });
+    expect(createTheme('light').radius).toEqual({ sm: 4, md: 6, lg: 8, full: 9999 });
+  });
+
+  it('exposes spacing, type and font in dp', () => {
+    const t = createTheme('light');
+    expect(t.space[4]).toBe(16);
+    expect(t.space['0.5']).toBe(2);
+    expect(t.space[12]).toBe(48);
+    expect(t.type.xs).toEqual({ fontSize: 12, lineHeight: 16 });
+    expect(t.type['2xl']).toEqual({ fontSize: 24, lineHeight: 32 });
+    expect(t.font).toMatchObject({ regular: '400', medium: '500', semibold: '600' });
+    expect(t.font.mono).toMatch(/^(Menlo|monospace)$/);
+  });
+
+  it('builds elevation styles with iOS shadow keys and Android elevation', () => {
+    const { elevation } = createTheme('dark');
+    expect(elevation[0]).toMatchObject({ shadowOpacity: 0, elevation: 0 });
+    expect(elevation[3]).toMatchObject({
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 6,
+    });
+  });
+
+  it('exposes motion with the standard easing pinned at its ends', () => {
+    const { motion } = createTheme('light');
+    expect(motion).toMatchObject({ fast: 120, base: 200, slow: 320 });
+    expect(motion.easing(0)).toBeCloseTo(0);
+    expect(motion.easing(1)).toBeCloseTo(1);
+  });
+
+  it('exposes accents per scheme and the scrim', () => {
+    for (const scheme of ['light', 'dark'] as const) {
+      const t = createTheme(scheme);
+      expect(t.accents.status.wip).toBe(hsl(accentHues.status[scheme].wip));
+      expect(t.accents.kind.bug).toBe(hsl(accentHues.kind[scheme].bug));
+      expect(t.scrim).toBe('hsla(0, 0%, 0%, 0.5)');
+    }
   });
 });
 
