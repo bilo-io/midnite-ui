@@ -46,6 +46,20 @@ describe.each(['left', 'bottom'] as const)('Sheet (%s)', (side) => {
   });
 });
 
+describe('Sheet in place', () => {
+  it('renders without a Modal and still closes on the scrim', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <Sheet open onOpenChange={onOpenChange} side="left" modal={false} title="Forge">
+        <Text>accounts</Text>
+      </Sheet>,
+    );
+    expect(screen.getByText('accounts')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});
+
 describe('Sheet closed', () => {
   it('renders nothing', () => {
     render(

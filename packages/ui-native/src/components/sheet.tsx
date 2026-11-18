@@ -26,6 +26,11 @@ export type SheetProps = {
   widthFraction?: number;
   /** Bottom sheet heights as fractions of the screen, smallest first. */
   snapPoints?: number[];
+  /**
+   * `false` draws the sheet in place (absolutely filling its parent) instead of
+   * in a native `Modal`: for a sheet inside a frame, such as a showcase phone.
+   */
+  modal?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 };
@@ -47,6 +52,7 @@ export function Sheet({
   children,
   widthFraction = 0.86,
   snapPoints = DEFAULT_SNAPS,
+  modal = true,
   style,
   testID,
 }: SheetProps) {
@@ -114,77 +120,79 @@ export function Sheet({
   });
   const translate = Animated.add(offset, drag);
 
+  const body = (
+    <View style={[StyleSheet.absoluteFill, !modal && styles.inPlace]} testID={testID}>
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: progress }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          onPress={close}
+          style={[StyleSheet.absoluteFill, { backgroundColor: theme.scrim }]}
+          testID={testID ? `${testID}-scrim` : 'sheet-scrim'}
+        />
+      </Animated.View>
+      <View pointerEvents="box-none" style={side === 'left' ? styles.leftDock : styles.bottomDock}>
+        <Animated.View
+          {...pan.panHandlers}
+          accessibilityViewIsModal
+          aria-modal
+          accessibilityLabel={title}
+          style={[
+            theme.elevation[2],
+            { backgroundColor: theme.colors.popover },
+            side === 'left'
+              ? [styles.left, { width: panelW, transform: [{ translateX: translate }] }]
+              : [
+                  styles.bottom,
+                  {
+                    height: panelH,
+                    maxWidth: BOTTOM_MAX,
+                    borderTopLeftRadius: theme.radius.lg * 2,
+                    borderTopRightRadius: theme.radius.lg * 2,
+                    transform: [{ translateY: translate }],
+                  },
+                ],
+            style,
+          ]}
+        >
+          {side === 'bottom' ? (
+            <View
+              style={[
+                styles.grabber,
+                {
+                  marginTop: theme.space[2],
+                  backgroundColor: theme.colors.border,
+                  borderRadius: theme.radius.full,
+                },
+              ]}
+            />
+          ) : null}
+          {title ? (
+            <Text
+              accessibilityRole="header"
+              style={[
+                theme.type.lg,
+                {
+                  color: theme.colors.popoverForeground,
+                  fontWeight: theme.font.semibold,
+                  paddingHorizontal: theme.space[4],
+                  paddingTop: theme.space[side === 'left' ? 6 : 3],
+                },
+              ]}
+            >
+              {title}
+            </Text>
+          ) : null}
+          <View style={[styles.content, { padding: theme.space[4] }]}>{children}</View>
+        </Animated.View>
+      </View>
+    </View>
+  );
+
+  if (!modal) return visible ? body : null;
   return (
     <Modal transparent visible={visible} animationType="none" onRequestClose={close}>
-      <View style={StyleSheet.absoluteFill} testID={testID}>
-        <Animated.View style={[StyleSheet.absoluteFill, { opacity: progress }]}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close"
-            onPress={close}
-            style={[StyleSheet.absoluteFill, { backgroundColor: theme.scrim }]}
-            testID={testID ? `${testID}-scrim` : 'sheet-scrim'}
-          />
-        </Animated.View>
-        <View
-          pointerEvents="box-none"
-          style={side === 'left' ? styles.leftDock : styles.bottomDock}
-        >
-          <Animated.View
-            {...pan.panHandlers}
-            accessibilityViewIsModal
-            aria-modal
-            accessibilityLabel={title}
-            style={[
-              theme.elevation[2],
-              { backgroundColor: theme.colors.popover },
-              side === 'left'
-                ? [styles.left, { width: panelW, transform: [{ translateX: translate }] }]
-                : [
-                    styles.bottom,
-                    {
-                      height: panelH,
-                      maxWidth: BOTTOM_MAX,
-                      borderTopLeftRadius: theme.radius.lg * 2,
-                      borderTopRightRadius: theme.radius.lg * 2,
-                      transform: [{ translateY: translate }],
-                    },
-                  ],
-              style,
-            ]}
-          >
-            {side === 'bottom' ? (
-              <View
-                style={[
-                  styles.grabber,
-                  {
-                    marginTop: theme.space[2],
-                    backgroundColor: theme.colors.border,
-                    borderRadius: theme.radius.full,
-                  },
-                ]}
-              />
-            ) : null}
-            {title ? (
-              <Text
-                accessibilityRole="header"
-                style={[
-                  theme.type.lg,
-                  {
-                    color: theme.colors.popoverForeground,
-                    fontWeight: theme.font.semibold,
-                    paddingHorizontal: theme.space[4],
-                    paddingTop: theme.space[side === 'left' ? 6 : 3],
-                  },
-                ]}
-              >
-                {title}
-              </Text>
-            ) : null}
-            <View style={[styles.content, { padding: theme.space[4] }]}>{children}</View>
-          </Animated.View>
-        </View>
-      </View>
+      {body}
     </Modal>
   );
 }
@@ -211,4 +219,5 @@ const styles = StyleSheet.create({
   bottom: { width: '100%' },
   grabber: { width: 36, height: 4, alignSelf: 'center' },
   content: { flex: 1 },
+  inPlace: { zIndex: 50 },
 });
